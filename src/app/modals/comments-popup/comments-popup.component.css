@@ -1,0 +1,364 @@
+
+.card {
+  margin-bottom: 20px;
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  display: inline-block;
+}
+
+.card .top {
+  padding: 10px 0px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ .card .top a {
+  color: #1d92ff;
+}
+
+ .card .bottom {
+  padding: 10px 20px;
+}
+
+.card .top .userDetails {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.card .top .userDetails h3 {
+  font-size: 16px;
+  color: #4d4d4f;
+  font-weight: 500;
+  line-height: 1em;
+}
+
+ .card .top .userDetails h3 span {
+  font-size: 0.75em;
+}
+
+ .card .top .userDetails h3 span {
+  font-size: 0.75em;
+}
+
+.profilepic {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.profilepic .profile_img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(to right, red, orange);
+  padding: 2px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.profilepic .profile_img .image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid white;
+}
+
+.profilepic .profile_img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.addComments {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  border-top: 1px solid #ddd;
+  padding: 10px 0;
+}
+
+.addComments a {
+  color: #1d92ffcb;
+  font-weight: 500;
+}
+
+.addComments .reaction {
+  position: relative;
+  font-size: 1.3rem;
+  margin-right: 10px;
+  color: rgb(88, 88, 88);
+}
+
+input.text {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-weight: 400;
+  font-size: 14px;
+  color: #262626;
+  background: none;
+}
+
+
+
+
+
+.post {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+@media screen and (max-width: 498px) {
+   .post {
+    width: 100%;
+  }
+}
+ .post .info {
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.post .info .person img {
+  width: 32px;
+  height: 32px;
+  border-radius: 30px;
+  padding: 5px;
+}
+ .post .info .person a {
+  color: rgb(38, 38, 38);
+  font-weight: 600;
+  margin-right: 5px;
+}
+ .post .info .person span {
+  color: rgb(142, 142, 142);
+  list-style: circle;
+  font-weight: 400;
+  position: relative;
+  top: -1px;
+}
+ .post .info .person span.circle {
+  align-items: center;
+  font-size: 30px;
+}
+ .post .info .more img {
+  width: 15px;
+  height: 15px;
+}
+.post .image {
+  width: 100%;
+  margin: auto;
+}
+
+.post .image img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+ .post .desc p {
+  font-weight: 400;
+  margin: 10px 0;
+}
+ .post .desc a.bold {
+  font-weight: 600;
+  color: rgb(38, 38, 38);
+}
+ .post .desc a.gray {
+  color: rgb(142, 142, 142);
+  font-weight: 400;
+}
+ .post .desc .icons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+.post .desc .icons div img {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+}
+ .post .desc input {
+  border: none;
+  color: rgb(142, 142, 142);
+}
+
+.reels {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.reels .reel {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+.reels .reel .video {
+  position: relative;
+  width: 450px;
+  height: 100%;
+  margin: auto 0;
+}
+@media screen and (max-width: 498px) {
+  .reels .reel .video {
+    width: auto;
+    height: 90vh;
+  }
+}
+.reels .reel .video video {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.reels .reel .video .content {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 99%;
+  padding: 1em 0.5em;
+}
+.reels .reel .video .content img {
+  width: 24px;
+  background-color: rgba(0, 0, 0, 0.235);
+  padding: 5px;
+  border-radius: 30px;
+}
+.reels .reel .video .content .sound {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  margin-right: 10px;
+  margin-top: 20px;
+}
+.reels .reel .video .content .sound .volume-mute {
+  display: none;
+}
+.reels .reel .video .content .play {
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.reels .reel .video .content .play img {
+  padding: 16px !important;
+  width: 50px;
+}
+.reels .reel .video .content .info {
+  display: flex;
+  flex-direction: column;
+  justify-content: baseline;
+}
+.reels .reel .video .content .info .profile {
+  display: flex;
+  align-items: baseline;
+}
+.reels .reel .video .content .info .profile h4 {
+  display: flex;
+  align-items: baseline;
+}
+.reels .reel .video .content .info .profile h4 a {
+  color: white;
+  font-size: 14px;
+}
+.reels .reel .video .content .info .profile h4 a img {
+  background: transparent;
+  width: 32px;
+}
+.reels .reel .video .content .info .profile span {
+  color: white;
+  padding: 0 10px;
+  font-size: 25px;
+}
+.reels .reel .video .content .info .profile button {
+  background-color: transparent;
+  border: none;
+  color: white;
+}
+.reels .reel .video .content .info .desc {
+  padding: 10px 5px;
+}
+.reels .reel .video .content .info .desc p {
+  font-weight: 300;
+  font-size: 14px;
+  padding: 0;
+  margin: 0;
+  color: white;
+  margin-bottom: 5px;
+}
+.reels .reel .video .content .info .desc .show_text {
+  cursor: pointer;
+}
+.reels .reel .video .content .info .desc .more {
+  font-size: 14px;
+  display: flex;
+  align-items: baseline;
+  color: white;
+}
+.reels .reel .video .content .info .desc .more .music {
+  margin-right: 10px;
+}
+.reels .reel .likes {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  margin-left: 10px;
+  margin-bottom: 1em;
+  font-size: 12px;
+}
+@media screen and (max-width: 768px) {
+  .reels .reel .likes {
+    margin-bottom: 3em;
+  }
+}
+@media screen and (max-width: 498px) {
+  .reels .reel .likes {
+    margin: 0;
+    margin-bottom: 3em;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
+.reels .reel .likes p {
+  margin: 0;
+}
+.reels .reel .likes div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 5px 0;
+  margin: 0;
+  cursor: pointer;
+}
+.reels .reel .likes div:hover {
+  opacity: 0.7;
+}
+.reels .reel .likes div .loved {
+  display: none;
+}
+.reels .reel .likes div.send, .reels .reel .likes div.save {
+  padding-bottom: 18px;
+}
+.reels .reel .likes img {
+  width: 22px;
+}
+.reels .reel .likes .profile img {
+  border-radius: 30px;
+}

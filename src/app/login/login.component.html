@@ -1,0 +1,10 @@
+<br>
+<div class="login-container">
+    <span>Enter Your Secret Key To Login</span>
+   
+    <input type="text" [(ngModel)]="secretKey" style="width: 350px;" />
+    <button (click)="verifySecretKey()">Login</button>
+    <br>
+
+    <span>{{message}}</span>
+</div>

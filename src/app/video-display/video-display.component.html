@@ -1,0 +1,13 @@
+<div *ngIf="isVideo; else notVideo">
+    <video
+      controls
+      [src]="videoUrl"
+      class="video-player"
+      preload="metadata"
+    ></video>
+  </div>
+  
+  <ng-template #notVideo>
+    <p>This content is not a video.</p>
+  </ng-template>
+  

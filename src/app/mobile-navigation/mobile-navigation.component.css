@@ -1,0 +1,19 @@
+.mobile-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 60px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}
+
+.mobile-nav a {
+  color: #555;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.mobile-nav a:hover {
+  color: #ed64d4;
+}

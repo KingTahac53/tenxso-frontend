@@ -1,0 +1,26 @@
+<div class="card">
+    <h6>Likes On Post</h6>
+    <div *ngFor="let like of likeData">
+        <div class="top">
+            <div class="userDetails">
+                <div class="profilepic">
+                    <div class="profile_img">
+                        <div class="image">
+                            <img src="{{like.userProfileUrl}}" alt="img12">
+                        </div>
+                    </div>
+                </div>
+                <h3>{{like.likeAuthorUsername}}<br>
+                  <span>{{like.likeDateCreated}}</span>
+                </h3>
+            </div>
+            <!-- <div>
+                <a href="#" 
+                   class="follow">follow
+                 </a>
+            </div> -->
+        </div>
+    </div>
+  
+   
+</div>

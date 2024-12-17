@@ -1,0 +1,33 @@
+<div class="feeds-popup" style="text-align: center;">
+   
+    <div class="avatar-container">
+      <h4>User: {{ username }}</h4>
+      <div class="image-container">
+        <img [src]="imgPreview" alt="Profile Picture" class="profile-pic" />
+      </div> 
+    </div>
+
+    <div>
+      
+        {{ userId }}
+        <br>
+        <button (click)="copyKey()" value="click to copy" style="width: 250px;">{{CopyKey}}</button>
+
+    </div>
+   
+   
+    <input type="text" [(ngModel)]="username"  maxlength="20"/> 
+  
+    <input type="file" (change)="onFileSelected($event)" />
+   
+    <!-- <div *ngIf="selectedFile">
+      <p>Selected file: {{ selectedFile.name }}</p>
+    </div> -->
+  
+    <div *ngIf="uploadProgress > 0">
+      <p>Upload Progress: {{ uploadProgress }}%</p>
+    </div>
+  
+    <button class="buttonEdit" (click)="updateUser()">Update Profile</button>
+  </div>
+  

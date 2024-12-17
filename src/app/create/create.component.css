@@ -1,0 +1,138 @@
+/* Main Container */
+.create-container {
+  font-family: Verdana, sans-serif;
+  margin: 20px auto;
+  max-width: 800px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+}
+
+/* Profile Information */
+.profile-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-right: 15px;
+  border: 2px solid #ddd;
+}
+
+.username-label {
+  font-size: 14px;
+  color: #555;
+}
+
+.username {
+  margin: 5px 0 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Upload Section */
+.upload-section {
+  margin-top: 20px;
+}
+
+.upload-header {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.file-input,
+.caption-input {
+  display: block;
+  margin: 10px auto;
+  width: 90%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Preview Section */
+.image-preview-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.image-preview,
+.video-preview {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.video-preview {
+  max-height: 400px;
+  background-color: black;
+}
+
+/* Progress Bar */
+.progress-container {
+  margin-top: 20px;
+  position: relative;
+  width: 100%;
+  background-color: #f3f3f3;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 10px;
+  background-color: #4caf50;
+  transition: width 0.4s ease;
+}
+
+/* Buttons */
+.upload-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.upload-button:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.upload-button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.success-message {
+  margin-top: 20px;
+  color: #4caf50;
+  font-weight: bold;
+}
+
+/* Info Text */
+.info-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #777;
+}

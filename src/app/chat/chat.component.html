@@ -1,0 +1,20 @@
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div style="padding-left: 200px;">
+    {{connectionId}}
+    <br>
+    <input [(ngModel)]="fromuser" placeholder="Enter From">
+    <input [(ngModel)]="touser" placeholder="Enter To ">
+    <input [(ngModel)]="message" placeholder="Enter your message">
+    <button (click)="sendMessage()">Send</button>
+    <div *ngFor="let msg of receivedMessages">
+        {{ msg }}
+    </div>
+</div>

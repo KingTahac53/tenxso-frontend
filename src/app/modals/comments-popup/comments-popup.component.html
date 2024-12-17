@@ -1,0 +1,77 @@
+<div style="width: 100%; height:80vh; ">
+    <div style="width: 50%; float: left;"> 
+        <div class="post">
+              
+            <div class="image" *ngIf="!feed.content.includes('.mp4')">
+              <img [src]="feed.content" style="width:95%;">
+            </div>
+            <div class="reels" *ngIf="feed.content.includes('.mp4') || feed.content.includes('.MOV')">
+                <div class="reel">
+                    <div class="video">
+                        <video [src]="feed.content" controls>
+                        </video>
+                    </div> 
+                </div>
+            </div>
+           
+         </div>
+    </div>
+    <div style="margin-left: 50%; height: 100px;"> 
+        <div>
+                
+            <div class="card" style="vertical-align: text-top;height:60vh;">
+                <h6>Comments On Post</h6>
+                <div *ngFor="let like of commentData">
+                    <div class="top">
+                        <div class="userDetails">
+                            <div class="profilepic">
+                                <div class="profile_img">
+                                    <div class="image">
+                                        <img src="{{like.userProfileUrl}}" alt="img12">
+                                    </div>
+                                </div>
+                            </div>
+                            <h3> 
+                                <span> {{like.commentAuthorUsername}} </span>
+                                <br>
+                                <span>{{like.commentContent}}</span>
+                                <br>
+                                <span>{{like.commentDateCreated}}</span>
+                            </h3>
+                        </div>
+                      
+                    </div>
+                </div>
+              
+            </div>
+           
+            <div class="addComments">
+                <div class="reaction">
+                    <h3>
+                      <i class="far fa-smile"></i>
+                    </h3>
+                </div>
+                <input type="text"
+                       class="text"
+                       placeholder="Add a comment..." [(ngModel)]="comment">
+                <button id="btnComment" (click)="commentPost()">Post</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <div class="main_section">
+        <div class="posts_container">
+            <div class="posts">
+              
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+       
+    

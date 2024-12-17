@@ -1,0 +1,28 @@
+<div class="create-container">
+  <div class="profile-info">
+    <img class="profile-image" [src]="profilePic" alt="Profile Picture" />
+    <div>
+      <span class="username-label">You Are :</span>
+      <h3 class="username">{{ username }}</h3>
+    </div>
+  </div>
+
+  <div class="upload-section">
+    <h2 class="upload-header">Upload Your Feed</h2>
+    <input type="file" (change)="onFileSelected($event)" class="file-input" accept="image/*,video/*" />
+    <input type="text" placeholder="Enter Caption" [(ngModel)]="caption" class="caption-input" />
+
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <div *ngIf="isUploading" class="progress-container">
+      <div class="progress-bar" [style.width.%]="uploadProgress"></div>
+      <div>{{ uploadProgress }}%</div>
+    </div>
+
+    <div *ngIf="uploadSuccess" class="success-message">Feed uploaded successfully!</div>
+
+    <button (click)="uploadFile()" class="upload-button" [disabled]="isUploading || !selectedFile">
+      Upload Feed
+    </button>
+  </div>
+</div>

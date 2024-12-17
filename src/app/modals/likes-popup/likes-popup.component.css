@@ -1,0 +1,82 @@
+ .card {
+    margin-bottom: 20px;
+    position: relative;
+    width: 100%;
+    /* min-height: 400px; */
+    display: inline-block;
+  }
+  
+ .card .top {
+    padding: 10px 0px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+   .card .top a {
+    color: #1d92ff;
+  }
+  
+   .card .bottom {
+    padding: 10px 20px;
+  }
+
+  .card .top .userDetails {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+  
+  .card .top .userDetails h3 {
+    font-size: 16px;
+    color: #4d4d4f;
+    font-weight: 500;
+    line-height: 1em;
+  }
+  
+   .card .top .userDetails h3 span {
+    font-size: 0.75em;
+  }
+  
+   .card .top .userDetails h3 span {
+    font-size: 0.75em;
+  }
+
+  .profilepic {
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  .profilepic .profile_img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(to right, red, orange);
+    padding: 2px;
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  
+  .profilepic .profile_img .image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid white;
+  }
+  
+  .profilepic .profile_img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  

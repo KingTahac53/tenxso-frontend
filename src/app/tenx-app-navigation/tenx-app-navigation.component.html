@@ -1,0 +1,82 @@
+<!-- Main Navigation Wrapper -->
+<div class="nav">
+  <ul class="menu">
+    <!-- Home -->
+    <li>
+      <a routerLink="/feeds" class="menu-item">
+      <i>
+        <h4>tenX</h4>
+      </i>
+      </a>
+    </li>
+
+    <li>
+      <a routerLink="/feeds" class="menu-item">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+    </li>
+
+    <!-- Login -->
+    <li>
+      <a routerLink="/login" class="menu-item">
+        <i class="fas fa-sign-in-alt"></i>
+        <span>Login</span>
+        <span class="notification-badge" *ngIf="notificationCounter > 0">
+          {{ notificationCounter }}
+        </span>
+      </a>
+    </li>
+
+    <!-- Create -->
+    <li>
+      <a routerLink="/create" class="menu-item">
+        <i class="fas fa-plus-circle"></i>
+        <span>Create</span>
+      </a>
+    </li>
+
+    <!-- Messages -->
+    <li>
+      <a routerLink="/messages" class="menu-item">
+        <i class="fas fa-envelope"></i>
+        <span>Messages</span>
+      </a>
+    </li>
+    
+    <!-- Notifications -->
+    <li>
+      <a routerLink="/notifications" class="menu-item">
+        <i class="fas fa-bell"></i>
+        <span>Notifications</span>
+        <span class="notification-badge" *ngIf="notificationCounter > 0">
+          {{ notificationCounter }}
+        </span>
+      </a>
+    </li>
+
+    <!-- About -->
+    <li>
+      <a routerLink="/about" class="menu-item">
+        <i class="fas fa-info-circle"></i>
+        <span>About</span>
+        <span class="notification-badge" *ngIf="notificationCounter > 0">
+          {{ notificationCounter }}
+        </span>
+      </a>
+    </li>
+
+
+    <!-- Profile -->
+    <li>
+      <a routerLink="/profile" class="menu-item">
+        <img
+          [src]="generatedUserData.profilePic"
+          alt="Profile"
+          class="profile-pic"
+        />
+        <span>Profile</span>
+      </a>
+    </li>
+  </ul>
+</div>

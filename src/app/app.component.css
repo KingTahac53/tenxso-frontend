@@ -1,0 +1,39 @@
+/* General Styles */
+body, html {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  height: 100%;
+  overflow: hidden; /* Prevent double scrollbars */
+}
+
+/* Desktop Layout */
+.content-container {
+  margin-left: 250px; /* Leave space for desktop navigation */
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto; /* Allow scrolling for the content */
+  background-color: #f9f9f9;
+}
+
+/* Mobile Navigation */
+app-mobile-navigation {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  tenx-app-navigation {
+    display: none; /* Hide desktop navigation on mobile */
+  }
+
+  .content-container {
+    margin-left: 0;
+    padding-bottom: 60px; /* Leave space for mobile navigation */
+  }
+}

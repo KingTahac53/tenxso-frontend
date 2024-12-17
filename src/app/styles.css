@@ -1,0 +1,88 @@
+/* Base Styles for HTML and Body */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: Verdana, sans-serif;
+  background-color: #202124; /* Dark blue background for contrast */
+}
+
+/* Darker Blue Background for Main Content */
+body {
+  background-color: #202124; /* Consistent dark blue background */
+}
+
+/* Navigation Sidebar */
+.nav-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;               /* Slightly wider sidebar */
+  height: 100%;
+  background-color: #202124;  /* Dark sidebar background */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 20px;
+  color: #ffffff;
+}
+
+/* Navigation Links */
+.nav-left a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 10px 0;
+}
+
+.nav-left a:hover {
+  color: #b3b3b3;             /* Slight hover effect */
+}
+
+/* Adjust the main content to account for sidebar width */
+main {
+  margin-left: 250px;         /* Push main content to the right of the sidebar */
+  padding: 20px;
+  background-color: #ffffff;  /* White background for the main content */
+  border-radius: 8px;         /* Optional: Rounded corners for a modern look */
+  min-height: 100vh;          /* Ensure main content covers full height */
+}
+
+/* Feed Container */
+.feeds-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;             /* Center the feeds container */
+  padding: 20px;
+  background-color: #ffffff;  /* White background for feeds */
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Light Line Below Username in Feed */
+.feed-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ddd; /* Light grey line for separation */
+  padding-bottom: 10px;          /* Space below the line */
+}
+
+/* Scrollbar Styling (Optional) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #202124;         /* Dark background for scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #555;      /* Dark grey scrollbar thumb */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #777;      /* Lighter grey on hover */
+}

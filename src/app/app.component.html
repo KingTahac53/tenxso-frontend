@@ -1,0 +1,11 @@
+<ng-container *ngIf="isMobileView; else desktopView">
+  <router-outlet></router-outlet>
+  <app-mobile-navigation></app-mobile-navigation>
+</ng-container>
+
+<ng-template #desktopView>
+  <tenx-app-navigation></tenx-app-navigation>
+  <div class="content-container">
+    <router-outlet></router-outlet>
+  </div>
+</ng-template>
