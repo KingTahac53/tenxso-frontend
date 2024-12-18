@@ -1,59 +1,59 @@
 /* Feeds Container */
 .feeds-container {
-  width: 100%;
+  width: 65%;
+  align-items: center;
   max-width: 800px;
-  margin: 0 auto;             /* Center the feeds container */
-  padding: 20px;
+  margin: 0 auto;
+  padding-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  background-color: #f5f5f5;
 }
 
 /* Feed Box */
-.feed-box {
-  background-color: #ffffff;  /* White background for contrast */
-  border-radius: 12px;        /* Rounded corners for a modern look */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+/* .feed-box {
+  width: 80%;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  transition: transform 0.2s, box-shadow 0.2s; /* Smooth hover effect */
+} */
+
+.feed-box {
+  width: 80%;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 500px; /* Ensures a consistent minimum height */
+  padding: 15px; /* Add internal padding */
 }
 
-/* Hover Effect for Feed Box */
-.feed-box:hover {
-  transform: translateY(-5px); /* Slight lift on hover */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
 
 /* Feed Header */
 .feed-header {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
 }
 
-/* Profile Picture */
 .profile-pic {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  margin-right: 15px;
+  margin-right: 10px;
 }
 
-/* Feed Author */
 .feed-author {
+  font-size: 1rem;
   font-weight: bold;
-  font-size: 1rem;
   color: #333;
-}
-
-/* Feed Caption */
-.feed-caption {
-  font-size: 1rem;
-  color: #555;
-  margin-bottom: 15px;
 }
 
 /* Feed Content */
@@ -61,140 +61,106 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 15px;
-  position: relative;
-  width: 100%;
-}
-
-/* Feed Image */
-.feed-image {
-  width: 100%;
-  max-height: 500px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-/* Feed Video Wrapper */
-.feed-video-wrapper {
-  position: relative;
-  width: 100%;
-  padding-bottom: 56.25%;     /* 16:9 Aspect Ratio */
-  background-color: black;    /* Background for consistency */
   overflow: hidden;
 }
 
-/* Video.js Player */
+.feed-video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  background: black;
+}
+
 .video-js {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;                /* Full width */
-  height: 100%;               /* Full height to match the wrapper */
-  display: block;             /* Ensure no inline spacing issues */
+  width: 100%;
+  height: 100%;
 }
 
-/* Ensure Video Controls are Always Visible */
-.video-js .vjs-control-bar {
-  opacity: 1 !important;
-  visibility: visible !important;
+.feed-image {
+  width: 100%; /* Image will take full width of the container */
+  max-height: 500px; /* Restrict tall images to a maximum height */
+  object-fit: cover; /* Crop the image to maintain aspect ratio */
+  border-bottom: 1px solid #eee; /* Optional: Divider below the image */
 }
 
-/* Feed Actions (Like, Comment, etc.) */
+/* Feed Actions */
 .feed-actions {
   display: flex;
-  justify-content: space-between;  /* Space out actions evenly */
+  justify-content: space-between;
   align-items: center;
-  padding: 10px 0;                 /* Padding above and below actions */
+  padding: 10px 15px;
 }
 
-/* Feed Action Buttons and Links */
-.feed-actions button,
-.feed-actions div {
-  display: flex;
-  align-items: center;             /* Align icon and text horizontally */
-  gap: 5px;                        /* Small gap between icon and text */
-  font-size: 0.9rem;               /* Slightly smaller font size */
-  color: #555;                     /* Neutral color for text */
+.feed-actions i {
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #333;
+  transition: color 0.3s;
+}
+
+.feed-actions i:hover {
+  color: #007bff;
+}
+
+.feed-actions span {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Buttons */
+.feed-actions button {
   background: none;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;          /* Smooth hover effect */
+  font-size: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
 }
 
-/* Icons within Feed Actions */
-.feed-actions i {
-  font-size: 1.2rem;               /* Icon size */
+.feed-actions button i {
+  margin-right: 5px;
 }
 
-/* Hover Effect for Buttons and Links */
-.feed-actions button:hover,
-.feed-actions div:hover {
-  color: #77be3d;                  /* Highlight color on hover */
+.feed-actions button:hover {
+  color: #ff3b30;
 }
 
-/* Liked Button Style */
-.like-button.liked {
-  color: #96ba42;                  /* Red color when liked */
-}
+
 
 /* Loading Spinner */
 .loading-spinner {
   text-align: center;
   font-size: 1.2rem;
-  color: #777;
-  padding: 20px;
-}
-
-/* No Feeds Message */
-.no-feeds-message {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #777;
-  margin: 20px 0;
-}
-
-/* Surprise Message */
-.surprise-message {
-  font-style: italic;
-  font-weight: bold;
-  text-align: center;
   color: #555;
-  margin: 20px 0;
-  font-size: 1rem;
 }
 
-/* Responsive Design */
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
   .feeds-container {
-    padding: 10px;
+    width: 90%;
   }
-
-  .feed-box {
-    padding: 15px;
+  .feed-caption {
+    font-size: 0.9rem; /* Slightly smaller font size on mobile */
+    padding: 5px 10px; /* Adjust padding for smaller screens */
   }
-
+  .feed-image {
+    max-height: 300px; /* Adjust for smaller screens */
+    object-fit: contain; /* Prevent cropping on smaller devices */
+  }
   .profile-pic {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
+    width: 30px;
+    height: 30px;
   }
 
-  .feed-actions {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+  .feed-actions span {
+    font-size: 0.8rem;
   }
 
-  .feed-actions button,
-  .feed-actions div {
-    width: 100%;                   /* Make buttons full width on mobile */
-    justify-content: flex-start;
-  }
-}
-
-/* Adjust Video Size for Smaller Screens */
-@media (max-width: 768px) {
   .feed-video-wrapper {
-    padding-bottom: 75%; /* Adjust the aspect ratio for mobile */
+    padding-bottom: 75%; /* Adapt for mobile */
   }
 }
