@@ -17,3 +17,7 @@
 .mobile-nav a:hover {
   color: #ed64d4;
 }
+
+.mobile-nav a.active {
+  color: #0d6efd;
+}

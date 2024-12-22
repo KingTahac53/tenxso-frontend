@@ -1,10 +1,10 @@
-
 .card {
   margin-bottom: 20px;
   position: relative;
   width: 100%;
-  min-height: 400px;
+  min-height: 300px;
   display: inline-block;
+  padding: 10px;
 }
 
 .card .top {
@@ -14,11 +14,11 @@
   align-items: center;
 }
 
- .card .top a {
+.card .top a {
   color: #1d92ff;
 }
 
- .card .bottom {
+.card .bottom {
   padding: 10px 20px;
 }
 
@@ -35,11 +35,11 @@
   line-height: 1em;
 }
 
- .card .top .userDetails h3 span {
+.card .top .userDetails h3 span {
   font-size: 0.75em;
 }
 
- .card .top .userDetails h3 span {
+.card .top .userDetails h3 span {
   font-size: 0.75em;
 }
 
@@ -111,20 +111,22 @@ input.text {
   background: none;
 }
 
+.popup {
+  display: flex;
+  gap: 20px;
+}
 
-
-
+.comments {
+  width: 50%;
+}
 
 .post {
   font-size: 14px;
   margin-bottom: 15px;
+  width: 50%;
 }
-@media screen and (max-width: 498px) {
-   .post {
-    width: 100%;
-  }
-}
- .post .info {
+
+.post .info {
   margin-bottom: 5px;
   display: flex;
   flex-direction: row;
@@ -137,23 +139,23 @@ input.text {
   border-radius: 30px;
   padding: 5px;
 }
- .post .info .person a {
+.post .info .person a {
   color: rgb(38, 38, 38);
   font-weight: 600;
   margin-right: 5px;
 }
- .post .info .person span {
+.post .info .person span {
   color: rgb(142, 142, 142);
   list-style: circle;
   font-weight: 400;
   position: relative;
   top: -1px;
 }
- .post .info .person span.circle {
+.post .info .person span.circle {
   align-items: center;
   font-size: 30px;
 }
- .post .info .more img {
+.post .info .more img {
   width: 15px;
   height: 15px;
 }
@@ -167,19 +169,19 @@ input.text {
   margin-left: auto;
   margin-right: auto;
 }
- .post .desc p {
+.post .desc p {
   font-weight: 400;
   margin: 10px 0;
 }
- .post .desc a.bold {
+.post .desc a.bold {
   font-weight: 600;
   color: rgb(38, 38, 38);
 }
- .post .desc a.gray {
+.post .desc a.gray {
   color: rgb(142, 142, 142);
   font-weight: 400;
 }
- .post .desc .icons {
+.post .desc .icons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -190,7 +192,7 @@ input.text {
   width: 24px;
   height: 24px;
 }
- .post .desc input {
+.post .desc input {
   border: none;
   color: rgb(142, 142, 142);
 }
@@ -213,12 +215,7 @@ input.text {
   height: 100%;
   margin: auto 0;
 }
-@media screen and (max-width: 498px) {
-  .reels .reel .video {
-    width: auto;
-    height: 90vh;
-  }
-}
+
 .reels .reel .video video {
   position: relative;
   width: 100%;
@@ -321,20 +318,7 @@ input.text {
   margin-bottom: 1em;
   font-size: 12px;
 }
-@media screen and (max-width: 768px) {
-  .reels .reel .likes {
-    margin-bottom: 3em;
-  }
-}
-@media screen and (max-width: 498px) {
-  .reels .reel .likes {
-    margin: 0;
-    margin-bottom: 3em;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
-}
+
 .reels .reel .likes p {
   margin: 0;
 }
@@ -353,7 +337,8 @@ input.text {
 .reels .reel .likes div .loved {
   display: none;
 }
-.reels .reel .likes div.send, .reels .reel .likes div.save {
+.reels .reel .likes div.send,
+.reels .reel .likes div.save {
   padding-bottom: 18px;
 }
 .reels .reel .likes img {
@@ -361,4 +346,67 @@ input.text {
 }
 .reels .reel .likes .profile img {
   border-radius: 30px;
+}
+
+.comments .card {
+  vertical-align: text-top;
+  height: 60vh;
+}
+
+.btn-comment {
+  box-shadow: none;
+  border-radius: 100%;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
+  width: 41px;
+}
+
+@media screen and (max-width: 768px) {
+  .reels .reel .likes {
+    margin-bottom: 3em;
+  }
+}
+
+@media screen and (max-width: 498px) {
+  .popup {
+    flex-direction: column;
+  }
+
+  .post {
+    width: auto;
+    max-height: 400px;
+    height: 100%;
+    margin: auto;
+  }
+  .post .image img {
+    width: auto;
+    max-height: 300px;
+    height: 100%;
+    margin: auto;
+  }
+
+  .comments {
+    width: 100%;
+  }
+
+  .comments .card {
+    width: 100%;
+    height: 40vh;
+  }
+
+  .reels .reel .video {
+    width: auto;
+    height: auto;
+  }
+
+  .reels .reel .likes {
+    margin: 0;
+    margin-bottom: 3em;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
 }

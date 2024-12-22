@@ -9,6 +9,61 @@
 
   <div class="upload-section">
     <h2 class="upload-header">Upload Your Feed</h2>
+
+    <!-- File Input -->
+    <input
+      type="file"
+      (change)="onFileSelected($event)"
+      class="file-input"
+      accept="image/*,video/*"
+    />
+
+    <!-- Caption Input (with length limit) -->
+    <input
+      type="text"
+      placeholder="Enter Caption"
+      [(ngModel)]="caption"
+      (input)="onCaptionChange()"
+      class="caption-input"
+      maxlength="200"
+    />
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <!-- Upload Progress -->
+    <div *ngIf="isUploading" class="progress-container">
+      <div class="progress-bar" [style.width.%]="uploadProgress"></div>
+      <div>{{ uploadProgress }}%</div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="uploadSuccess" class="success-message">
+      Feed uploaded successfully!
+    </div>
+
+    <!-- Upload Button -->
+    <button
+      (click)="uploadFile()"
+      class="upload-button"
+      [disabled]="isUploading || !selectedFile"
+    >
+      Upload Feed
+    </button>
+  </div>
+</div>
+
+<!-- <div class="create-container">
+  <div class="profile-info">
+    <img class="profile-image" [src]="profilePic" alt="Profile Picture" />
+    <div>
+      <span class="username-label">You Are :</span>
+      <h3 class="username">{{ username }}</h3>
+    </div>
+  </div>
+
+  <div class="upload-section">
+    <h2 class="upload-header">Upload Your Feed</h2>
     <input type="file" (change)="onFileSelected($event)" class="file-input" accept="image/*,video/*" />
     <input type="text" placeholder="Enter Caption" [(ngModel)]="caption" class="caption-input" />
 
@@ -25,4 +80,4 @@
       Upload Feed
     </button>
   </div>
-</div>
+</div> -->

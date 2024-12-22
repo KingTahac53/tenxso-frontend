@@ -1,17 +1,9 @@
 <nav class="mobile-nav">
-  <a routerLink="/home">
-    <i class="fas fa-home"></i>
-  </a>
-  <a routerLink="/messages">
-    <i class="fas fa-envelope"></i>
-  </a>
-  <a routerLink="/create">
-    <i class="fas fa-plus-circle"></i>
-  </a>
-  <a routerLink="/notifications">
-    <i class="fas fa-bell"></i>
-  </a>
-  <a routerLink="/edit-profile">
-    <i class="fas fa-user"></i>
+  <a
+    *ngFor="let route of routes"
+    [routerLink]="route.link"
+    [ngClass]="{ active: router.url === route.link }"
+  >
+    <i [class]="route.icon"></i>
   </a>
 </nav>

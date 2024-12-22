@@ -31,7 +31,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     private signalRService: SignalRService,
     private dialog: MatDialog,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     console.log('Initializing FeedsComponent...');
@@ -53,6 +53,19 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     // Load initial feeds
     this.loadFeeds();
+  }
+
+
+  getCookie(name: string): string | null {
+    const nameEQ = `${name}=`;
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i].trim();
+      if (c.indexOf(nameEQ) === 0) {
+        return c.substring(nameEQ.length, c.length);
+      }
+    }
+    return null;
   }
 
   /**
@@ -155,43 +168,44 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.disposeVideoPlayers();
   }
 
-  likePost(feedInfo:any) {
-  
-    if (this.userId && this.username) {
+  likePost(feedInfo: any) {
+    const userId = this.getCookie('userId');
+    const username = this.getCookie('username');
 
-      if(feedInfo.likeFlag==0){
-        feedInfo.likeFlag=1;
-        feedInfo.likeCount=Number(feedInfo.likeCount) + 1;
+    if (userId && username) {
+
+      if (feedInfo.likeFlag == 0) {
+        feedInfo.likeFlag = 1;
+        feedInfo.likeCount = Number(feedInfo.likeCount) + 1;
       }
-      else{
-        feedInfo.likeFlag=0;
-        feedInfo.likeCount=Number(feedInfo.likeCount) - 1;
+      else {
+        feedInfo.likeFlag = 0;
+        feedInfo.likeCount = Number(feedInfo.likeCount) - 1;
       }
-     
-    const formData = new FormData();
-  
-    // Add required fields to formData
-      formData.append('LikeAuthorId', this.userId);  // Required field
-      formData.append('LikeAuthorUsername', this.username);  // Required field
+
+      const formData = new FormData();
+
+      // Add required fields to formData
+      formData.append('LikeAuthorId', userId);  // Required field
+      formData.append('LikeAuthorUsername', username);  // Required field
       formData.append('postId', feedInfo.postId);  // Required field
-     
+
       this.sharedService.getProfilePic().subscribe(pic => {
         formData.append('UserProfileUrl', pic as string);  // Required field
       });
       console.log("likePostStart");
-      this.signalRService.sendBellCount(feedInfo.authorId,"1"); 
+      this.signalRService.sendBellCount(feedInfo.authorId, "1");
       this.feedService.likePost(formData).subscribe(
         (response: any) => {
-          if(response!=null)
-          {
+          if (response != null) {
             //console.log("JustOnce");
           }
 
           //for (let i = 0; i < this.feedData.length; i++) {
-           //if(feedInfo.postId==this.feedData[i].postId){
-            //this.feedData[i].likeFlag=1;
-            //this.feedData[i].likeCount= this.feedData[i].likeCount + 1;
-           //}
+          //if(feedInfo.postId==this.feedData[i].postId){
+          //this.feedData[i].likeFlag=1;
+          //this.feedData[i].likeCount= this.feedData[i].likeCount + 1;
+          //}
           //}
 
         },
@@ -202,7 +216,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       );
     }
   }
-  
+
 
   /**
    * Download a file.
@@ -224,11 +238,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'mkv', 'avi'];
     const fileExtension = url.split('.').pop()?.toLowerCase();
     const isVideoFile = videoExtensions.includes(fileExtension || '');
-    console.log(`URL: ${url}, Is Video: ${isVideoFile}`);
     return isVideoFile;
   }
 
-  showComments(feedInfo:any){
+  showComments(feedInfo: any) {
 
     const dialogRef = this.dialog.open(CommentsPopupComponent, {
       width: 'auto%', // You can adjust the size as needed
@@ -240,17 +253,17 @@ export class FeedsComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToChatBox(feedInfo:any){
+  goToChatBox(feedInfo: any) {
     console.log(feedInfo);
-     this.sharedService.setChatUserInfo(
-       feedInfo.authorId,
-       feedInfo.authorUsername,
-       feedInfo.title
-     );
- 
-     localStorage.setItem('userId', feedInfo.authorId);
-     localStorage.setItem('username', feedInfo.authorUsername);
-     localStorage.setItem('profilePic', feedInfo.title);
-     this.router.navigate(['/messages']);
-   }
+    this.sharedService.setChatUserInfo(
+      feedInfo.authorId,
+      feedInfo.authorUsername,
+      feedInfo.title
+    );
+
+    localStorage.setItem('userId', feedInfo.authorId);
+    localStorage.setItem('username', feedInfo.authorUsername);
+    localStorage.setItem('profilePic', feedInfo.title);
+    this.router.navigate(['/messages']);
+  }
 }

@@ -21,11 +21,31 @@ export class CreateComponent implements OnInit {
   uploadSuccess: boolean = false;
   errorMessage: string | null = null;
 
+  // Updated max file size to 500 MB
+  private readonly MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
+
+  // Added webp to allowed image types
+  private readonly ALLOWED_IMAGE_TYPES = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif',
+    'image/webp'
+  ];
+
+  private readonly ALLOWED_VIDEO_TYPES = [
+    'video/mp4',
+    'video/ogg',
+    'video/webm',
+    'video/avi',
+    'video/mpeg'
+  ];
+
   constructor(
     private uploadService: UploadService,
     private sharedService: SharedService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.sharedService.getUserId().subscribe(userId => this.userId = userId);
@@ -33,35 +53,89 @@ export class CreateComponent implements OnInit {
     this.sharedService.getProfilePic().subscribe(profilePic => this.profilePic = profilePic);
   }
 
+  // onFileSelected(event: any): void {
+  //   this.errorMessage = null;
+  //   this.selectedFile = event.target.files[0] || null;
+
+  //   if (this.selectedFile) {
+  //     if (this.selectedFile.size > 200 * 1024 * 1024) {
+  //       this.errorMessage = 'File size exceeds 200 MB. Please select a smaller file.';
+  //       this.selectedFile = null;
+  //       this.imgPreview = null;
+  //       return;
+  //     }
+
+  //     const reader = new FileReader();
+  //     reader.onload = (e: any) => {
+  //       this.imgPreview = e.target.result;
+  //     };
+  //     reader.readAsDataURL(this.selectedFile);
+  //   }
+  // }
+
   onFileSelected(event: any): void {
     this.errorMessage = null;
     this.selectedFile = event.target.files[0] || null;
+    this.imgPreview = null; // reset preview
 
-    if (this.selectedFile) {
-      if (this.selectedFile.size > 200 * 1024 * 1024) {
-        this.errorMessage = 'File size exceeds 200 MB. Please select a smaller file.';
-        this.selectedFile = null;
-        this.imgPreview = null;
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imgPreview = e.target.result;
-      };
-      reader.readAsDataURL(this.selectedFile);
+    if (!this.selectedFile) {
+      return;
     }
+
+    // 1. Validate File Size (DOS Mitigation)
+    if (this.selectedFile.size > this.MAX_FILE_SIZE) {
+      this.errorMessage = `File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)} MB. 
+                           Please select a smaller file.`;
+      this.selectedFile = null;
+      return;
+    }
+
+    // 2. Validate File Type
+    if (
+      !this.ALLOWED_IMAGE_TYPES.includes(this.selectedFile.type) &&
+      !this.ALLOWED_VIDEO_TYPES.includes(this.selectedFile.type)
+    ) {
+      this.errorMessage = 'Invalid file type. Only images and videos are allowed.';
+      this.selectedFile = null;
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      if (this.ALLOWED_IMAGE_TYPES.includes(this.selectedFile!.type)) {
+        this.imgPreview = e.target.result;
+      }
+    };
+    reader.readAsDataURL(this.selectedFile);
+  }
+
+  onCaptionChange(): void {
+    this.caption = this.caption.replace(/[<>]/g, '');
+  }
+
+  getCookie(name: string): string | null {
+    const nameEQ = `${name}=`;
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i].trim();
+      if (c.indexOf(nameEQ) === 0) {
+        return c.substring(nameEQ.length, c.length);
+      }
+    }
+    return null;
   }
 
   uploadFile(): void {
-    if (this.selectedFile && this.userId && this.username) {
+    const userId = this.getCookie('userId');
+    const username = this.getCookie('username');
+    if (this.selectedFile && userId && username) {
       this.isUploading = true;
       this.errorMessage = null;
       const formData = new FormData();
 
       formData.append('file', this.selectedFile);
-      formData.append('userId', this.userId);
-      formData.append('userName', this.username);
+      formData.append('userId', userId);
+      formData.append('userName', username);
       formData.append('fileName', this.selectedFile.name);
       formData.append('caption', this.caption || '');
       if (this.profilePic) {

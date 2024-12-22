@@ -3,22 +3,20 @@
   <div *ngFor="let feed of feeds" class="feed-box">
     <!-- Feed Header -->
     <div class="feed-header">
-      <img [src]="feed.title" alt="Profile Picture" class="profile-pic" />
-      <span class="feed-author">{{ feed.authorUsername }}</span>
-      <span  (click)="goToChatBox(feed)">
-       Message
-      </span>
-    
-    </div>
-
-    <div *ngIf="feed.caption && feed.caption !== 'undefined' && feed.caption.trim()" class="feed-caption">
-      {{ feed.caption }}
+      <div>
+        <img [src]="feed.title" alt="Profile Picture" class="profile-pic" />
+        <span class="feed-author">{{ feed.authorUsername }}</span>
+      </div>
+      <span (click)="goToChatBox(feed)"> Message </span>
     </div>
 
     <!-- Feed Content -->
     <div class="feed-content">
       <!-- Video Feed -->
-      <div *ngIf="isVideo(feed.content); else notVideo" class="feed-video-wrapper">
+      <div
+        *ngIf="isVideo(feed.content); else notVideo"
+        class="feed-video-wrapper"
+      >
         <video-js
           id="video-player-{{ feed.postId }}"
           class="video-js vjs-big-play-centered"
@@ -34,39 +32,53 @@
       </ng-template>
     </div>
 
-    <!-- Feed Actions -->
-    <div class="feed-actions">
-      <!-- Like Button -->
-      <div>
-    
-        <span>{{ feed.likeCount || 0 }} Likes</span>
-        <div *ngIf="feed.likeFlag==0" class="like" (click)="likePost(feed)">
-          <i class="fas fa-heart" ></i>
-      </div>
-      <div *ngIf="feed.likeFlag==1" class="like" (click)="likePost(feed)">
-        <i class="fas fa-heart" ></i>
+    <div
+      *ngIf="
+        feed.caption && feed.caption !== 'undefined' && feed.caption.trim()
+      "
+      class="feed-caption"
+    >
+      {{ feed.caption }}
     </div>
+
+    <!-- Feed Actions -->
+    <div class="actions">
+      <div class="feed-actions">
+        <!-- Like Button -->
+        <div>
+          <button
+            (click)="likePost(feed)"
+            *ngIf="feed.likeFlag == 0"
+            class="like"
+          >
+            <i class="fas fa-heart"></i>
+            <span>{{ feed.likeCount || 0 }}</span>
+          </button>
+          <button
+            (click)="likePost(feed)"
+            *ngIf="feed.likeFlag == 1"
+            class="like liked"
+          >
+            <i class="fas fa-heart"></i>
+            <span>{{ feed.likeCount || 0 }}</span>
+          </button>
+        </div>
+
+        <!-- Comment Button -->
+        <div class="comment-icon">
+          <i class="fas fa-comment" (click)="showComments(feed)"></i>
+          <span>{{ feed.commentCount || 0 }}</span>
+        </div>
+
+        <!-- Download Button -->
+        <div>
+          <a [href]="feed.content" target="_self" download>
+            <i class="fas fa-download"></i>
+          </a>
+        </div>
       </div>
-
-
-      <!-- Comment Button -->
       <div>
-        <i class="fas fa-comment" (click)="showComments(feed)"></i>
-        <span>{{ feed.commentCount || 0 }} Comments</span>
-      </div>
-
-      <!-- Download Button -->
-      <div>
-        <a [href]="feed.content" target="_self" download>
-          <i class="fas fa-download"></i> Download
-        </a>
-      </div>
-
-      <!-- Report Button -->
-      <div>
-        <button>
-          <i class="fas fa-flag"></i> Report Feed
-        </button>
+        <button class="report-btn">Report</button>
       </div>
     </div>
   </div>
