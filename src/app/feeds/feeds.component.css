@@ -1,8 +1,8 @@
 /* Feeds Container */
 .feeds-container {
-  width: 65%;
+  width: 100%;
   align-items: center;
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
   padding-top: 20px;
   display: flex;
@@ -20,7 +20,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 500px; /* Ensures a consistent minimum height */
   padding: 15px; /* Add internal padding */
 }
 
@@ -57,7 +56,6 @@
 .feed-video-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
   background: black;
 }
 
@@ -125,10 +123,6 @@
   align-items: center;
 }
 
-.feed-actions button i {
-  margin-right: 5px;
-}
-
 .feed-actions button:hover {
   color: #ff3b30;
 }
@@ -155,10 +149,30 @@
   font-weight: 600;
 }
 
+button.like {
+  padding-inline: 0;
+  gap: 5px;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #555;
+}
+
+.download {
+  text-decoration: none;
+  display: flex;
+  gap: 5px;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   .feed-actions {
     padding: 10px 7px;
+  }
+  .feed-actions .label {
+    display: none;
   }
   .feeds-container {
     width: 100%;
@@ -187,8 +201,8 @@
     font-size: 0.8rem;
   }
 
-  .feed-video-wrapper {
-    padding-bottom: 75%; /* Adapt for mobile */
+  .like i {
+    color: #333;
   }
 }
 

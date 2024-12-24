@@ -29,7 +29,8 @@ import { LoginComponent } from './login/login.component';
 import { CreateComponent } from './create/create.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { ProfileComponent } from './profile/profile.component';
-import { MobileNavigationComponent } from './mobile-navigation/mobile-navigation.component';  // Import your components
+import { MobileNavigationComponent } from './mobile-navigation/mobile-navigation.component';
+import { VideoPlayerComponent } from './video-player/video-player.component';  // Import your components
 
 
 @NgModule({
@@ -52,7 +53,8 @@ import { MobileNavigationComponent } from './mobile-navigation/mobile-navigation
     CreateComponent,
     NotificationsComponent,
     ProfileComponent,
-    MobileNavigationComponent
+    MobileNavigationComponent,
+    VideoPlayerComponent
   ],
   imports: [
     BrowserModule,

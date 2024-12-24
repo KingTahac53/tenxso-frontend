@@ -41,6 +41,10 @@ export class CreateComponent implements OnInit {
     'video/mpeg'
   ];
 
+  videoExtensions = /\.(mp4|m4v|mov|wmv|avi|flv|mkv|webm|3gp|3g2|ts|m2ts|mts|vob|ogv|rm|divx|asf|f4v|mpeg|mpg)$/i;
+  audioExtensions = /\.(mp3|wav|aac|ogg|m4a|flac|wma|aiff|alac|amr|opus|mid|midi|caf|ra|mka)$/i;
+  imageExtensions = /\.(jpg|jpeg|png|gif|webp)$/i;
+
   constructor(
     private uploadService: UploadService,
     private sharedService: SharedService,
@@ -48,9 +52,9 @@ export class CreateComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.sharedService.getUserId().subscribe(userId => this.userId = userId);
-    this.sharedService.getUsername().subscribe(username => this.username = username);
-    this.sharedService.getProfilePic().subscribe(profilePic => this.profilePic = profilePic);
+    this.userId = this.getCookie('userId');
+    this.username = this.getCookie('username');
+    this.profilePic = this.getCookie('profilePic');
   }
 
   // onFileSelected(event: any): void {
@@ -91,9 +95,11 @@ export class CreateComponent implements OnInit {
     }
 
     // 2. Validate File Type
+    console.log('File type:', this.selectedFile.name.toLowerCase().toString());
+
     if (
-      !this.ALLOWED_IMAGE_TYPES.includes(this.selectedFile.type) &&
-      !this.ALLOWED_VIDEO_TYPES.includes(this.selectedFile.type)
+      !(this.imageExtensions.test(this.selectedFile.name.toLowerCase().toString()) ||
+        this.videoExtensions.test(this.selectedFile.name.toLowerCase().toString()) || this.audioExtensions.test(this.selectedFile.name.toLowerCase().toString()))
     ) {
       this.errorMessage = 'Invalid file type. Only images and videos are allowed.';
       this.selectedFile = null;

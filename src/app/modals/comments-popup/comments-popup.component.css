@@ -114,16 +114,15 @@ input.text {
 .popup {
   display: flex;
   gap: 20px;
+  width: 100%;
+  max-width: 1000px;
+  font-size: 14px;
+  margin-bottom: 15px;
 }
 
 .comments {
-  width: 50%;
-}
-
-.post {
-  font-size: 14px;
-  margin-bottom: 15px;
-  width: 50%;
+  width: 100%;
+  min-width: 350px;
 }
 
 .post .info {
@@ -211,7 +210,7 @@ input.text {
 }
 .reels .reel .video {
   position: relative;
-  width: 450px;
+  width: 100%;
   height: 100%;
   margin: auto 0;
 }
@@ -351,6 +350,7 @@ input.text {
 .comments .card {
   vertical-align: text-top;
   height: 60vh;
+  overflow-y: auto;
 }
 
 .btn-comment {
@@ -370,16 +370,17 @@ input.text {
   }
 }
 
+.post {
+  width: 100%;
+}
+
 @media screen and (max-width: 498px) {
   .popup {
     flex-direction: column;
   }
 
   .post {
-    width: auto;
-    max-height: 400px;
-    height: 100%;
-    margin: auto;
+    display: none;
   }
   .post .image img {
     width: auto;
@@ -390,6 +391,7 @@ input.text {
 
   .comments {
     width: 100%;
+    min-width: none;
   }
 
   .comments .card {

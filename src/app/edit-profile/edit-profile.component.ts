@@ -12,14 +12,24 @@ export class EditProfileComponent implements OnInit {
   profilePic: string | null = null;
   imgPreview: string | null = null;
 
-  constructor(private sharedService: SharedService) {}
+  constructor(private sharedService: SharedService) { }
 
   ngOnInit(): void {
-    this.sharedService.getUserId().subscribe((userId) => (this.userId = userId));
-    this.sharedService.getUsername().subscribe((username) => (this.username = username));
-    this.sharedService.getProfilePic().subscribe((profilePic) => {
-      this.profilePic = profilePic;
-      this.imgPreview = this.profilePic; // Show profile picture preview
-    });
+    this.userId = this.getCookie('userId');
+    this.username = this.getCookie('username');
+    this.profilePic = this.getCookie('profilePic');
+    this.imgPreview = this.profilePic;
+  }
+
+  getCookie(name: string): string | null {
+    const nameEQ = `${name}=`;
+    const ca = document.cookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i].trim();
+      if (c.indexOf(nameEQ) === 0) {
+        return c.substring(nameEQ.length, c.length);
+      }
+    }
+    return null;
   }
 }

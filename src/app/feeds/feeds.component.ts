@@ -18,7 +18,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   feeds: any[] = []; // Array to store feed data
   players: { [key: string]: VideoJsPlayer } = {}; // Map to store Video.js players
   pageNumber = 1; // Current page number
-  pageSize = 8; // Number of feeds to load per API call
+  pageSize = 5; // Number of feeds to load per API call
   loading = false; // Loading state
   allFeedsLoaded = false; // Flag for no more feeds
   userId: string | undefined;
@@ -102,6 +102,73 @@ export class FeedsComponent implements OnInit, OnDestroy {
     );
   }
 
+  // refreshFeeds() {
+  //   const pageSize = this.feeds.length;
+  //   const pageNumber = 1
+  //   this.loading = true; // Set loading state
+  //   console.log(`Loading feeds - Page: ${pageNumber}, Size: ${pageSize}`);
+
+  //   this.feedService.getFeeds(pageNumber, pageSize, this.userId).subscribe(
+  //     (response: any) => {
+  //       console.log('Feed response:', response);
+  //       const newFeeds = response.blogPostsMostRecent || [];
+  //       this.feeds = [...newFeeds];
+  //       console.log('New feeds added:', newFeeds);
+  //       setTimeout(() => this.initializeVideoPlayers(), 0); // Initialize video players after DOM updates
+
+  //       this.loading = false;
+  //     },
+  //     (error) => {
+  //       console.error('Error loading feeds:', error);
+  //       this.loading = false; // Reset loading even on error
+  //     }
+  //   );
+  // }
+
+  refreshFeeds() {
+    // We'll base the pageSize on the current total feeds
+    const pageSize = this.feeds.length;
+    const pageNumber = 1;
+
+    this.loading = true;
+    console.log(`Loading feeds - Page: ${pageNumber}, Size: ${pageSize}`);
+
+    this.feedService.getFeeds(pageNumber, pageSize, this.userId).subscribe(
+      (response: any) => {
+        console.log('Feed response:', response);
+
+        const newFeeds = response.blogPostsMostRecent || [];
+
+        const currentIdOrder = this.feeds.map(feed => feed.postId);
+
+        const sortedNewFeeds = [...newFeeds].sort((a, b) => {
+          const indexA = currentIdOrder.indexOf(a.postId);
+          const indexB = currentIdOrder.indexOf(b.postId);
+
+          if (indexA === -1 && indexB === -1) {
+            return 0;
+          } else if (indexA === -1) {
+            return 1;
+          } else if (indexB === -1) {
+            return -1;
+          }
+          return indexA - indexB;
+        });
+
+        this.feeds = sortedNewFeeds;
+
+        setTimeout(() => this.initializeVideoPlayers(), 0);
+
+        this.loading = false;
+      },
+      (error) => {
+        console.error('Error loading feeds:', error);
+        this.loading = false;
+      }
+    );
+  }
+
+
   /**
    * Initialize Video.js players for new feeds.
    */
@@ -135,6 +202,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
    * Infinite scroll: Load more feeds when nearing the bottom of the page.
    */
   onScroll(): void {
+    console.log('Scroll event triggered...');
+
     const scrollHeight = document.documentElement.scrollHeight;
     const scrollTop = document.documentElement.scrollTop;
     const clientHeight = document.documentElement.clientHeight;
@@ -245,8 +314,18 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(CommentsPopupComponent, {
       width: 'auto%', // You can adjust the size as needed
-      data: feedInfo // If you need to pass any data, do so here
+      data: feedInfo, // If you need to pass any data, do so here
+    },
+    );
+
+    const instance = dialogRef.componentInstance;
+
+    // 2) Subscribe to its EventEmitter
+    instance.commentPosted.subscribe((data) => {
+      this.refreshFeeds();
+
     });
+
 
     dialogRef.afterClosed().subscribe(result => {
       // Handle result if needed

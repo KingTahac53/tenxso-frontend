@@ -12,10 +12,9 @@ export class AppComponent implements OnInit {
   generatedUserData: UserData = new UserData('', '', ''); // Initialize UserData object with profilePic
   isMobileView: boolean = false; // Flag to track if the view is mobile
 
-  constructor(private userService: UserService, private deviceService: DeviceService) {}
+  constructor(private userService: UserService, private deviceService: DeviceService) { }
 
   ngOnInit() {
-    this.isMobileView = this.deviceService.isMobile(); // Check if the device is mobile
 
     const userId = this.getCookie('userId');
     const username = this.getCookie('username');
@@ -26,6 +25,7 @@ export class AppComponent implements OnInit {
     } else {
       this.generateAndStoreUser(true); // Generate new data if no cookies
     }
+    this.isMobileView = this.deviceService.isMobile(); // Check if the device is mobile
   }
 
   generateAndStoreUser(storeCookies: boolean) {
