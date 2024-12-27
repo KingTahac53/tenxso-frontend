@@ -2,7 +2,7 @@
 .feeds-container {
   width: 100%;
   align-items: center;
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
   padding-top: 20px;
   display: flex;
@@ -69,9 +69,9 @@
 
 .feed-image {
   width: 100%; /* Image will take full width of the container */
-  max-height: 500px; /* Restrict tall images to a maximum height */
   object-fit: cover; /* Crop the image to maintain aspect ratio */
   border-bottom: 1px solid #eee; /* Optional: Divider below the image */
+  height: auto;
 }
 
 /* Feed Actions */
