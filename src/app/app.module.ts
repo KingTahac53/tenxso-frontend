@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,40 +33,33 @@ import { MobileNavigationComponent } from './mobile-navigation/mobile-navigation
 import { VideoPlayerComponent } from './video-player/video-player.component';  // Import your components
 
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    TenxAppNavigationComponent,
-    FeedsComponent,
-    MessagesComponent,
-    CommentsPopupComponent,
-    NotificationsPopupComponent,
-    EditProfilePopUpComponent,
-    MessagesPopupComponent,
-    LoginPopupComponent,
-    LikesPopupComponent,
-    ChatComponent,
-    EditProfileComponent,
-    AboutComponent,
-    VideoDisplayComponent,
-    LoginComponent,
-    CreateComponent,
-    NotificationsComponent,
-    ProfileComponent,
-    MobileNavigationComponent,
-    VideoPlayerComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    MatDialogModule,
-    MatButtonModule,
-    MatProgressBarModule,
-    AppRoutingModule
-  ],
-  providers: [UserService],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        TenxAppNavigationComponent,
+        FeedsComponent,
+        MessagesComponent,
+        CommentsPopupComponent,
+        NotificationsPopupComponent,
+        EditProfilePopUpComponent,
+        MessagesPopupComponent,
+        LoginPopupComponent,
+        LikesPopupComponent,
+        ChatComponent,
+        EditProfileComponent,
+        AboutComponent,
+        VideoDisplayComponent,
+        LoginComponent,
+        CreateComponent,
+        NotificationsComponent,
+        ProfileComponent,
+        MobileNavigationComponent,
+        VideoPlayerComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatProgressBarModule,
+        AppRoutingModule], providers: [UserService, provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule { }
