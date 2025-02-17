@@ -2,8 +2,9 @@ import { Component, OnInit, NgZone } from '@angular/core';
 import { UserService } from '../services/user.service';
 import { UserData } from '../models/user-data.model';
 import { SharedService } from '../services/shared.service';
+import { environment } from '../environment';
 
-// Declare the global 'google' variable
+// Declare the global google object for TypeScript
 declare const google: any;
 
 @Component({
@@ -20,20 +21,18 @@ export class LoginComponent implements OnInit {
   constructor(
     private userService: UserService,
     private sharedService: SharedService,
-    private ngZone: NgZone  // NgZone can be useful to run UI updates
+    private ngZone: NgZone
   ) { }
 
   ngOnInit(): void {
-    // Optionally, initialize your secret key login here
-
-    // Initialize Google Sign-In after view has loaded
+    // Initialize any existing secret key flow if needed
     this.initializeGoogleSignIn();
   }
 
   verifySecretKey(): void {
     this.userService.getUser(this.secretKey).subscribe(
       (response: UserData) => {
-        if(response.userId === ''){
+        if (response.userId === '') {
           this.message = 'Invalid Key';
         } else {
           this.generatedUserData = response;
@@ -48,16 +47,13 @@ export class LoginComponent implements OnInit {
           location.reload();
         }
       },
-      error => console.error('Error generating user ID:', error)
+      (error: any) => console.error('Error generating user ID:', error)
     );
   }
 
-  // ---------------------------
-  // Google SSO Integration Code
-  // ---------------------------
+  // Google SSO Integration
   initializeGoogleSignIn(): void {
-    // Replace with your actual Google Client ID
-    const clientId = 'YOUR_GOOGLE_CLIENT_ID';
+    const clientId = environment.GOOGLE_CLIENT_ID; // Replace with your actual Google Client ID
 
     // Initialize the Google Identity Services library
     google.accounts.id.initialize({
@@ -65,27 +61,24 @@ export class LoginComponent implements OnInit {
       callback: this.handleCredentialResponse.bind(this)
     });
 
-    // Render the Google Sign-In button into the div with id 'googleSignInDiv'
+    // Render the Google Sign-In button in the div with id 'googleSignInDiv'
     google.accounts.id.renderButton(
       document.getElementById('googleSignInDiv'),
-      { theme: 'outline', size: 'large' }  // Customize button style as needed
+      { theme: 'outline', size: 'large' }
     );
 
-    // Optionally, prompt the One Tap dialog
+    // Optionally, display the One Tap dialog
     // google.accounts.id.prompt();
   }
 
   handleCredentialResponse(response: any): void {
-    // response.credential contains the JWT token returned by Google
+    // response.credential contains the JWT token from Google
     console.log('Google JWT token:', response.credential);
 
-    // Send the token to your backend for verification if needed.
-    // For example, you might have a method in your userService:
+    // Send the token to your backend for verification
     this.userService.verifyGoogleToken(response.credential).subscribe(
       (userData: UserData) => {
-        // Use NgZone to ensure UI updates occur inside Angular's zone
         this.ngZone.run(() => {
-          // Save user info in cookies or shared state as in your secret key flow
           this.sharedService.setCookie('userId', userData.userId, 365);
           this.sharedService.setCookie('username', userData.username, 365);
           this.sharedService.setCookie('profilePic', userData.profilePic, 365);
@@ -93,7 +86,7 @@ export class LoginComponent implements OnInit {
           location.reload();
         });
       },
-      error => console.error('Error verifying Google token:', error)
+      (error: any) => console.error('Error verifying Google token:', error)
     );
   }
 }
