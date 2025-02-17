@@ -4,7 +4,6 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { FeedService } from '../../services/feed.service';
 import { SharedService } from '../../services/shared.service';
 import { LikesPopupComponent } from '../likes-popup/likes-popup.component';
-import { convertActionBinding } from '@angular/compiler/src/compiler_util/expression_converter';
 
 @Component({
   selector: 'app-comments-popup',
