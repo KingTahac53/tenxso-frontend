@@ -1,111 +1,118 @@
 <div class="message-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="chat-area">
-                        
-                        <div class="chatlist">
-                            <div class="modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    
-
-                                    <div class="modal-body">
-                                       
-                                        <div class="chat-lists">
-                                            <div class="tab-content" id="myTabContent">
-                                                <div class="tab-pane fade show active" id="Open" role="tabpanel" aria-labelledby="Open-tab">
-                                                   
-                                                    <div class="chat-list">
-                                                        <div *ngFor="let users of chatList">
-                                                            <a class="d-flex align-items-center" (click)="displayChats(users.toUserId)" >
-                                                                <div class="flex-shrink-0">
-                                                                    <img class="img-fluid" src="{{users.toUserProfilePic}}" alt="user img" style="width: 50px;height: 50px;border-radius: 50%;">
-                                                                    <!-- <span class="active"></span> -->
-                                                                </div>
-                                                                <div class="flex-grow-1 ms-3">
-                                                                    <h3>{{users.toUserName}}</h3>
-                                                                    <p>tenX</p>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                       
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="chat-area">
+                    <!-- Sidebar: Active Users List -->
+                    <div class="chatlist" [ngClass]="{'hidden': !sidebarVisible}">
+                        <div class="modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <div class="chat-lists">
+                                        <div class="tab-content" id="myTabContent">
+                                            <div class="tab-pane fade show active" id="Open" role="tabpanel"
+                                                aria-labelledby="Open-tab">
+                                                <div class="chat-list">
+                                                    <div *ngFor="let user of chatList">
+                                                        <a class="d-flex align-items-center"
+                                                            (click)="displayChats(user.toUserId)">
+                                                            <div class="flex-shrink-0 position-relative">
+                                                                <img class="img-fluid" [src]="user.toUserProfilePic"
+                                                                    alt="user img"
+                                                                    style="width: 50px; height: 50px; border-radius: 50%;">
+                                                                <!-- Show active dot if user is active -->
+                                                                <span *ngIf="user.isActive" class="active-dot"></span>
+                                                            </div>
+                                                            <div class="flex-grow-1 ms-3">
+                                                                <h3>{{ user.toUserName }}</h3>
+                                                                <p>{{ user.statusMessage || 'Online' }}</p>
+                                                            </div>
+                                                        </a>
                                                     </div>
-                                                   
                                                 </div>
-                                               
                                             </div>
-
                                         </div>
-                                       
                                     </div>
                                 </div>
                             </div>
                         </div>
-                      
-                        <div class="chatbox">
-                            <div class="modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    <div class="msg-head">
-                                        <div class="row">
-                                            <div class="col-8">
-                                                <div class="d-flex align-items-center">
-                                                    <span class="chat-icon"><img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/arroleftt.svg" alt="image title"></span>
-                                                    <div class="flex-shrink-0">
-                                                        <img class="img-fluid" src="{{chat_with_profilepic}}" alt="user img" style="width: 50px;height: 50px;border-radius: 50%;">
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h3>{{chat_with_username}}</h3>
-                                                        <p>**</p>
-                                                    </div>
+                    </div>
+
+                    <!-- Chatbox: Message Window and Controls -->
+                    <div class="chatbox">
+                        <div class="modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <!-- Chat Header with Back/Toggler and Call Controls -->
+                                <div class="msg-head">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="d-flex align-items-center">
+                                                <!-- Sidebar toggle (for mobile) -->
+                                                <span class="chat-icon" (click)="toggleSidebar()">
+                                                    <img class="img-fluid" src="assets/img/arroleftt.svg" alt="back">
+                                                </span>
+                                                <div class="flex-shrink-0">
+                                                    <img class="img-fluid" [src]="chat_with_profilepic" alt="user img"
+                                                        style="width: 50px; height: 50px; border-radius: 50%;">
+                                                </div>
+                                                <div class="flex-grow-1 ms-3">
+                                                    <h3>{{ chat_with_username }}</h3>
+                                                    <p>**</p>
                                                 </div>
                                             </div>
-                                            <div class="col-4">
-                                               
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <!-- Call controls: Audio and Video buttons -->
+                                            <div class="call-controls">
+                                                <button class="btn btn-sm btn-secondary" (click)="startAudioCall()">
+                                                    <i class="fa fa-phone"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" (click)="startVideoCall()">
+                                                    <i class="fa fa-video-camera"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
-
-                                    <div class="modal-body">
-                                        <div class="msg-body">
+                                <!-- Chat Message History -->
+                                <div class="modal-body">
+                                    <div class="msg-body">
                                         <ul>
                                             <div *ngFor="let msg of receivedMessages">
                                                 <li class="sender" *ngIf="msg.type=='sender'">
-                                                    <p>  {{ msg.message }} </p>
-                                                    <span class="time">10:06 am</span>
+                                                    <p>{{ msg.message }}</p>
+                                                    <span class="time">{{ msg.msgtime }}</span>
                                                 </li>
                                                 <li class="repaly" *ngIf="msg.type=='reply'">
-                                                    <p>  {{ msg.message }} </p>
-                                                    <span class="time">10:20 am</span>
+                                                    <p>{{ msg.message }}</p>
+                                                    <span class="time">{{ msg.msgtime }}</span>
                                                 </li>
                                             </div>
                                         </ul>
                                     </div>
                                 </div>
 
-
-                                    <div class="send-box">
-                                        <form action="">
-                                            <input type="text" class="form-control" aria-label="message…" placeholder="Write message…" [(ngModel)]="message">
-
-                                            <button type="button" (click)="sendMessage()"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
-                                        </form>
-
-                                       
-                                    </div>
+                                <!-- Message Input Area -->
+                                <div class="send-box">
+                                    <form (ngSubmit)="sendMessage()">
+                                        <input type="text" class="form-control" placeholder="Write message…"
+                                            [(ngModel)]="message" name="message">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-paper-plane"></i> Send
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
+
                 </div>
             </div>
         </div>
-</div>
+    </div>
 
-<div style="text-align: center;padding-top: 200px;">
-    <div *ngIf="loading" class="loading-spinner">Loading Chats...</div>
-  </div>
-
-
-  
+    <!-- Global Loading Indicator -->
+    <div style="text-align: center; padding-top: 200px;">
+        <div *ngIf="loading" class="loading-spinner">Loading Chats...</div>
+    </div>
