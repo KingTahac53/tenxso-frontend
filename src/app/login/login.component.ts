@@ -1,4 +1,5 @@
 import { Component, OnInit, NgZone } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 import { UserData } from '../models/user-data.model';
 import { SharedService } from '../services/shared.service';
@@ -21,7 +22,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private userService: UserService,
     private sharedService: SharedService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -44,7 +46,7 @@ export class LoginComponent implements OnInit {
             this.generatedUserData.username,
             this.generatedUserData.profilePic
           );
-          location.reload();
+          this.router.navigate(['/create']);
         }
       },
       (error: any) => console.error('Error generating user ID:', error)
@@ -83,7 +85,7 @@ export class LoginComponent implements OnInit {
           this.sharedService.setCookie('username', userData.username, 365);
           this.sharedService.setCookie('profilePic', userData.profilePic, 365);
           this.sharedService.setUserInfo(userData.userId, userData.username, userData.profilePic);
-          location.reload();
+          this.router.navigate(['/create']);
         });
       },
       (error: any) => console.error('Error verifying Google token:', error)
