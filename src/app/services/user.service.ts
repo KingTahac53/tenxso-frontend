@@ -26,7 +26,7 @@ export class UserService {
 
   // New method to verify the Google token by sending it to your backend.
   verifyGoogleToken(token: string): Observable<UserData> {
-    return this.http.post<UserData>(`${this.apiUrl}/verify-google`, { token });
+    return this.http.post<UserData>(`${this.apiUrl}/Account/google-verify-token`, { token });
   }
 
   // Method to upload a feed with form data
