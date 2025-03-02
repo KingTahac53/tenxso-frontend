@@ -18,15 +18,20 @@ export class UserService {
     return this.http.get<UserData>(sanitizedUrl);
   }
 
-  getUser(userId:any): Observable<UserData> {
-    const sanitizedUrl = this.apiUrl+"/Users/getUser/?userId="+userId;
+  getUser(userId: any): Observable<UserData> {
+    const sanitizedUrl = this.apiUrl + "/Users/getUser/?userId=" + userId;
     //console.log('Calling API (GET):', sanitizedUrl);
     return this.http.get<UserData>(sanitizedUrl);
   }
 
+  // New method to verify the Google token by sending it to your backend.
+  verifyGoogleToken(token: string): Observable<UserData> {
+    return this.http.post<UserData>(`${this.apiUrl}/Account/google-verify-token`, { token });
+  }
+
   // Method to upload a feed with form data
   updateUser(formData: FormData): Observable<HttpEvent<any>> {
-    const req = new HttpRequest('POST', this.apiUrl+'/Users/updateUser', formData, {
+    const req = new HttpRequest('POST', this.apiUrl + '/Users/updateUser', formData, {
       reportProgress: true,   // Report upload progress
       responseType: 'json'
     });
