@@ -12,7 +12,8 @@ export class MobileNavigationComponent {
     { link: '/messages', icon: 'fas fa-envelope' },
     { link: '/create', icon: 'fas fa-plus-circle' },
     { link: '/notifications', icon: 'fas fa-bell' },
-    { link: '/edit-profile', icon: 'fas fa-user' }
+    { link: '/edit-profile', icon: 'fas fa-user' },
+    { link: '/login', icon: 'fas fa-sign-in-alt' }
   ];
 
   constructor(public router: Router) { }
