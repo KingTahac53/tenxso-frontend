@@ -1,11 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { FeedService } from "../services/feed.service"; // if still needed for other feed functions
+import { FeedService } from "../services/feed.service";
 import { SharedService } from "../services/shared.service";
 import { SignalRService } from "../services/signal-r.service";
 import { ChatService } from "../services/chat.service";
 import { Feed } from "../models/feed.model";
-// (Optional) Uncomment if you wish to use Angular Signals for reactive state
-// import { signal } from '@angular/core';
 
 @Component({
   selector: "messagespage",
@@ -34,9 +32,7 @@ export class MessagesComponent implements OnInit {
   chat_with_profilepic: any;
   chatId: string | null = null;
 
-  // New property to track call state (could also use Angular Signals)
   callState: "idle" | "calling" | "inCall" = "idle";
-  // New property to toggle sidebar visibility (especially for mobile)
   sidebarVisible: boolean = true;
 
   constructor(
@@ -47,7 +43,7 @@ export class MessagesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Get userId and username from sharedService
+    // Get userId and username from shared service
     this.sharedService.getUserId().subscribe((userId) => {
       this.userId = userId;
     });
@@ -59,6 +55,7 @@ export class MessagesComponent implements OnInit {
     let uId = this.sharedService.getCookie("userId");
     if (uId) {
       this.userId = uId;
+      // We call checkNewChat() if needed—be sure it doesn't override recipient info.
       this.checkNewChat();
       this.getChats(uId);
     }
@@ -75,88 +72,59 @@ export class MessagesComponent implements OnInit {
         this.receivedMessages.push(obj);
       }
     });
-
-    // (Example) Subscribe to call events (if implemented in your SignalR service)
-    // this.signalRService.currentCall.subscribe(callInfo => {
-    // console.log("Incoming call:", callInfo);
-    // Here you could update the call state or open a call modal, etc.
-    // });
   }
 
-  // Send a text message and clear the input field afterward
-  // Send a text message and clear the input field afterward
+  // Send a text message using the send-message API.
+  // Pass chatId as null if it's a new chat.
   sendMessage(): void {
-    if (!this.chatId) {
-      // New chat: call the new-chat API
-      this.chatService
-        .createNewChat(this.userId, this.chat_with_userId, this.message)
-        .subscribe(
-          (response) => {
-            // Assume response returns a ChatId
-            this.chatId = response.chatId;
-            // Push the message into the local array
-            const obj = {
-              message: this.message,
-              type: "reply",
-              msgtime: new Date().toLocaleTimeString(),
-            };
-            this.receivedMessages.push(obj);
-            // Optionally, send via SignalR for real-time update
-            this.signalRService.sendMessage(
-              this.userId,
-              this.chat_with_userId,
-              this.message
-            );
-            this.message = "";
-          },
-          (error) => {
-            console.error("Error creating new chat", error);
-          }
-        );
-    } else {
-      // Existing chat: call the send-message API
-      this.chatService
-        .sendMessage(
-          this.chatId,
-          this.userId,
-          this.chat_with_userId,
-          this.message
-        )
-        .subscribe(
-          (response) => {
-            // On success, update the chat window
-            const obj = {
-              message: this.message,
-              type: "reply",
-              msgtime: new Date().toLocaleTimeString(),
-            };
-            this.receivedMessages.push(obj);
-            // Also notify via SignalR if needed
-            this.signalRService.sendMessage(
-              this.userId,
-              this.chat_with_userId,
-              this.message
-            );
-            this.message = "";
-          },
-          (error) => {
-            console.error("Error sending message", error);
-          }
-        );
+    if (!this.userId || !this.chat_with_userId || !this.message.trim()) {
+      return;
     }
+
+    this.chatService
+      .sendMessage(
+        this.chatId,
+        this.userId,
+        this.chat_with_userId,
+        this.message
+      )
+      .subscribe({
+        next: (response: any) => {
+          // If chatId was null and the backend returns a new chatId, update it.
+          if (!this.chatId && response.chatId) {
+            this.chatId = response.chatId;
+            // Refresh chat users list so that the new chat shows up in the left pane.
+            this.getChats(this.userId);
+          }
+          const obj = {
+            message: this.message,
+            type: "reply",
+            msgtime: new Date().toLocaleTimeString(),
+          };
+          this.receivedMessages.push(obj);
+          this.signalRService.sendMessage(
+            this.userId,
+            this.chat_with_userId,
+            this.message
+          );
+          this.message = "";
+        },
+        error: (error) => {
+          console.error("Error sending message", error);
+        },
+      });
   }
 
-  // Load messages for the selected chat using the new API
+  // Load messages for the selected chat using the chat-history API.
   loadChatHistory(chatId: string) {
     this.chatService.getChatHistory(chatId).subscribe(
       (history: any[]) => {
-        // Map the API response to your message format.
+        // Map the API response to your local message format.
         this.receivedMessages = history.map((msg) => ({
           message: msg.content,
           type: msg.senderId === this.userId ? "reply" : "sender",
           msgtime: new Date(msg.timestamp).toLocaleTimeString(),
         }));
-        // Update current chatId
         this.chatId = chatId;
       },
       (error) => {
@@ -164,7 +132,9 @@ export class MessagesComponent implements OnInit {
       }
     );
   }
-  // Subscribe to new chat information from shared service
+
+  // Subscribe to default chat user info if needed.
+  // Make sure this does not override the recipient set via the sidebar.
   checkNewChat() {
     this.sharedService
       .getchat_UserId()
@@ -188,23 +158,26 @@ export class MessagesComponent implements OnInit {
     this.backup_profilepic = this.chat_with_profilepic;
   }
 
-  // Retrieve chat users list using the new API
+  // Retrieve chat users list using the updated API (which returns chatId too).
   getChats(uid: any) {
     if (this.loading) return;
     this.loading = true;
     this.chatService.getChatUsers(uid).subscribe(
       (response: any[]) => {
-        // response should be an array of chat user objects
         this.chatList = response;
         this.loading = false;
 
-        // Optionally load the first chat in the list
-        if (this.chatList && this.chatList.length > 0) {
+        // Auto-select the first chat ONLY if no recipient is already set (i.e. coming from feed page).
+        if (
+          !this.chat_with_userId &&
+          this.chatList &&
+          this.chatList.length > 0
+        ) {
           let chatUser = this.chatList[0];
           this.chat_with_userId = chatUser.userId;
-          // If your API returns a chatId with the chat user, set it; else, null indicates a new chat.
+          this.chat_with_username = chatUser.username;
+          this.chat_with_profilepic = chatUser.profilePicUrl;
           this.chatId = chatUser.chatId || null;
-          // Load chat history if a chatId exists
           if (this.chatId) {
             this.loadChatHistory(this.chatId);
           }
@@ -217,48 +190,37 @@ export class MessagesComponent implements OnInit {
     );
   }
 
-  // Add this method to handle the click event on a user in the chat list.
+  // Called when a user is clicked in the sidebar.
+  // Updates recipient details and loads chat history if chatId exists.
   selectChatUser(user: any): void {
-    console.log("User clicked:", user); // Debug log
-    // Use the correct property names from the API response:
+    console.log("User clicked:", user);
     this.chat_with_userId = user.userId;
     this.chat_with_username = user.username;
-    this.chat_with_profilepic = user.profilePicUrl; // Correct property from API
+    this.chat_with_profilepic = user.profilePicUrl;
 
-    // If the API provided a chatId, load the chat history; otherwise, clear the chat window.
     if (user.chatId) {
-      this.chatId = "ejkRfs"; // user.chatId
-      this.loadChatHistory(this.chatId);
+      this.chatId = user.chatId;
+      this.loadChatHistory(this.chatId!);
     } else {
       this.chatId = null;
       this.receivedMessages = [];
-      // Optionally, you can show a placeholder message in the chat window here.
-      // this.receivedMessages.push({
-      //   message: "No previous messages. Start the conversation!",
-      //   type: "placeholder",
-      //   msgtime: ""
-      // });
     }
   }
 
-  // Toggle sidebar visibility (useful on mobile)
+  // Toggle sidebar visibility (useful for mobile)
   toggleSidebar(): void {
     this.sidebarVisible = !this.sidebarVisible;
   }
 
-  // Initiate an audio call by updating call state and invoking SignalR call request
+  // Initiate an audio call (dummy implementation)
   startAudioCall(): void {
     console.log("Starting audio call with user:", this.chat_with_userId);
     this.callState = "calling";
-    // this.signalRService.sendCallRequest(this.userId, this.chat_with_userId, 'audio');
-    // Optionally, open a modal or update the UI to reflect the call status.
   }
 
-  // Initiate a video call by updating call state and invoking SignalR call request
+  // Initiate a video call (dummy implementation)
   startVideoCall(): void {
     console.log("Starting video call with user:", this.chat_with_userId);
     this.callState = "calling";
-    // this.signalRService.sendCallRequest(this.userId, this.chat_with_userId, 'video');
-    // For video calls, you might display a video element overlay.
   }
 }
