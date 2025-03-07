@@ -8,7 +8,8 @@ import { SharedService } from "../services/shared.service";
 })
 export class SignalRService {
   public hubConnection: signalR.HubConnection;
-  private messageSource = new BehaviorSubject<string>("");
+  // Use any to allow message objects (or define an interface if you prefer)
+  private messageSource = new BehaviorSubject<any>(null);
   private counterSource = new BehaviorSubject<string>("");
   currentMessage = this.messageSource.asObservable();
   notificationCounter = this.counterSource.asObservable();
@@ -23,31 +24,13 @@ export class SignalRService {
     this.hubConnection
       .start()
       .then(() => console.log("Connection started"))
-      .then(() => console.log(this.getConnectionId()))
+      .then(() => this.getConnectionId())
       .catch((err) => console.log("Error while starting connection: " + err));
 
+    // Listen for full message objects from the hub.
     this.hubConnection.on("ReceiveMessage", (message: any) => {
-      this.messageSource.next(`${message}`);
-    });
-
-    this.hubConnection.on("ReceiveBellCount", (counter: any) => {
-      this.counterSource.next(`${counter}`);
-    });
-  }
-
-  public startSignalRHub() {
-    this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl("https://tenxs.azurewebsites.net/api/chatHub")
-      .build();
-
-    this.hubConnection
-      .start()
-      .then(() => console.log("Connection started"))
-      .then(() => console.log(this.getConnectionId()))
-      .catch((err) => console.log("Error while starting connection: " + err));
-
-    this.hubConnection.on("ReceiveMessage", (user: any, message: any) => {
-      this.messageSource.next(`${user}: ${message}`);
+      // Do not convert message to string—pass it as an object.
+      this.messageSource.next(message);
     });
 
     this.hubConnection.on("ReceiveBellCount", (counter: any) => {
@@ -56,9 +39,6 @@ export class SignalRService {
   }
 
   private getConnectionId = () => {
-    //var userId=this.sharedService.getCookie('userId');
-    //console.log("this.sharedService.getUserId()");
-    //console.log(this.sharedService.getUserId());
     this.sharedService
       .getUserId()
       .subscribe((userId) => (this.userId = userId));

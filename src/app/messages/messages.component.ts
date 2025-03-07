@@ -60,17 +60,18 @@ export class MessagesComponent implements OnInit {
       this.getChats(uId);
     }
 
-    // Listen for incoming messages via SignalR
-    this.signalRService.currentMessage.subscribe((msg) => {
+    // Subscribe to incoming SignalR messages and update the current chat if applicable.
+    this.signalRService.currentMessage.subscribe((msg: any) => {
       console.log("Received message:", msg);
-      if (msg) {
+      if (msg && this.chatId && msg.chatId === this.chatId) {
         let obj = {
-          message: msg,
-          type: "sender",
-          msgtime: new Date().toLocaleTimeString(),
+          message: msg.content,
+          type: msg.senderId === this.userId ? "reply" : "sender",
+          msgtime: new Date(msg.timestamp || Date.now()).toLocaleTimeString(),
         };
         this.receivedMessages.push(obj);
       }
+      // Optionally, handle messages for other chats (e.g. update notifications)
     });
   }
 
@@ -90,7 +91,7 @@ export class MessagesComponent implements OnInit {
       )
       .subscribe({
         next: (response: any) => {
-          // If chatId was null and the backend returns a new chatId, update it.
+          // If chatId was null and backend returns a new chatId, update it.
           if (!this.chatId && response.chatId) {
             this.chatId = response.chatId;
             // Refresh chat users list so that the new chat shows up in the left pane.
