@@ -43,7 +43,7 @@ export class MessagesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Get userId and username from shared service
+    // Get userId and username from shared service (or cookie)
     this.sharedService.getUserId().subscribe((userId) => {
       this.userId = userId;
     });
@@ -51,27 +51,33 @@ export class MessagesComponent implements OnInit {
       this.username = username;
     });
 
-    // Retrieve userId from cookie if available
     let uId = this.sharedService.getCookie("userId");
     if (uId) {
       this.userId = uId;
-      // We call checkNewChat() if needed—be sure it doesn't override recipient info.
       this.checkNewChat();
       this.getChats(uId);
     }
 
-    // Subscribe to incoming SignalR messages and update the current chat if applicable.
+    // Subscribe to incoming SignalR messages.
     this.signalRService.currentMessage.subscribe((msg: any) => {
-      console.log("Received message:", msg);
-      if (msg && this.chatId && msg.chatId === this.chatId) {
-        let obj = {
-          message: msg.content,
-          type: msg.senderId === this.userId ? "reply" : "sender",
-          msgtime: new Date(msg.timestamp || Date.now()).toLocaleTimeString(),
-        };
-        this.receivedMessages.push(obj);
+      console.log("Received message object:", msg);
+      if (msg && msg.chatId) {
+        if (this.chatId && msg.chatId === this.chatId) {
+          let obj = {
+            message: msg.content,
+            type: msg.senderId === this.userId ? "reply" : "sender",
+            msgtime: new Date(msg.timestamp || Date.now()).toLocaleTimeString(),
+          };
+          this.receivedMessages.push(obj);
+        } else {
+          const index = this.chatList.findIndex(
+            (item) => item.chatId === msg.chatId
+          );
+          if (index > -1) {
+            this.chatList[index].newMessage = true;
+          }
+        }
       }
-      // Optionally, handle messages for other chats (e.g. update notifications)
     });
   }
 
@@ -94,7 +100,7 @@ export class MessagesComponent implements OnInit {
           // If chatId was null and backend returns a new chatId, update it.
           if (!this.chatId && response.chatId) {
             this.chatId = response.chatId;
-            // Refresh chat users list so that the new chat shows up in the left pane.
+            // Refresh chat users list so that the new chat appears in the left pane.
             this.getChats(this.userId);
           }
           const obj = {
@@ -120,7 +126,6 @@ export class MessagesComponent implements OnInit {
   loadChatHistory(chatId: string) {
     this.chatService.getChatHistory(chatId).subscribe(
       (history: any[]) => {
-        // Map the API response to your local message format.
         this.receivedMessages = history.map((msg) => ({
           message: msg.content,
           type: msg.senderId === this.userId ? "reply" : "sender",
@@ -135,7 +140,7 @@ export class MessagesComponent implements OnInit {
   }
 
   // Subscribe to default chat user info if needed.
-  // Make sure this does not override the recipient set via the sidebar.
+  // Ensure this doesn't override the recipient set via the sidebar.
   checkNewChat() {
     this.sharedService
       .getchat_UserId()
@@ -168,7 +173,7 @@ export class MessagesComponent implements OnInit {
         this.chatList = response;
         this.loading = false;
 
-        // Auto-select the first chat ONLY if no recipient is already set (i.e. coming from feed page).
+        // Auto-select the first chat ONLY if no recipient is already set (e.g. coming from feed page).
         if (
           !this.chat_with_userId &&
           this.chatList &&
@@ -192,14 +197,15 @@ export class MessagesComponent implements OnInit {
   }
 
   // Called when a user is clicked in the sidebar.
-  // Updates recipient details and loads chat history if chatId exists.
+  // Updates recipient details, clears any new-message flag, and loads chat history if chatId exists.
   selectChatUser(user: any): void {
     console.log("User clicked:", user);
     this.chat_with_userId = user.userId;
     this.chat_with_username = user.username;
     this.chat_with_profilepic = user.profilePicUrl;
-
+    // Clear the new message flag for this chat.
     if (user.chatId) {
+      user.newMessage = false;
       this.chatId = user.chatId;
       this.loadChatHistory(this.chatId!);
     } else {
@@ -208,18 +214,18 @@ export class MessagesComponent implements OnInit {
     }
   }
 
-  // Toggle sidebar visibility (useful for mobile)
+  // Toggle sidebar visibility (useful for mobile).
   toggleSidebar(): void {
     this.sidebarVisible = !this.sidebarVisible;
   }
 
-  // Initiate an audio call (dummy implementation)
+  // Initiate an audio call (dummy implementation).
   startAudioCall(): void {
     console.log("Starting audio call with user:", this.chat_with_userId);
     this.callState = "calling";
   }
 
-  // Initiate a video call (dummy implementation)
+  // Initiate a video call (dummy implementation).
   startVideoCall(): void {
     console.log("Starting video call with user:", this.chat_with_userId);
     this.callState = "calling";

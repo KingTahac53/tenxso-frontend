@@ -1,43 +1,39 @@
 <div class="container-fluid chat-container">
     <div class="row h-100">
-
         <!-- Sidebar (Chat List) -->
         <div class="col-12 col-md-4 col-lg-3 p-0 user-list" [ngClass]="{'d-none d-md-block': !sidebarVisible}">
             <div class="list-group rounded-0 border-0 h-100 overflow-auto">
                 <div class="list-group-item list-group-item-action" *ngFor="let user of chatList"
                     (click)="selectChatUser(user)">
                     <div class="d-flex align-items-center">
-                        <!-- Use user.profilePicUrl as returned by your API -->
                         <img [src]="user.profilePicUrl || 'assets/img/default-avatar.png'" alt="User"
                             class="rounded-circle me-3" width="50" height="50" />
                         <div>
                             <h6 class="mb-0">{{ user.username }}</h6>
-                            <small class="text-muted">{{ user.isActive ? 'Online' : 'Offline' }}</small>
+                            <!-- If there is a new message flag, display a bold label -->
+                            <div *ngIf="user.newMessage">
+                                <b>New Message</b>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-
         <!-- Chat Area -->
         <div class="col-12 col-md-8 col-lg-9 p-0 d-flex flex-column chat-area">
-
             <!-- Chat Header -->
             <div class="chat-header d-flex align-items-center p-3 border-bottom">
                 <!-- Mobile toggle button -->
                 <button class="btn btn-link text-secondary d-md-none" (click)="toggleSidebar()">
                     <i class="fa fa-bars"></i>
                 </button>
-
                 <img [src]="chat_with_profilepic || 'assets/img/default-avatar.png'" alt="User"
                     class="rounded-circle me-2" width="50" height="50" />
-
                 <div>
                     <h5 class="mb-0">{{ chat_with_username || 'Select a User' }}</h5>
-                    <small class="text-muted" *ngIf="chat_with_userId">Offline</small>
+                    <!-- Removed Active/Online status -->
                 </div>
-
                 <div class="ms-auto">
                     <button class="btn btn-sm btn-secondary me-1" (click)="startAudioCall()"
                         [disabled]="!chat_with_userId">
@@ -51,14 +47,9 @@
 
             <!-- Chat Body -->
             <div class="chat-body flex-grow-1 p-3 overflow-auto" id="chatBody">
-                <div *ngFor="let msg of receivedMessages" [ngClass]="{
-              'text-end': msg.type === 'reply',
-              'text-start': msg.type === 'sender'
-            }">
-                    <div [ngClass]="{
-                'msg-sent': msg.type === 'reply',
-                'msg-received': msg.type === 'sender'
-              }">
+                <div *ngFor="let msg of receivedMessages"
+                    [ngClass]="{'text-end': msg.type === 'reply', 'text-start': msg.type === 'sender'}">
+                    <div [ngClass]="{'msg-sent': msg.type === 'reply', 'msg-received': msg.type === 'sender'}">
                         <p class="mb-1">{{ msg.message }}</p>
                         <small class="text-muted">{{ msg.msgtime }}</small>
                     </div>

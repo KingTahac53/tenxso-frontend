@@ -17,8 +17,11 @@ export class SignalRService {
   public userId: string | null = null;
 
   constructor(private sharedService: SharedService) {
+    // Pass { withCredentials: false } in the connection options.
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl("https://tenxs.azurewebsites.net/chatHub")
+      .withUrl("https://snappservice.azurewebsites.net/chatHub", {
+        withCredentials: false,
+      })
       .build();
 
     this.hubConnection
@@ -29,7 +32,7 @@ export class SignalRService {
 
     // Listen for full message objects from the hub.
     this.hubConnection.on("ReceiveMessage", (message: any) => {
-      // Do not convert message to string—pass it as an object.
+      // Pass the raw message object.
       this.messageSource.next(message);
     });
 
