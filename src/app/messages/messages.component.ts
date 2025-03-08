@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { FeedService } from "../services/feed.service";
 import { SharedService } from "../services/shared.service";
-import { SignalRService } from "../services/signal-r.service";
 import { ChatService } from "../services/chat.service";
+import { ServiceBusService } from "../services/service-bus.service"; // NEW: Import the Service Bus polling service
 import { Feed } from "../models/feed.model";
 
 @Component({
@@ -38,8 +38,8 @@ export class MessagesComponent implements OnInit {
   constructor(
     private feedService: FeedService,
     private sharedService: SharedService,
-    private signalRService: SignalRService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private serviceBusService: ServiceBusService // NEW: Inject the Service Bus service
   ) {}
 
   ngOnInit() {
@@ -58,24 +58,50 @@ export class MessagesComponent implements OnInit {
       this.getChats(uId);
     }
 
-    // Subscribe to incoming SignalR messages.
-    this.signalRService.currentMessage.subscribe((msg: any) => {
-      console.log("Received message object:", msg);
-      if (msg && msg.chatId) {
-        if (this.chatId && msg.chatId === this.chatId) {
-          let obj = {
-            message: msg.content,
-            type: msg.senderId === this.userId ? "reply" : "sender",
-            msgtime: new Date(msg.timestamp || Date.now()).toLocaleTimeString(),
+    // NEW: Start polling Service Bus for messages
+    // Poll every 10 seconds (adjust as needed)
+    this.serviceBusService.startPolling(10000).subscribe((message) => {
+      if (message) {
+        console.log("Message from Service Bus:", message);
+        // Parse the returned XML message.
+        // This example uses DOMParser and assumes the message XML contains <chatId>, <senderId>, <content>, <timestamp>
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(message, "application/xml");
+
+        const chatIdNode = xmlDoc.getElementsByTagName("chatId")[0];
+        const senderIdNode = xmlDoc.getElementsByTagName("senderId")[0];
+        const contentNode = xmlDoc.getElementsByTagName("content")[0];
+        const timestampNode = xmlDoc.getElementsByTagName("timestamp")[0];
+
+        if (chatIdNode && senderIdNode && contentNode) {
+          const msgObj = {
+            chatId: chatIdNode.textContent,
+            senderId: senderIdNode.textContent,
+            content: contentNode.textContent,
+            timestamp: timestampNode ? timestampNode.textContent : Date.now(),
           };
-          this.receivedMessages.push(obj);
-        } else {
-          const index = this.chatList.findIndex(
-            (item) => item.chatId === msg.chatId
-          );
-          if (index > -1) {
-            this.chatList[index].newMessage = true;
+
+          // If the message belongs to the currently open chat, update the chat window.
+          if (this.chatId && msgObj.chatId === this.chatId) {
+            const obj = {
+              message: msgObj.content,
+              type: msgObj.senderId === this.userId ? "reply" : "sender",
+              msgtime: new Date(
+                msgObj.timestamp || Date.now()
+              ).toLocaleTimeString(),
+            };
+            this.receivedMessages.push(obj);
+          } else {
+            // Otherwise, update the chat list: mark the corresponding chat as having a new message.
+            const index = this.chatList.findIndex(
+              (item) => item.chatId === msgObj.chatId
+            );
+            if (index > -1) {
+              this.chatList[index].newMessage = true;
+            }
           }
+        } else {
+          console.warn("Invalid message format received from Service Bus.");
         }
       }
     });
@@ -109,11 +135,7 @@ export class MessagesComponent implements OnInit {
             msgtime: new Date().toLocaleTimeString(),
           };
           this.receivedMessages.push(obj);
-          this.signalRService.sendMessage(
-            this.userId,
-            this.chat_with_userId,
-            this.message
-          );
+          // Optionally, you could also trigger a service bus send if your backend requires it.
           this.message = "";
         },
         error: (error) => {
@@ -203,9 +225,8 @@ export class MessagesComponent implements OnInit {
     this.chat_with_userId = user.userId;
     this.chat_with_username = user.username;
     this.chat_with_profilepic = user.profilePicUrl;
-    // Clear the new message flag for this chat.
     if (user.chatId) {
-      user.newMessage = false;
+      user.newMessage = false; // Clear new message flag.
       this.chatId = user.chatId;
       this.loadChatHistory(this.chatId!);
     } else {
