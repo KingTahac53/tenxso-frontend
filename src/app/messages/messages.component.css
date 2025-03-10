@@ -1,79 +1,94 @@
+/* Container for the entire chat screen */
 .chat-container {
-  height: calc(100vh - 80px); /* Adjust if you have a fixed navbar/header */
-  position: relative;
+  height: 100%; /* Full viewport height */
+  overflow: hidden; /* Hide any overflow */
+  background: #f5f5f5;
 }
 
-/* Sidebar (User List) */
+/* Sidebar (chat list) */
 .user-list {
-  background-color: #f8f9fa;
-  border-right: 1px solid #dee2e6;
-  overflow-y: auto;
   height: 100%;
+  overflow: hidden; /* Disable scroll */
+  background: #fff;
+  border-right: 1px solid #ddd;
 }
 
-/* Chat Area */
+/* Chat area container */
 .chat-area {
-  background-color: #fff;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
 }
 
-/* Chat Header */
+/* Chat header: fixed height */
 .chat-header {
-  background-color: #fff;
-  min-height: 60px;
+  height: 60px;
+  flex: 0 0 auto;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
 }
 
-/* Chat Body */
+/* Chat body: occupies remaining space, no scroll */
 .chat-body {
-  background-color: #f4f5f7;
+  flex: 1 1 auto;
+  overflow: hidden; /* Hide scrollbars */
+  padding: 15px;
+  background: #f4f5f7;
 }
 
-/* Message Bubbles */
-.msg-sent {
-  display: inline-block;
-  background-color: #4b7bec;
-  color: #fff;
-  padding: 10px 15px;
-  border-radius: 15px;
-  margin-bottom: 10px;
-  max-width: 75%;
-  word-wrap: break-word;
+/* Chat footer: fixed height */
+.chat-footer {
+  height: 60px;
+  flex: 0 0 auto;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+  display: flex;
+  align-items: center;
 }
 
+/* Ensure the form inside the footer takes full width */
+.chat-footer form {
+  display: flex;
+  width: 100%;
+}
+
+/* Ensure the input takes full available width */
+.chat-footer form .form-control {
+  flex: 1;
+  width: 100%;
+}
+
+/* Chat message bubbles */
+.msg-sent,
 .msg-received {
   display: inline-block;
-  background-color: #e9ecef;
-  color: #333;
+  max-width: 80%;
+  word-wrap: break-word;
+  margin-bottom: 10px;
   padding: 10px 15px;
   border-radius: 15px;
-  margin-bottom: 10px;
-  max-width: 75%;
-  word-wrap: break-word;
 }
 
-/* Chat Footer */
-.chat-footer {
-  background-color: #fff;
+/* Sent messages (from you) */
+.msg-sent {
+  background: #4b7bec;
+  color: #fff;
+  align-self: flex-end;
 }
 
-/* Responsive Sidebar Toggle */
-@media (max-width: 768px) {
-  .user-list {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 250px;
-    z-index: 999;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-  }
+/* Received messages */
+.msg-received {
+  background: #e9ecef;
+  color: #333;
+  align-self: flex-start;
+}
 
-  .user-list.d-none.d-md-block {
-    /* show/hide on mobile by toggling the classes from TS */
-    display: block !important;
-    transform: translateX(0);
-  }
-
-  .chat-area {
-    margin-left: 0;
-  }
+/* Hide native scrollbar if any element still shows one */
+::-webkit-scrollbar {
+  display: none;
 }

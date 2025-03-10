@@ -11,11 +11,7 @@ export class ChatService {
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Sends a message using the send-message API.
-   * If chatId is null, the backend creates a new chat; if chatId is provided,
-   * the message is added to the existing chat.
-   */
+  // Send message API.
   sendMessage(
     chatId: string | null,
     senderId: string,
@@ -30,13 +26,18 @@ export class ChatService {
     });
   }
 
-  // Get list of existing chat users (now returns chatId as well)
+  // Get chat users API.
   getChatUsers(userId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/Messages/chat-users/${userId}`);
   }
 
-  // Get chat history by ChatId
+  // Get chat history API.
   getChatHistory(chatId: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/Messages/chat-history/${chatId}`);
+  }
+
+  // NEW: Get new messages API (returns up to 10 new messages).
+  getNewMessages(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Messages/get-new-messages`);
   }
 }

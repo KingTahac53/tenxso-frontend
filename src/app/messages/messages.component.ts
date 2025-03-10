@@ -2,8 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { FeedService } from "../services/feed.service";
 import { SharedService } from "../services/shared.service";
 import { ChatService } from "../services/chat.service";
-import { ServiceBusService } from "../services/service-bus.service"; // NEW: Import the Service Bus polling service
 import { Feed } from "../models/feed.model";
+import { interval } from "rxjs";
+import { exhaustMap } from "rxjs/operators";
 
 @Component({
   selector: "messagespage",
@@ -38,8 +39,7 @@ export class MessagesComponent implements OnInit {
   constructor(
     private feedService: FeedService,
     private sharedService: SharedService,
-    private chatService: ChatService,
-    private serviceBusService: ServiceBusService // NEW: Inject the Service Bus service
+    private chatService: ChatService
   ) {}
 
   ngOnInit() {
@@ -58,53 +58,40 @@ export class MessagesComponent implements OnInit {
       this.getChats(uId);
     }
 
-    // NEW: Start polling Service Bus for messages
-    // Poll every 10 seconds (adjust as needed)
-    this.serviceBusService.startPolling(10000).subscribe((message) => {
-      if (message) {
-        console.log("Message from Service Bus:", message);
-        // Parse the returned XML message.
-        // This example uses DOMParser and assumes the message XML contains <chatId>, <senderId>, <content>, <timestamp>
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(message, "application/xml");
+    // Poll the new messages endpoint every 5 seconds.
+    // exhaustMap ensures that a new call only starts after the previous call completes.
+    interval(10000)
+      .pipe(exhaustMap(() => this.chatService.getNewMessages()))
+      .subscribe((messages: any[]) => {
+        if (messages && messages.length > 0) {
+          messages.forEach((msg) => {
+            // Ensure chatId strings are trimmed to avoid mismatch.
+            const incomingChatId = msg.chatId ? msg.chatId.trim() : "";
+            const currentChatId = this.chatId ? this.chatId.trim() : "";
 
-        const chatIdNode = xmlDoc.getElementsByTagName("chatId")[0];
-        const senderIdNode = xmlDoc.getElementsByTagName("senderId")[0];
-        const contentNode = xmlDoc.getElementsByTagName("content")[0];
-        const timestampNode = xmlDoc.getElementsByTagName("timestamp")[0];
-
-        if (chatIdNode && senderIdNode && contentNode) {
-          const msgObj = {
-            chatId: chatIdNode.textContent,
-            senderId: senderIdNode.textContent,
-            content: contentNode.textContent,
-            timestamp: timestampNode ? timestampNode.textContent : Date.now(),
-          };
-
-          // If the message belongs to the currently open chat, update the chat window.
-          if (this.chatId && msgObj.chatId === this.chatId) {
-            const obj = {
-              message: msgObj.content,
-              type: msgObj.senderId === this.userId ? "reply" : "sender",
-              msgtime: new Date(
-                msgObj.timestamp || Date.now()
-              ).toLocaleTimeString(),
-            };
-            this.receivedMessages.push(obj);
-          } else {
-            // Otherwise, update the chat list: mark the corresponding chat as having a new message.
-            const index = this.chatList.findIndex(
-              (item) => item.chatId === msgObj.chatId
-            );
-            if (index > -1) {
-              this.chatList[index].newMessage = true;
+            if (currentChatId && incomingChatId === currentChatId) {
+              // If the message belongs to the currently open chat, append it immediately.
+              const obj = {
+                message: msg.content,
+                type: msg.senderId === this.userId ? "reply" : "sender",
+                msgtime: new Date(msg.timestamp).toLocaleTimeString(),
+              };
+              this.receivedMessages.push(obj);
+            } else {
+              // Otherwise, try to find the chat in the list.
+              const index = this.chatList.findIndex((item) => {
+                return item.chatId && item.chatId.trim() === incomingChatId;
+              });
+              if (index > -1) {
+                this.chatList[index].newMessage = true;
+              } else {
+                // If no matching chat is found, refresh the chat users list immediately.
+                this.getChats(this.userId);
+              }
             }
-          }
-        } else {
-          console.warn("Invalid message format received from Service Bus.");
+          });
         }
-      }
-    });
+      });
   }
 
   // Send a text message using the send-message API.
@@ -135,7 +122,6 @@ export class MessagesComponent implements OnInit {
             msgtime: new Date().toLocaleTimeString(),
           };
           this.receivedMessages.push(obj);
-          // Optionally, you could also trigger a service bus send if your backend requires it.
           this.message = "";
         },
         error: (error) => {
@@ -194,7 +180,6 @@ export class MessagesComponent implements OnInit {
       (response: any[]) => {
         this.chatList = response;
         this.loading = false;
-
         // Auto-select the first chat ONLY if no recipient is already set (e.g. coming from feed page).
         if (
           !this.chat_with_userId &&
