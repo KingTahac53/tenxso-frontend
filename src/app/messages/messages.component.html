@@ -1,111 +1,78 @@
-<div class="message-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="chat-area">
-                        
-                        <div class="chatlist">
-                            <div class="modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    
-
-                                    <div class="modal-body">
-                                       
-                                        <div class="chat-lists">
-                                            <div class="tab-content" id="myTabContent">
-                                                <div class="tab-pane fade show active" id="Open" role="tabpanel" aria-labelledby="Open-tab">
-                                                   
-                                                    <div class="chat-list">
-                                                        <div *ngFor="let users of chatList">
-                                                            <a class="d-flex align-items-center" (click)="displayChats(users.toUserId)" >
-                                                                <div class="flex-shrink-0">
-                                                                    <img class="img-fluid" src="{{users.toUserProfilePic}}" alt="user img" style="width: 50px;height: 50px;border-radius: 50%;">
-                                                                    <!-- <span class="active"></span> -->
-                                                                </div>
-                                                                <div class="flex-grow-1 ms-3">
-                                                                    <h3>{{users.toUserName}}</h3>
-                                                                    <p>tenX</p>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                       
-                                                    </div>
-                                                   
-                                                </div>
-                                               
-                                            </div>
-
-                                        </div>
-                                       
-                                    </div>
-                                </div>
+<div class="container-fluid chat-container">
+    <div class="row h-100">
+        <!-- Sidebar (Chat List) -->
+        <div class="col-12 col-md-4 col-lg-3 p-0 user-list" [ngClass]="{'d-none d-md-block': !sidebarVisible}">
+            <div class="list-group rounded-0 border-0 h-100 overflow-auto">
+                <div class="list-group-item list-group-item-action" *ngFor="let user of chatList"
+                    (click)="selectChatUser(user)">
+                    <div class="d-flex align-items-center">
+                        <img [src]="user.profilePicUrl || 'assets/img/default-avatar.png'" alt="User"
+                            class="rounded-circle me-3" width="50" height="50" />
+                        <div>
+                            <h6 class="mb-0">{{ user.username }}</h6>
+                            <!-- If there is a new message flag, display a bold label -->
+                            <div *ngIf="user.newMessage">
+                                <b>New Message</b>
                             </div>
                         </div>
-                      
-                        <div class="chatbox">
-                            <div class="modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    <div class="msg-head">
-                                        <div class="row">
-                                            <div class="col-8">
-                                                <div class="d-flex align-items-center">
-                                                    <span class="chat-icon"><img class="img-fluid" src="https://mehedihtml.com/chatbox/assets/img/arroleftt.svg" alt="image title"></span>
-                                                    <div class="flex-shrink-0">
-                                                        <img class="img-fluid" src="{{chat_with_profilepic}}" alt="user img" style="width: 50px;height: 50px;border-radius: 50%;">
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h3>{{chat_with_username}}</h3>
-                                                        <p>**</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-4">
-                                               
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <div class="modal-body">
-                                        <div class="msg-body">
-                                        <ul>
-                                            <div *ngFor="let msg of receivedMessages">
-                                                <li class="sender" *ngIf="msg.type=='sender'">
-                                                    <p>  {{ msg.message }} </p>
-                                                    <span class="time">10:06 am</span>
-                                                </li>
-                                                <li class="repaly" *ngIf="msg.type=='reply'">
-                                                    <p>  {{ msg.message }} </p>
-                                                    <span class="time">10:20 am</span>
-                                                </li>
-                                            </div>
-                                        </ul>
-                                    </div>
-                                </div>
-
-
-                                    <div class="send-box">
-                                        <form action="">
-                                            <input type="text" class="form-control" aria-label="message…" placeholder="Write message…" [(ngModel)]="message">
-
-                                            <button type="button" (click)="sendMessage()"><i class="fa fa-paper-plane" aria-hidden="true"></i> Send</button>
-                                        </form>
-
-                                       
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Chat Area -->
+        <div class="col-12 col-md-8 col-lg-9 p-0 d-flex flex-column chat-area">
+            <!-- Chat Header -->
+            <div class="chat-header d-flex align-items-center p-3 border-bottom">
+                <!-- Mobile toggle button -->
+                <button class="btn btn-link text-secondary d-md-none" (click)="toggleSidebar()">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <img [src]="chat_with_profilepic || 'assets/img/default-avatar.png'" alt="User"
+                    class="rounded-circle me-2" width="50" height="50" />
+                <div>
+                    <h5 class="mb-0">{{ chat_with_username || 'Select a User' }}</h5>
+                    <!-- Removed Active/Online status -->
+                </div>
+                <div class="ms-auto">
+                    <button class="btn btn-sm btn-secondary me-1" (click)="startAudioCall()"
+                        [disabled]="!chat_with_userId">
+                        <i class="fa fa-phone"></i>
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="startVideoCall()" [disabled]="!chat_with_userId">
+                        <i class="fa fa-video-camera"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Body -->
+            <div class="chat-body flex-grow-1 p-3 overflow-auto" id="chatBody">
+                <div *ngFor="let msg of receivedMessages"
+                    [ngClass]="{'text-end': msg.type === 'reply', 'text-start': msg.type === 'sender'}">
+                    <div [ngClass]="{'msg-sent': msg.type === 'reply', 'msg-received': msg.type === 'sender'}">
+                        <p class="mb-1">{{ msg.message }}</p>
+                        <small class="text-muted">{{ msg.msgtime }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Footer -->
+            <div class="chat-footer p-3 border-top">
+                <form class="d-flex mb-0" (ngSubmit)="sendMessage()">
+                    <input type="text" class="form-control me-2" placeholder="Write a message..." [(ngModel)]="message"
+                        name="message" />
+                    <button type="submit" class="btn btn-primary" [disabled]="!chat_with_userId">
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading indicator (optional) -->
+    <div *ngIf="loading" class="position-absolute top-50 start-50 translate-middle">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 </div>
-
-<div style="text-align: center;padding-top: 200px;">
-    <div *ngIf="loading" class="loading-spinner">Loading Chats...</div>
-  </div>
-
-
-  
