@@ -34,6 +34,11 @@ export class TenxAppNavigationComponent implements OnInit {
       this.generateAndStoreUser(true);
     }
 
+    // Subscribe to profile picture updates
+    this.sharedService.getProfilePic().subscribe((updatedPic) => {
+      this.generatedUserData.profilePic = updatedPic ?? ""; // Ensure it's always a string
+    });
+
     // Subscribe to notification updates
     this.signalRService.notificationCounter.subscribe((resp) => {
       this.notificationCounter += Number(resp);
