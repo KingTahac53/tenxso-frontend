@@ -35,6 +35,11 @@ export class SharedService {
     this.userIdSubject.next(userId);
     this.usernameSubject.next(username);
     this.profilePicSubject.next(profilePic);
+
+    // Also update the cookies for persistence
+    this.setCookie("userId", userId, 365);
+    this.setCookie("username", username, 365);
+    this.setCookie("profilePic", profilePic, 365);
   }
 
   setChatUserInfo(userId: string, username: string, profilePic: string): void {
