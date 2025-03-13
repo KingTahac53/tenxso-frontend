@@ -1,21 +1,26 @@
-import { Component, OnInit, Optional, Inject, EventEmitter, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FeedService } from '../../services/feed.service';
-import { SharedService } from '../../services/shared.service';
-import { LikesPopupComponent } from '../likes-popup/likes-popup.component';
+import { Component, OnInit, EventEmitter, Output, Inject } from "@angular/core";
+import { Router } from "@angular/router";
+import { MatDialog, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { FeedService } from "../../services/feed.service";
+import { SharedService } from "../../services/shared.service";
+import { LikesPopupComponent } from "../likes-popup/likes-popup.component";
 
 @Component({
-  selector: 'app-comments-popup',
-  templateUrl: './comments-popup.component.html',
-  styleUrls: ['./comments-popup.component.css']
+  selector: "app-comments-popup",
+  templateUrl: "./comments-popup.component.html",
+  styleUrls: ["./comments-popup.component.css"],
 })
 export class CommentsPopupComponent implements OnInit {
   @Output() commentPosted = new EventEmitter<any>();
-  commentData: any;
+  commentData: any[] = [];
+  likesData: any[] = [];
+  comment: string = "";
   loading: boolean = false;
   feed: any;
-  comment: any;
+  userId: string | null;
+  username: string | null;
+  profilePic: string | null;
+  isLiked: boolean = false;
 
   constructor(
     private sharedService: SharedService,
@@ -24,106 +29,116 @@ export class CommentsPopupComponent implements OnInit {
     private dialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) private data: any
   ) {
-    console.log(data);
     this.feed = data;
-    this.getPostComments(data.postId);
+    this.userId = this.getCookie("userId");
+    this.username = this.getCookie("username");
+    this.profilePic = this.getCookie("profilePic");
+
+    this.getPostComments(this.feed.postId);
+    this.getPostLikes(this.feed.postId);
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  getPostComments(postId: any) {
-
+  /** GET comments for a post */
+  getPostComments(postId: string) {
     this.feedService.getPostComments(postId).subscribe(
       (response: any) => {
         this.commentData = response;
-        this.loading = false;
       },
-      error => {
-        this.loading = false;
-        console.error('Error loading feeds:', error);
-      }
+      (error) => console.error("Error fetching comments:", error)
     );
-
   }
 
+  /** GET likes for a post */
+  getPostLikes(postId: string) {
+    this.feedService.getPostLikes(postId).subscribe(
+      (response: any) => {
+        this.likesData = response;
+        this.isLiked = this.likesData.some(
+          (like) => like.likeAuthorId === this.userId
+        );
+      },
+      (error) => console.error("Error fetching likes:", error)
+    );
+  }
+
+  /** POST a new comment */
   commentPost() {
+    if (!this.comment.trim()) return;
 
-    const formData = new FormData();
-    formData.append('PostId', this.feed.postId);  // Required field
-    if (this.comment == undefined || this.comment == null || this.comment == "") {
-      formData.append('CommentContent', 'no caption');  // Required field
+    const commentData = {
+      postId: this.feed.postId,
+      commentAuthorId: this.userId,
+      commentAuthorUsername: this.username,
+      userProfileUrl: this.profilePic,
+      commentContent: this.comment,
+    };
 
-    } else {
-      formData.append('CommentContent', this.comment);  // Required field
-    }
-
-    const userId = this.getCookie('userId');
-    const username = this.getCookie('username');
-    const profilePic = this.getCookie('profilePic');
-
-    formData.append('CommentAuthorId', userId as string);
-    formData.append('CommentAuthorUsername', username as string);
-    formData.append('UserProfileUrl', profilePic as string);
-
-    this.feedService.postCommentNew(formData).subscribe(
-      (newFeeds: any) => {
-        // this.feedData=[];
-        // this.feedData=newFeeds.blogPostsMostRecent;
-        this.comment = '';
+    this.feedService.postComment(commentData).subscribe(
+      () => {
+        this.comment = "";
         this.getPostComments(this.feed.postId);
-        this.commentPosted.emit({
-          postId: this.feed.postId
-        });
-        this.loading = false;
+        this.commentPosted.emit({ postId: this.feed.postId });
       },
-      error => {
-        this.loading = false;
-        console.error('Error loading feeds:', error);
-      }
+      (error) => console.error("Error posting comment:", error)
     );
-
   }
 
+  /** UPDATE a comment */
+  updateComment(commentId: string, newContent: string) {
+    const updateData = { commentContent: newContent };
+
+    this.feedService.updatePostComment(commentId, updateData).subscribe(
+      () => this.getPostComments(this.feed.postId),
+      (error) => console.error("Error updating comment:", error)
+    );
+  }
+
+  /** DELETE a comment */
+  deleteComment(commentId: string) {
+    this.feedService.deletePostComment(commentId).subscribe(
+      () => this.getPostComments(this.feed.postId),
+      (error) => console.error("Error deleting comment:", error)
+    );
+  }
+
+  /** LIKE/UNLIKE a post */
+  likePost() {
+    const likeData = {
+      postId: this.feed.postId,
+      likeAuthorId: this.userId,
+      likeAuthorUsername: this.username,
+      userProfileUrl: this.profilePic,
+    };
+
+    this.feedService.likeUnlikePost(likeData).subscribe(
+      () => this.getPostLikes(this.feed.postId),
+      (error) => console.error("Error liking/unliking post:", error)
+    );
+  }
+
+  /** Show likes popup */
+  showLikes() {
+    this.dialog
+      .open(LikesPopupComponent, {
+        width: "400px",
+        data: { postId: this.feed.postId },
+      })
+      .afterClosed()
+      .subscribe(() => this.getPostLikes(this.feed.postId));
+  }
+
+  /** Helper function: Get cookies */
   getCookie(name: string): string | null {
     const nameEQ = `${name}=`;
-    const ca = document.cookie.split(';');
-    for (let i = 0; i < ca.length; i++) {
-      let c = ca[i].trim();
+    const ca = document.cookie.split(";");
+    for (let c of ca) {
+      c = c.trim();
       if (c.indexOf(nameEQ) === 0) {
-        return c.substring(nameEQ.length, c.length);
+        return c.substring(nameEQ.length);
       }
     }
     return null;
-  }
-
-  goToChatBox(feedInfo: any) {
-    console.log(feedInfo);
-    this.sharedService.setChatUserInfo(
-      feedInfo.authorId,
-      feedInfo.authorUsername,
-      feedInfo.title
-    );
-    this.router.navigate(['/messages']);
-  }
-
-  showLikes(feedInfo: any) {
-
-    const dialogRef = this.dialog.open(LikesPopupComponent, {
-      width: '400px', // You can adjust the size as needed
-      data: {
-        postId: feedInfo.postId
-      } // If you need to pass any data, do so here
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-
-      // Handle result if needed
-    });
-
-  }
-
-  likePost(feedInfo: any) {
-
   }
 }
