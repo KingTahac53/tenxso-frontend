@@ -49,35 +49,12 @@ export class FeedService {
   }
 
   /**
-   * Like a post by sending the necessary form data.
-   * @param formData FormData containing the details of the like action.
+   * Like or Unlike a post.
+   * @param data The like/unlike request payload.
    * @returns An Observable for tracking the HTTP request status.
    */
-  likePost(formData: FormData): Observable<HttpEvent<any>> {
-    const req = new HttpRequest(
-      "POST",
-      `${this.apiUrl}/UserPost/postLike`,
-      formData
-    );
-    return this.http.request(req); // Return an observable for the HTTP request
-  }
-
-  /**
-   * Post a new comment on a feed.
-   * @param formData FormData containing the comment details.
-   * @returns An Observable for tracking the HTTP request status.
-   */
-  postCommentNew(formData: FormData): Observable<HttpEvent<any>> {
-    const req = new HttpRequest(
-      "POST",
-      `${this.apiUrl}/UserPost/PostCommentNew`,
-      formData,
-      {
-        reportProgress: true, // Track upload progress
-        responseType: "json", // Expect JSON response
-      }
-    );
-    return this.http.request(req);
+  likeUnlikePost(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/UserPost/like-unlike-post`, data);
   }
 
   /**
@@ -87,7 +64,7 @@ export class FeedService {
    */
   getPostLikes(postId: string): Observable<any[]> {
     let params = new HttpParams().set("postId", postId.toString());
-    return this.http.get<any[]>(`${this.apiUrl}/UserPost/PostLikes`, {
+    return this.http.get<any[]>(`${this.apiUrl}/UserPost/post-likes`, {
       params,
     });
   }
@@ -99,7 +76,41 @@ export class FeedService {
    */
   getPostComments(postId: string): Observable<any[]> {
     let params = new HttpParams().set("postId", postId.toString());
-    return this.http.get<any[]>(`${this.apiUrl}/UserPost/PostComments`, {
+    return this.http.get<any[]>(`${this.apiUrl}/UserPost/post-comments`, {
+      params,
+    });
+  }
+
+  /**
+   * Post a new comment.
+   * @param data The comment request payload.
+   * @returns An Observable for tracking the HTTP request status.
+   */
+  postComment(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/UserPost/create-post-comment`, data);
+  }
+
+  /**
+   * Update an existing comment.
+   * @param commentId The ID of the comment to update.
+   * @param data The updated comment content.
+   * @returns An Observable for tracking the HTTP request status.
+   */
+  updatePostComment(commentId: string, data: any): Observable<any> {
+    return this.http.put(
+      `${this.apiUrl}/UserPost/update-post-comment/${commentId}`,
+      data
+    );
+  }
+
+  /**
+   * Delete a comment.
+   * @param commentId The ID of the comment to delete.
+   * @returns An Observable for tracking the HTTP request status.
+   */
+  deletePostComment(commentId: string): Observable<any> {
+    let params = new HttpParams().set("commentId", commentId.toString());
+    return this.http.delete(`${this.apiUrl}/UserPost/delete-post-comment`, {
       params,
     });
   }

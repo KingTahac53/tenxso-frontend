@@ -1,18 +1,18 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { FeedService } from '../services/feed.service';
-import { SharedService } from '../services/shared.service';
-import { SignalRService } from '../services/signal-r.service';
-import videojs from 'video.js';
-import { CommentsPopupComponent } from '../modals/comments-popup/comments-popup.component';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Router } from "@angular/router";
+import { MatDialog } from "@angular/material/dialog";
+import { FeedService } from "../services/feed.service";
+import { SharedService } from "../services/shared.service";
+import { SignalRService } from "../services/signal-r.service";
+import videojs from "video.js";
+import { CommentsPopupComponent } from "../modals/comments-popup/comments-popup.component";
 
 type VideoJsPlayer = ReturnType<typeof videojs>;
 
 @Component({
-  selector: 'feedspage',
-  templateUrl: './feeds.component.html',
-  styleUrls: ['./feeds.component.css'],
+  selector: "feedspage",
+  templateUrl: "./feeds.component.html",
+  styleUrls: ["./feeds.component.css"],
 })
 export class FeedsComponent implements OnInit, OnDestroy {
   feeds: any[] = []; // Array to store feed data
@@ -31,34 +31,33 @@ export class FeedsComponent implements OnInit, OnDestroy {
     private signalRService: SignalRService,
     private dialog: MatDialog,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    console.log('Initializing FeedsComponent...');
+    console.log("Initializing FeedsComponent...");
 
     // Fetch user data
     this.sharedService.getUserId().subscribe((userId) => {
       this.userId = userId || undefined;
-      console.log('User ID:', this.userId);
+      console.log("User ID:", this.userId);
     });
 
     this.sharedService.getUsername().subscribe((username) => {
       this.username = username || undefined;
-      console.log('Username:', this.username);
+      console.log("Username:", this.username);
     });
 
     // Bind scroll event for infinite scroll
     this.scrollListener = this.onScroll.bind(this);
-    window.addEventListener('scroll', this.scrollListener);
+    window.addEventListener("scroll", this.scrollListener);
 
     // Load initial feeds
     this.loadFeeds();
   }
 
-
   getCookie(name: string): string | null {
     const nameEQ = `${name}=`;
-    const ca = document.cookie.split(';');
+    const ca = document.cookie.split(";");
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i].trim();
       if (c.indexOf(nameEQ) === 0) {
@@ -73,33 +72,37 @@ export class FeedsComponent implements OnInit, OnDestroy {
    */
   loadFeeds(): void {
     if (this.loading || this.allFeedsLoaded) {
-      console.log('Already loading or all feeds loaded.');
+      console.log("Already loading or all feeds loaded.");
       return;
     }
 
     this.loading = true; // Set loading state
-    console.log(`Loading feeds - Page: ${this.pageNumber}, Size: ${this.pageSize}`);
-
-    this.feedService.getFeeds(this.pageNumber, this.pageSize, this.userId).subscribe(
-      (response: any) => {
-        console.log('Feed response:', response);
-        const newFeeds = response.blogPostsMostRecent || [];
-        if (newFeeds.length > 0) {
-          this.feeds = [...this.feeds, ...newFeeds];
-          console.log('New feeds added:', newFeeds);
-          this.pageNumber++; // Increment page for next call
-          setTimeout(() => this.initializeVideoPlayers(), 0); // Initialize video players after DOM updates
-        } else {
-          this.allFeedsLoaded = true;
-          console.log('No more feeds to load.');
-        }
-        this.loading = false;
-      },
-      (error) => {
-        console.error('Error loading feeds:', error);
-        this.loading = false; // Reset loading even on error
-      }
+    console.log(
+      `Loading feeds - Page: ${this.pageNumber}, Size: ${this.pageSize}`
     );
+
+    this.feedService
+      .getFeeds(this.pageNumber, this.pageSize, this.userId)
+      .subscribe(
+        (response: any) => {
+          console.log("Feed response:", response);
+          const newFeeds = response.blogPostsMostRecent || [];
+          if (newFeeds.length > 0) {
+            this.feeds = [...this.feeds, ...newFeeds];
+            console.log("New feeds added:", newFeeds);
+            this.pageNumber++; // Increment page for next call
+            setTimeout(() => this.initializeVideoPlayers(), 0); // Initialize video players after DOM updates
+          } else {
+            this.allFeedsLoaded = true;
+            console.log("No more feeds to load.");
+          }
+          this.loading = false;
+        },
+        (error) => {
+          console.error("Error loading feeds:", error);
+          this.loading = false; // Reset loading even on error
+        }
+      );
   }
 
   // refreshFeeds() {
@@ -135,11 +138,11 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
     this.feedService.getFeeds(pageNumber, pageSize, this.userId).subscribe(
       (response: any) => {
-        console.log('Feed response:', response);
+        console.log("Feed response:", response);
 
         const newFeeds = response.blogPostsMostRecent || [];
 
-        const currentIdOrder = this.feeds.map(feed => feed.postId);
+        const currentIdOrder = this.feeds.map((feed) => feed.postId);
 
         const sortedNewFeeds = [...newFeeds].sort((a, b) => {
           const indexA = currentIdOrder.indexOf(a.postId);
@@ -162,34 +165,38 @@ export class FeedsComponent implements OnInit, OnDestroy {
         this.loading = false;
       },
       (error) => {
-        console.error('Error loading feeds:', error);
+        console.error("Error loading feeds:", error);
         this.loading = false;
       }
     );
   }
 
-
   /**
    * Initialize Video.js players for new feeds.
    */
   initializeVideoPlayers(): void {
-    console.log('Initializing video players...');
+    console.log("Initializing video players...");
     this.feeds.forEach((feed) => {
       const playerId = `video-player-${feed.postId}`;
       if (!this.players[feed.postId]) {
         const playerElement = document.getElementById(playerId);
         if (playerElement) {
           try {
-            console.log(`Initializing Video.js player for feed: ${feed.postId}`);
+            console.log(
+              `Initializing Video.js player for feed: ${feed.postId}`
+            );
             this.players[feed.postId] = videojs(playerElement, {
               autoplay: true,
               controls: true,
               muted: true,
-              preload: 'auto',
+              preload: "auto",
               loop: true,
             });
           } catch (error) {
-            console.error(`Error initializing Video.js for feed ${feed.postId}:`, error);
+            console.error(
+              `Error initializing Video.js for feed ${feed.postId}:`,
+              error
+            );
           }
         } else {
           console.warn(`Player element not found for feed: ${feed.postId}`);
@@ -202,14 +209,14 @@ export class FeedsComponent implements OnInit, OnDestroy {
    * Infinite scroll: Load more feeds when nearing the bottom of the page.
    */
   onScroll(): void {
-    console.log('Scroll event triggered...');
+    console.log("Scroll event triggered...");
 
     const scrollHeight = document.documentElement.scrollHeight;
     const scrollTop = document.documentElement.scrollTop;
     const clientHeight = document.documentElement.clientHeight;
 
     if (scrollTop + clientHeight >= scrollHeight - 100 && !this.loading) {
-      console.log('Scrolled near the bottom, loading more feeds...');
+      console.log("Scrolled near the bottom, loading more feeds...");
       this.loadFeeds(); // Load next set of feeds
     }
   }
@@ -218,10 +225,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
    * Dispose Video.js players.
    */
   disposeVideoPlayers(): void {
-    console.log('Disposing all video players...');
+    console.log("Disposing all video players...");
     Object.values(this.players).forEach((player) => {
       if (player) {
-        console.log('Disposing player:', player);
+        console.log("Disposing player:", player);
         player.dispose();
       }
     });
@@ -232,22 +239,20 @@ export class FeedsComponent implements OnInit, OnDestroy {
    * Clean up resources on component destruction.
    */
   ngOnDestroy(): void {
-    console.log('Cleaning up FeedsComponent...');
-    window.removeEventListener('scroll', this.scrollListener);
+    console.log("Cleaning up FeedsComponent...");
+    window.removeEventListener("scroll", this.scrollListener);
     this.disposeVideoPlayers();
   }
 
   likePost(feedInfo: any) {
-    const userId = this.getCookie('userId');
-    const username = this.getCookie('username');
+    const userId = this.getCookie("userId");
+    const username = this.getCookie("username");
 
     if (userId && username) {
-
       if (feedInfo.likeFlag == 0) {
         feedInfo.likeFlag = 1;
         feedInfo.likeCount = Number(feedInfo.likeCount) + 1;
-      }
-      else {
+      } else {
         feedInfo.likeFlag = 0;
         feedInfo.likeCount = Number(feedInfo.likeCount) - 1;
       }
@@ -255,16 +260,16 @@ export class FeedsComponent implements OnInit, OnDestroy {
       const formData = new FormData();
 
       // Add required fields to formData
-      formData.append('LikeAuthorId', userId);  // Required field
-      formData.append('LikeAuthorUsername', username);  // Required field
-      formData.append('postId', feedInfo.postId);  // Required field
+      formData.append("LikeAuthorId", userId); // Required field
+      formData.append("LikeAuthorUsername", username); // Required field
+      formData.append("postId", feedInfo.postId); // Required field
 
-      this.sharedService.getProfilePic().subscribe(pic => {
-        formData.append('UserProfileUrl', pic as string);  // Required field
+      this.sharedService.getProfilePic().subscribe((pic) => {
+        formData.append("UserProfileUrl", pic as string); // Required field
       });
       console.log("likePostStart");
       this.signalRService.sendBellCount(feedInfo.authorId, "1");
-      this.feedService.likePost(formData).subscribe(
+      this.feedService.likeUnlikePost(formData).subscribe(
         (response: any) => {
           if (response != null) {
             //console.log("JustOnce");
@@ -276,58 +281,50 @@ export class FeedsComponent implements OnInit, OnDestroy {
           //this.feedData[i].likeCount= this.feedData[i].likeCount + 1;
           //}
           //}
-
         },
-        error => {
+        (error) => {
           this.loading = false;
-          console.error('Error loading feeds:', error);
+          console.error("Error loading feeds:", error);
         }
       );
     }
   }
-
 
   /**
    * Download a file.
    */
   downloadFile(filePath: string): void {
     console.log(`Downloading file from path: ${filePath}`);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = filePath;
-    link.download = filePath.split('/').pop() || 'download';
+    link.download = filePath.split("/").pop() || "download";
     link.click();
   }
-
-
 
   /**
    * Check if a URL points to a video.
    */
   isVideo(url: string): boolean {
-    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'mkv', 'avi'];
-    const fileExtension = url.split('.').pop()?.toLowerCase();
-    const isVideoFile = videoExtensions.includes(fileExtension || '');
+    const videoExtensions = ["mp4", "webm", "ogg", "mov", "mkv", "avi"];
+    const fileExtension = url.split(".").pop()?.toLowerCase();
+    const isVideoFile = videoExtensions.includes(fileExtension || "");
     return isVideoFile;
   }
 
   showComments(feedInfo: any) {
-
     const dialogRef = this.dialog.open(CommentsPopupComponent, {
-      width: 'auto%', // You can adjust the size as needed
+      width: "auto%", // You can adjust the size as needed
       data: feedInfo, // If you need to pass any data, do so here
-    },
-    );
+    });
 
     const instance = dialogRef.componentInstance;
 
     // 2) Subscribe to its EventEmitter
     instance.commentPosted.subscribe((data) => {
       this.refreshFeeds();
-
     });
 
-
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       // Handle result if needed
     });
   }
@@ -340,9 +337,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feedInfo.title
     );
 
-    localStorage.setItem('userId', feedInfo.authorId);
-    localStorage.setItem('username', feedInfo.authorUsername);
-    localStorage.setItem('profilePic', feedInfo.title);
-    this.router.navigate(['/messages']);
+    localStorage.setItem("userId", feedInfo.authorId);
+    localStorage.setItem("username", feedInfo.authorUsername);
+    localStorage.setItem("profilePic", feedInfo.title);
+    this.router.navigate(["/messages"]);
   }
 }
