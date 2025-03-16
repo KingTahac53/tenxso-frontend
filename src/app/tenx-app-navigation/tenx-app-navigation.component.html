@@ -1,78 +1,122 @@
-<!-- Main Navigation Wrapper -->
-<div class="nav">
-  <ul class="menu">
-    <!-- Home -->
-    <li>
-      <a routerLink="/feeds" class="menu-item">
-        <i>
-          <h4>tenX</h4>
-        </i>
-      </a>
-    </li>
+<div id="wrapper">
+  <!-- Sidebar -->
+  <div id="sidebar" class="fixed top-0 left-0 z-40 max-md:top-auto max-md:bottom-0">
+    <div id="sidebar__inner"
+      class="flex flex-col justify-between md:h-screen md:p-2 p-1 transition-all duration-500 bg-white shadow dark:bg-dark2 2xl:w-72 xl:w-60 max-xl:w-[73px] max-md:w-screen max-md:border-t max-md:dark:border-slate-700">
+      <!-- Logo -->
+      <div
+        class="flex h-20 px-2 max-md:fixed max-md:top-0 max-md:w-full max-md:bg-white/80 max-md:left-0 max-md:px-4 max-md:h-14 max-md:shadow-sm max-md:dark:bg-slate-900/80 backdrop-blur-xl">
+        <a routerLink="/feeds" id="logo" class="flex items-center gap-3">
+          <img id="logo__text" src="assets/images/logo.png" alt="Logo"
+            class="w-full h-6 ml-1 max-xl:hidden max-md:block dark:!hidden" />
+        </a>
+      </div>
 
-    <li>
-      <a routerLink="/feeds" class="menu-item">
-        <i class="fas fa-home"></i>
-        <span>Home</span>
-      </a>
-    </li>
+      <!-- Navigation -->
+      <nav class="flex-1 flex flex-col space-y-2">
+        <!-- Home -->
+        <a routerLink="/feeds" class="flex items-center p-2 hover:bg-gray-100 rounded">
+          <svg id="icon__outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+          </svg>
+          <span class="max-xl:hidden ml-2">Home</span>
+        </a>
 
-    <!-- Login -->
-    <li>
-      <a routerLink="/login" class="menu-item">
-        <i class="fas fa-sign-in-alt"></i>
-        <span>Login</span>
-        <span class="notification-badge" *ngIf="notificationCounter > 0">
-          {{ notificationCounter }}
-        </span>
-      </a>
-    </li>
+        <!-- Messages -->
+        <a routerLink="/messages"
+          class="flex items-center p-2 hover:bg-gray-100 rounded max-md:fixed max-md:top-2 max-md:right-2">
+          <svg id="icon__outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+          </svg>
+          <span class="max-xl:hidden ml-2">Messages</span>
+        </a>
 
-    <!-- Create -->
-    <li>
-      <a routerLink="/create" class="menu-item">
-        <i class="fas fa-plus-circle"></i>
-        <span>Create</span>
-      </a>
-    </li>
+        <!-- Notifications -->
+        <a routerLink="/notifications" class="relative flex items-center p-2 hover:bg-gray-100 rounded">
+          <svg id="icon__outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+          </svg>
+          <svg id="icon__solid" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+            class="hidden w-6 h-6">
+            <path
+              d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+          </svg>
+          <span class="max-xl:hidden ml-2">Notifications</span>
+          <!-- Notification dot -->
+          <div class="w-2 h-2 bg-red-600 rounded-full absolute left-7 top-2.5"></div>
+        </a>
 
-    <!-- Messages -->
-    <li>
-      <a routerLink="/messages" class="menu-item">
-        <i class="fas fa-envelope"></i>
-        <span>Messages</span>
-      </a>
-    </li>
+        <!-- Create -->
+        <a routerLink="/create" class="flex items-center p-2 hover:bg-gray-100 rounded">
+          <button class="flex items-center gap-3 w-full">
+            <svg id="icon__outline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="max-xl:hidden ml-2">Create</span>
+          </button>
+        </a>
 
-    <!-- Notifications -->
-    <li>
-      <a routerLink="/notifications" class="menu-item">
-        <i class="fas fa-bell"></i>
-        <span>Notifications</span>
-        <span class="notification-badge" *ngIf="notificationCounter > 0">
-          {{ notificationCounter }}
-        </span>
-      </a>
-    </li>
+        <!-- About Us -->
+        <a routerLink="/about" class="flex items-center p-2 hover:bg-gray-100 rounded">
+          <svg id="icon__outline" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"
+            class="w-6 h-6">
+            <path
+              d="M8 16.016a7.5 7.5 0 0 0 1.962-14.74A1 1 0 0 0 9 0H7a1 1 0 0 0-.962 1.276A7.5 7.5 0 0 0 8 16.016zM14.5 8.516a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z" />
+            <path d="m6.94 7.44 4.95-2.83-2.83 4.95-4.949 2.83 2.828-4.95z" />
+          </svg>
+          <span class="max-xl:hidden ml-2">About Us</span>
+        </a>
 
-    <!-- About -->
-    <li>
-      <a routerLink="/about" class="menu-item">
-        <i class="fas fa-info-circle"></i>
-        <span>About</span>
-        <span class="notification-badge" *ngIf="notificationCounter > 0">
-          {{ notificationCounter }}
-        </span>
-      </a>
-    </li>
+        <!-- Download App Section -->
+        <div class="download-app-section mt-4">
+          <div class="px-5 py-4">
+            <h3 class="md:text-xl text-lg font-medium mt-3 text-black dark:text-white">
+              Download App
+            </h3>
+          </div>
+          <div class="download-app flex space-x-2">
+            <a href="#" target="_blank">
+              <img src="assets/images/android.png" alt="Android" />
+            </a>
+            <a href="#" target="_blank">
+              <img src="assets/images/ios.png" alt="iOS" />
+            </a>
+          </div>
+        </div>
+      </nav>
 
-
-    <!-- Profile -->
-    <li>
-      <a routerLink="/profile" class="menu-item">
-        <img [src]="generatedUserData.profilePic" alt="Profile" class="profile-pic" />
-        <span>Profile</span>
-      </a>
-    </li>
-  </ul>
-</div>
+      <!-- Profile Section -->
+      <div>
+        <a routerLink="/profile" id="profile-link" class="flex items-center gap-3 p-3 group">
+          <img src="assets/images/avatar-7.jpg" alt="Profile" class="rounded-full md:w-7 md:h-7 w-5 h-5 shrink-0" />
+          <span class="font-semibold text-sm max-xl:hidden">My Profile</span>
+          <ion-icon name="chevron-forward-outline"
+            class="text-xl ml-auto duration-200 group-aria-expanded:-rotate-90 max-xl:hidden"></ion-icon>
+        </a>
+        <!-- Profile dropdown (hidden by default) -->
+        <div
+          class="bg-white sm:w-64 2xl:w-[calc(100%-16px)] w-full shadow-lg border rounded-xl overflow-hidden dark:bg-dark2 hidden">
+          <div class="w-full h-1.5 bg-gradient-to-r to-purple-500 via-red-500 from-pink-500"></div>
+          <div class="p-4 text-xs font-medium">
+            <img src="assets/images/avatar-7.jpg" class="w-8 h-8 rounded-full" alt="Profile" />
+            <div class="mt-2 space-y-0.5">
+              <div class="text-base font-semibold">Monroe Parker</div>
+              <!-- <div class="text-gray-400 dark:text-white/80">@</div> -->
+            </div>
+          </div>
+          <hr class="opacity-60" />
+          <ul class="text-sm font-semibold p-2">
+            <li>
+              <a href="#" class="flex gap-3 rounded-md p-2 hover:bg-gray-200">
+                <ion-icon name="person-outline" class="text-lg"></ion-icon>
+                Login with Google
+              </a>
+            </li>
+            <!-- <li> -->

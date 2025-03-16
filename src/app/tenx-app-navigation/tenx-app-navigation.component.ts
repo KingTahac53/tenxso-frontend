@@ -8,10 +8,10 @@ import { UserData } from "../models/user-data.model";
 @Component({
   selector: "tenx-app-navigation",
   templateUrl: "./tenx-app-navigation.component.html",
-  styleUrls: ["./tenx-app-navigation.component.css"],
+  // Note: The CSS file is no longer needed because Tailwind is used.
 })
 export class TenxAppNavigationComponent implements OnInit {
-  notificationCounter: any = 0; // Tracks notifications count
+  notificationCounter: number = 0; // Tracks notifications count
   generatedUserData: UserData = new UserData("", "", ""); // Stores user information
 
   constructor(
@@ -48,8 +48,6 @@ export class TenxAppNavigationComponent implements OnInit {
           this.generateAndStoreUser(true);
         } else {
           this.generatedUserData = response;
-
-          // Store cookies if required
           if (storeCookies) {
             this.setCookie("userId", this.generatedUserData.userId, 365);
             this.setCookie("username", this.generatedUserData.username, 365);
@@ -59,8 +57,6 @@ export class TenxAppNavigationComponent implements OnInit {
               365
             );
           }
-
-          // Update shared service
           this.sharedService.setUserInfo(
             this.generatedUserData.userId,
             this.generatedUserData.username,
@@ -77,15 +73,11 @@ export class TenxAppNavigationComponent implements OnInit {
     this.userService.generateUserId().subscribe(
       (response: UserData) => {
         this.generatedUserData = response;
-
-        // Store cookies if required
         if (storeCookies) {
           this.setCookie("userId", this.generatedUserData.userId, 365);
           this.setCookie("username", this.generatedUserData.username, 365);
           this.setCookie("profilePic", this.generatedUserData.profilePic, 365);
         }
-
-        // Update shared service
         this.sharedService.setUserInfo(
           this.generatedUserData.userId,
           this.generatedUserData.username,
