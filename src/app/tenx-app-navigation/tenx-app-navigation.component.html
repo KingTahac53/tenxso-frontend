@@ -91,6 +91,9 @@
           </div>
         </div> -->
       </nav>
+      <!-- <div class="group">
+        <div class="p-4 bg-gray-200 group-hover:bg-red-500">Hover Test</div>
+      </div> -->
 
       <!-- Profile Section -->
       <div class="relative group">
@@ -101,10 +104,15 @@
           <ion-icon name="chevron-forward-outline"
             class="text-xl ml-auto duration-200 group-hover:-rotate-90 max-xl:hidden"></ion-icon>
         </a>
-        <!-- Profile dropdown (shown on hover) -->
+
+        <!-- Profile dropdown using opacity -->
         <div
-          class="absolute right-0 mt-2 w-64 bg-white shadow-lg border rounded-xl overflow-hidden dark:bg-dark2 hidden group-hover:block z-50">
+          class="absolute right-0 mt-2 w-64 bg-white shadow-lg border rounded-xl overflow-hidden dark:bg-dark2 
+                opacity-0 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 group-hover:pointer-events-auto z-50">
+          <!-- Gradient header -->
           <div class="w-full h-1.5 bg-gradient-to-r to-purple-500 via-red-500 from-pink-500"></div>
+
+          <!-- User Info -->
           <div class="p-4 text-xs font-medium flex items-center">
             <img [src]="generatedUserData.profilePic" class="w-8 h-8 rounded-full" alt="Profile" />
             <div class="ml-2">
@@ -116,7 +124,10 @@
               </div>
             </div>
           </div>
+
           <hr class="opacity-60" />
+
+          <!-- Dropdown Links -->
           <ul class="text-sm font-semibold p-2">
             <li>
               <a href="#" class="flex gap-3 rounded-md p-2 hover:bg-gray-200">
