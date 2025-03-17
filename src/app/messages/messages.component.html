@@ -1,78 +1,124 @@
-<div class="container-fluid chat-container">
-    <div class="row h-100">
-        <!-- Sidebar (Chat List) -->
-        <div class="col-12 col-md-4 col-lg-3 p-0 user-list" [ngClass]="{'d-none d-md-block': !sidebarVisible}">
-            <div class="list-group rounded-0 border-0 h-100 overflow-auto">
-                <div class="list-group-item list-group-item-action" *ngFor="let user of chatList"
-                    (click)="selectChatUser(user)">
-                    <div class="d-flex align-items-center">
-                        <img [src]="user.profilePicUrl || 'assets/img/default-avatar.png'" alt="User"
-                            class="rounded-circle me-3" width="50" height="50" />
-                        <div>
-                            <h6 class="mb-0">{{ user.username }}</h6>
-                            <!-- If there is a new message flag, display a bold label -->
-                            <div *ngIf="user.newMessage">
-                                <b>New Message</b>
+<main class="2xl:ml-[--w-side] xl:ml-[--w-side-md] md:ml-[--w-side-small]">
+    <div class="2xl:max-w-6xl mx-auto h-screen relative shadow-lg overflow-hidden border1 max-md:pt-14">
+        <div class="flex bg-white dark:bg-dark2">
+            <!-- Chat Sidebar -->
+            <div class="md:w-[360px] relative border-r dark:border-slate-200">
+                <div id="side-chat"
+                    class="top-0 left-0 max-md:fixed max-md:w-5/6 max-md:h-screen bg-white z-50 max-md:shadow max-md:-translate-x-full dark:bg-dark2">
+                    <div class="p-4 border-b dark:border-slate-200">
+                        <div class="flex mt-2 items-center justify-between">
+                            <h2 class="text-2xl font-bold text-black ml-1 dark:text-white">
+                                Chats
+                            </h2>
+                        </div>
+                    </div>
+                    <!-- Chat Users List -->
+                    <div class="space-y-2 p-2 overflow-y-auto h-[calc(100vh-127px)]">
+                        <div *ngFor="let user of chatList" (click)="selectChatUser(user)"
+                            class="cursor-pointer relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery">
+                            <div class="relative w-14 h-14 shrink-0">
+                                <img [src]="user.profilePicUrl || 'assets/img/default-avatar.png'" alt="User"
+                                    class="object-cover w-full h-full rounded-full" />
+                                <!-- Show online indicator if available -->
+                                <div *ngIf="user.online"
+                                    class="w-4 h-4 absolute bottom-0 right-0 bg-green-500 rounded-full border border-white dark:border-slate-200">
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">
+                                        {{ user.username }}
+                                    </div>
+                                    <div *ngIf="user.newMessage"
+                                        class="text-xs font-light text-gray-500 dark:text-white/70">
+                                        <b>New Message</b>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Chat Area -->
-        <div class="col-12 col-md-8 col-lg-9 p-0 d-flex flex-column chat-area">
-            <!-- Chat Header -->
-            <div class="chat-header d-flex align-items-center p-3 border-bottom">
-                <!-- Mobile toggle button -->
-                <button class="btn btn-link text-secondary d-md-none" (click)="toggleSidebar()">
-                    <i class="fa fa-bars"></i>
-                </button>
-                <img [src]="chat_with_profilepic || 'assets/img/default-avatar.png'" alt="User"
-                    class="rounded-circle me-2" width="50" height="50" />
-                <div>
-                    <h5 class="mb-0">{{ chat_with_username || 'Select a User' }}</h5>
-                    <!-- Removed Active/Online status -->
-                </div>
-                <div class="ms-auto">
-                    <button class="btn btn-sm btn-secondary me-1" (click)="startAudioCall()"
-                        [disabled]="!chat_with_userId">
-                        <i class="fa fa-phone"></i>
-                    </button>
-                    <button class="btn btn-sm btn-secondary" (click)="startVideoCall()" [disabled]="!chat_with_userId">
-                        <i class="fa fa-video-camera"></i>
-                    </button>
-                </div>
+                <!-- Mobile backdrop to toggle sidebar -->
+                <div id="side-chat"
+                    class="bg-slate-100/40 backdrop-blur w-full h-full dark:bg-slate-800/40 z-40 fixed inset-0 max-md:-translate-x-full md:hidden"
+                    uk-toggle="target: #side-chat ; cls: max-md:-translate-x-full"></div>
             </div>
 
-            <!-- Chat Body -->
-            <div class="chat-body flex-grow-1 p-3 overflow-auto" id="chatBody">
-                <div *ngFor="let msg of receivedMessages"
-                    [ngClass]="{'text-end': msg.type === 'reply', 'text-start': msg.type === 'sender'}">
-                    <div [ngClass]="{'msg-sent': msg.type === 'reply', 'msg-received': msg.type === 'sender'}">
-                        <p class="mb-1">{{ msg.message }}</p>
-                        <small class="text-muted">{{ msg.msgtime }}</small>
+            <!-- Message Center -->
+            <div class="flex-1 flex flex-col">
+                <!-- Chat Header -->
+                <div class="flex items-center justify-between gap-2 px-6 py-3.5 z-10 border-b dark:border-slate-200">
+                    <div class="flex items-center sm:gap-4 gap-2">
+                        <!-- Mobile toggle button -->
+                        <button type="button" class="md:hidden" (click)="toggleSidebar()">
+                            <ion-icon name="chevron-back-outline" class="text-2xl -ml-4"></ion-icon>
+                        </button>
+                        <div class="relative cursor-pointer hidden md:block">
+                            <img [src]="chat_with_profilepic || 'assets/img/default-avatar.png'" alt="User"
+                                class="w-8 h-8 rounded-full shadow" />
+                            <div class="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>
+                        </div>
+                        <div class="cursor-pointer">
+                            <div class="text-base font-bold">
+                                {{ chat_with_username || 'Select a User' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" class="button__ico" [disabled]="!chat_with_userId"
+                            (click)="startAudioCall()">
+                            <ion-icon name="call-outline" class="text-2xl"></ion-icon>
+                        </button>
+                        <button type="button" class="hover:bg-slate-100 p-1.5 rounded-full"
+                            [disabled]="!chat_with_userId" (click)="startVideoCall()">
+                            <ion-icon name="videocam-outline" class="text-2xl"></ion-icon>
+                        </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Chat Footer -->
-            <div class="chat-footer p-3 border-top">
-                <form class="d-flex mb-0" (ngSubmit)="sendMessage()">
-                    <input type="text" class="form-control me-2" placeholder="Write a message..." [(ngModel)]="message"
-                        name="message" />
-                    <button type="submit" class="btn btn-primary" [disabled]="!chat_with_userId">
-                        <i class="fa fa-paper-plane"></i>
-                    </button>
-                </form>
+                <!-- Chat Body -->
+                <div id="chatBody"
+                    class="w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-137px)] h-[calc(100vh-250px)] flex-1">
+                    <div class="text-sm font-medium space-y-6 w-full">
+                        <ng-container *ngFor="let msg of receivedMessages">
+                            <div [ngClass]="{
+                    'flex gap-3': msg.type === 'sender',
+                    'flex gap-2 flex-row-reverse items-end': msg.type === 'reply'
+                  }">
+                                <div [ngClass]="{
+                      'px-4 py-2 rounded-[20px] max-w-sm bg-secondery': msg.type === 'sender',
+                      'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow': msg.type === 'reply'
+                    }">
+                                    {{ msg.message }}
+                                </div>
+                                <small>{{ msg.msgtime }}</small>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+
+                <!-- Chat Footer -->
+                <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden border-t">
+                    <form class="flex items-center w-full" (ngSubmit)="sendMessage()">
+                        <div class="relative flex-1">
+                            <textarea placeholder="Write your message" rows="1"
+                                class="w-full resize-none bg-secondery rounded-full px-4 p-2" [(ngModel)]="message"
+                                name="message"></textarea>
+                        </div>
+                        <button type="submit"
+                            class="flex items-center justify-center p-2 bg-blue-500 rounded-full hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
+                            [disabled]="!chat_with_userId">
+                            <!-- Inline SVG icon for send -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 512 512">
+                                <path
+                                    d="M476 3L12 218c-13 6-12 24 1 28l111 35 35 111c4 13 22 14 28 1L509 36c6-13-10-23-23-33zM99 248l213-126"
+                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
+                                    stroke-width="32" />
+                            </svg>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Loading indicator (optional) -->
-    <div *ngIf="loading" class="position-absolute top-50 start-50 translate-middle">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-</div>
+</main>
