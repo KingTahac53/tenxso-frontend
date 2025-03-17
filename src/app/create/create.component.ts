@@ -10,6 +10,9 @@ import { Router } from "@angular/router";
   styleUrls: ["./create.component.css"],
 })
 export class CreateComponent implements OnInit {
+  // Set to true so the modal is shown when the component loads
+  isModalOpen: boolean = true;
+
   selectedFile: File | null = null;
   uploadProgress: number = 0;
   userId: string | null = null;
@@ -21,10 +24,8 @@ export class CreateComponent implements OnInit {
   uploadSuccess: boolean = false;
   errorMessage: string | null = null;
 
-  // Updated max file size to 500 MB
   private readonly MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
 
-  // Added webp to allowed image types
   private readonly ALLOWED_IMAGE_TYPES = [
     "image/jpeg",
     "image/jpg",
@@ -59,59 +60,28 @@ export class CreateComponent implements OnInit {
     this.profilePic = this.getCookie("profilePic");
   }
 
-  // onFileSelected(event: any): void {
-  //   this.errorMessage = null;
-  //   this.selectedFile = event.target.files[0] || null;
-
-  //   if (this.selectedFile) {
-  //     if (this.selectedFile.size > 200 * 1024 * 1024) {
-  //       this.errorMessage = 'File size exceeds 200 MB. Please select a smaller file.';
-  //       this.selectedFile = null;
-  //       this.imgPreview = null;
-  //       return;
-  //     }
-
-  //     const reader = new FileReader();
-  //     reader.onload = (e: any) => {
-  //       this.imgPreview = e.target.result;
-  //     };
-  //     reader.readAsDataURL(this.selectedFile);
-  //   }
-  // }
-
   onFileSelected(event: any): void {
     this.errorMessage = null;
     this.selectedFile = event.target.files[0] || null;
-    this.imgPreview = null; // reset preview
+    this.imgPreview = null;
 
     if (!this.selectedFile) {
       return;
     }
 
-    // 1. Validate File Size (DOS Mitigation)
     if (this.selectedFile.size > this.MAX_FILE_SIZE) {
       this.errorMessage = `File size exceeds ${
         this.MAX_FILE_SIZE / (1024 * 1024)
-      } MB. 
-                           Please select a smaller file.`;
+      } MB. Please select a smaller file.`;
       this.selectedFile = null;
       return;
     }
 
-    // 2. Validate File Type
-    console.log("File type:", this.selectedFile.name.toLowerCase().toString());
-
     if (
       !(
-        this.imageExtensions.test(
-          this.selectedFile.name.toLowerCase().toString()
-        ) ||
-        this.videoExtensions.test(
-          this.selectedFile.name.toLowerCase().toString()
-        ) ||
-        this.audioExtensions.test(
-          this.selectedFile.name.toLowerCase().toString()
-        )
+        this.imageExtensions.test(this.selectedFile.name.toLowerCase()) ||
+        this.videoExtensions.test(this.selectedFile.name.toLowerCase()) ||
+        this.audioExtensions.test(this.selectedFile.name.toLowerCase())
       )
     ) {
       this.errorMessage =
@@ -139,7 +109,7 @@ export class CreateComponent implements OnInit {
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i].trim();
       if (c.indexOf(nameEQ) === 0) {
-        return c.substring(nameEQ.length, c.length);
+        return c.substring(nameEQ.length);
       }
     }
     return null;
@@ -165,17 +135,13 @@ export class CreateComponent implements OnInit {
         formData.append("profilePic", this.profilePic);
       }
 
-      console.log("FormData fields:", Array.from((formData as any).entries()));
-
       this.uploadService.uploadFile(formData).subscribe(
         (event) => {
           if (event.type === HttpEventType.UploadProgress && event.total) {
             this.uploadProgress = Math.round(
               (100 * event.loaded) / event.total
             );
-            console.log(`Upload Progress: ${this.uploadProgress}%`);
           } else if (event.type === HttpEventType.Response) {
-            console.log("Upload successful:", event.body);
             this.uploadSuccess = true;
             this.isUploading = false;
             setTimeout(() => {
@@ -184,7 +150,6 @@ export class CreateComponent implements OnInit {
           }
         },
         (error: HttpErrorResponse) => {
-          console.error("Upload failed:", error);
           if (error.status === 400 && error.error?.errors) {
             this.errorMessage =
               "Validation Error: " +
@@ -198,7 +163,6 @@ export class CreateComponent implements OnInit {
     } else {
       this.errorMessage =
         "User data or file is missing. Please select a file and try again.";
-      console.error("User data or file is missing");
     }
   }
 }
