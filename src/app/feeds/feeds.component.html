@@ -66,7 +66,8 @@
           </div>
 
           <!-- Feed Content -->
-          <div class="relative w-full h-72 overflow-hidden sm:px-4">
+          <!-- Feed Content with Aspect Ratio Container -->
+          <div class="w-full overflow-hidden aspect-video sm:px-4">
             <ng-container *ngIf="isVideo(feed.content); else notVideo">
               <app-video-player [src]="feed.content" [poster]="feed.thumbnail || '/assets/default-video-poster.jpg'"
                 [muted]="true" [loop]="true" class="w-full h-full object-cover"></app-video-player>
@@ -75,6 +76,9 @@
               <img [src]="feed.content" alt="Feed Content" class="w-full h-full object-cover">
             </ng-template>
           </div>
+
+
+
 
           <!-- Feed Actions -->
           <div class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
