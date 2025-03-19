@@ -53,7 +53,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i].trim();
       if (c.indexOf(nameEQ) === 0) {
-        return c.substring(nameEQ.length, c.length);
+        return c.substring(nameEQ.length);
       }
     }
     return null;
