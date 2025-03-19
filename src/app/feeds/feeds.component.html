@@ -7,7 +7,8 @@
           class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
           <!-- Feed Header -->
           <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-            <img [src]="feed.authorProfilePic || 'assets/images/default-avatar.jpg'" alt="Profile Picture"
+            <!-- Use feed.profilePicUrl for other users -->
+            <img [src]="feed.profilePicUrl || 'assets/images/default-avatar.jpg'" alt="Profile Picture"
               class="w-9 h-9 rounded-full">
             <div class="flex-1">
               <h4 class="text-black dark:text-white">{{ feed.authorUsername }}</h4>
@@ -25,7 +26,7 @@
                     d="M6 12h.01M12 12h.01M18 12h.01" />
                 </svg>
               </button>
-              <!-- Dropdown Menu (shown on hover) -->
+              <!-- Dropdown Menu -->
               <div
                 class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
                 <nav class="flex flex-col">
@@ -66,7 +67,6 @@
           </div>
 
           <!-- Feed Content -->
-          <!-- Feed Content with Aspect Ratio Container -->
           <div class="w-full overflow-hidden aspect-video sm:px-4">
             <ng-container *ngIf="isVideo(feed.content); else notVideo">
               <app-video-player [src]="feed.content" [poster]="feed.thumbnail || '/assets/default-video-poster.jpg'"
@@ -77,18 +77,16 @@
             </ng-template>
           </div>
 
-
-
-
           <!-- Feed Actions -->
           <div class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
             <div class="flex items-center gap-2">
               <button type="button" (click)="likePost(feed)"
                 class="flex items-center justify-center w-8 h-8 rounded-full"
-                [ngClass]="feed.likeFlag == 0 ? 'text-red-500 bg-red-100 dark:bg-gray-600' : 'text-red-500 bg-red-200 dark:bg-gray-500'">
+                [ngClass]="feed.likeFlag == 0 ? 'text-gray-500 bg-gray-100 dark:bg-gray-600' : 'text-red-500 bg-red-200 dark:bg-gray-500'">
                 <!-- Heart icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                  [attr.fill]="feed.likeFlag == 1 ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
               </button>
@@ -123,7 +121,8 @@
             </div>
             <!-- Add Comment Input -->
             <div class="sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 dark:border-gray-700 flex items-center gap-2">
-              <img [src]="feed.currentUserProfilePic || 'assets/images/default-avatar.jpg'" alt="Your Avatar"
+              <!-- Logged in user's profile pic from cookies -->
+              <img [src]="profilePic || 'assets/images/default-avatar.jpg'" alt="Your Avatar"
                 class="w-6 h-6 rounded-full">
               <div class="flex-1">
                 <textarea placeholder="Add a comment...." rows="1"

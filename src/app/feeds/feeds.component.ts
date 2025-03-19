@@ -22,6 +22,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
   allFeedsLoaded = false;
   userId: string | undefined;
   username: string | undefined;
+  profilePic: string | undefined;
+
   private scrollListener!: () => void;
 
   constructor(
@@ -42,6 +44,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
       this.username = username || undefined;
       console.log("Username:", this.username);
     });
+    // Retrieve the logged in user's profile pic from cookies
+    this.profilePic =
+      this.getCookie("profilePic") || "assets/images/default-avatar.jpg";
+
     this.scrollListener = this.onScroll.bind(this);
     window.addEventListener("scroll", this.scrollListener);
     this.loadFeeds();
@@ -214,7 +220,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feed.likeCount = Number(feed.likeCount) + 1;
     } else {
       feed.likeFlag = 0;
-      feed.likeCount = Number(feed.likeCount) - 1;
+      feed.likeCount = Math.max(Number(feed.likeCount) - 1, 0);
     }
     const formData = new FormData();
     formData.append("LikeAuthorId", this.userId);
