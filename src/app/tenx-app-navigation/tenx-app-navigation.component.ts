@@ -1,18 +1,18 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { SharedService } from '../services/shared.service';
-import { SignalRService } from '../services/signal-r.service';
-import { UserService } from '../services/user.service';
-import { UserData } from '../models/user-data.model';
+import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { SharedService } from "../services/shared.service";
+import { SignalRService } from "../services/signal-r.service";
+import { UserService } from "../services/user.service";
+import { UserData } from "../models/user-data.model";
 
 @Component({
-  selector: 'tenx-app-navigation',
-  templateUrl: './tenx-app-navigation.component.html',
-  styleUrls: ['./tenx-app-navigation.component.css'],
+  selector: "tenx-app-navigation",
+  templateUrl: "./tenx-app-navigation.component.html",
+  styleUrls: ["./tenx-app-navigation.component.css"],
 })
 export class TenxAppNavigationComponent implements OnInit {
   notificationCounter: any = 0; // Tracks notifications count
-  generatedUserData: UserData = new UserData('', '', ''); // Stores user information
+  generatedUserData: UserData = new UserData("", "", ""); // Stores user information
 
   constructor(
     private userService: UserService,
@@ -23,9 +23,9 @@ export class TenxAppNavigationComponent implements OnInit {
 
   ngOnInit() {
     // Load user data from cookies or generate new user data
-    const userId = this.getCookie('userId');
-    const username = this.getCookie('username');
-    const profilePic = this.getCookie('profilePic');
+    const userId = this.getCookie("userId");
+    const username = this.getCookie("username");
+    const profilePic = this.getCookie("profilePic");
 
     if (userId && username && profilePic) {
       this.generatedUserData = new UserData(userId, username, profilePic);
@@ -33,6 +33,11 @@ export class TenxAppNavigationComponent implements OnInit {
     } else {
       this.generateAndStoreUser(true);
     }
+
+    // Subscribe to profile picture updates
+    this.sharedService.getProfilePic().subscribe((updatedPic) => {
+      this.generatedUserData.profilePic = updatedPic ?? ""; // Ensure it's always a string
+    });
 
     // Subscribe to notification updates
     this.signalRService.notificationCounter.subscribe((resp) => {
@@ -44,16 +49,20 @@ export class TenxAppNavigationComponent implements OnInit {
   getUser(userId: any, storeCookies: boolean) {
     this.userService.getUser(userId).subscribe(
       (response: UserData) => {
-        if (response.userId === '') {
+        if (response.userId === "") {
           this.generateAndStoreUser(true);
         } else {
           this.generatedUserData = response;
 
           // Store cookies if required
           if (storeCookies) {
-            this.setCookie('userId', this.generatedUserData.userId, 365);
-            this.setCookie('username', this.generatedUserData.username, 365);
-            this.setCookie('profilePic', this.generatedUserData.profilePic, 365);
+            this.setCookie("userId", this.generatedUserData.userId, 365);
+            this.setCookie("username", this.generatedUserData.username, 365);
+            this.setCookie(
+              "profilePic",
+              this.generatedUserData.profilePic,
+              365
+            );
           }
 
           // Update shared service
@@ -64,7 +73,7 @@ export class TenxAppNavigationComponent implements OnInit {
           );
         }
       },
-      (error) => console.error('Error fetching user data:', error)
+      (error) => console.error("Error fetching user data:", error)
     );
   }
 
@@ -76,9 +85,9 @@ export class TenxAppNavigationComponent implements OnInit {
 
         // Store cookies if required
         if (storeCookies) {
-          this.setCookie('userId', this.generatedUserData.userId, 365);
-          this.setCookie('username', this.generatedUserData.username, 365);
-          this.setCookie('profilePic', this.generatedUserData.profilePic, 365);
+          this.setCookie("userId", this.generatedUserData.userId, 365);
+          this.setCookie("username", this.generatedUserData.username, 365);
+          this.setCookie("profilePic", this.generatedUserData.profilePic, 365);
         }
 
         // Update shared service
@@ -88,7 +97,7 @@ export class TenxAppNavigationComponent implements OnInit {
           this.generatedUserData.profilePic
         );
       },
-      (error) => console.error('Error generating user data:', error)
+      (error) => console.error("Error generating user data:", error)
     );
   }
 
@@ -101,8 +110,8 @@ export class TenxAppNavigationComponent implements OnInit {
 
   // Get cookies
   getCookie(name: string): string | null {
-    const nameEQ = name + '=';
-    const ca = document.cookie.split(';');
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i].trim();
       if (c.indexOf(nameEQ) === 0) {
