@@ -81,24 +81,17 @@ export class FeedsComponent implements OnInit, OnDestroy {
           console.log("Feed response:", response);
           const newFeeds = response.blogPostsMostRecent || [];
           if (newFeeds.length > 0) {
-            newFeeds.forEach(
-              (feed: {
-                showComments: boolean;
-                newComment: string;
-                postId: string;
-                comments: any;
-                commentCount: any;
-              }) => {
-                feed.showComments = false;
-                feed.newComment = "";
-                this.feedService
-                  .getPostComments(feed.postId)
-                  .subscribe((comments: any) => {
-                    feed.comments = comments;
-                    feed.commentCount = comments.length;
-                  });
-              }
-            );
+            newFeeds.forEach((feed: any) => {
+              feed.showComments = false;
+              feed.newComment = "";
+              feed.dropdownOpen = false; // Initialize dropdown toggle
+              this.feedService
+                .getPostComments(feed.postId)
+                .subscribe((comments: any) => {
+                  feed.comments = comments;
+                  feed.commentCount = comments.length;
+                });
+            });
             this.feeds = [...this.feeds, ...newFeeds];
             console.log("New feeds added:", newFeeds);
             this.pageNumber++;
@@ -126,24 +119,17 @@ export class FeedsComponent implements OnInit, OnDestroy {
         console.log("Feed response:", response);
         const newFeeds = response.blogPostsMostRecent || [];
         this.feeds = newFeeds;
-        newFeeds.forEach(
-          (feed: {
-            showComments: boolean;
-            newComment: string;
-            postId: string;
-            comments: any;
-            commentCount: any;
-          }) => {
-            feed.showComments = false;
-            feed.newComment = "";
-            this.feedService
-              .getPostComments(feed.postId)
-              .subscribe((comments: any) => {
-                feed.comments = comments;
-                feed.commentCount = comments.length;
-              });
-          }
-        );
+        newFeeds.forEach((feed: any) => {
+          feed.showComments = false;
+          feed.newComment = "";
+          feed.dropdownOpen = false;
+          this.feedService
+            .getPostComments(feed.postId)
+            .subscribe((comments: any) => {
+              feed.comments = comments;
+              feed.commentCount = comments.length;
+            });
+        });
         setTimeout(() => this.initializeVideoPlayers(), 0);
         this.loading = false;
       },
@@ -289,6 +275,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
         console.error("Error posting comment:", error);
       }
     );
+  }
+
+  toggleDropdown(feed: any): void {
+    feed.dropdownOpen = !feed.dropdownOpen;
   }
 
   goToChatBox(feed: any): void {
