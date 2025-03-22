@@ -227,11 +227,29 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   downloadFile(filePath: string): void {
-    console.log(`Downloading file from path: ${filePath}`);
-    const link = document.createElement("a");
-    link.href = filePath;
-    link.download = filePath.split("/").pop() || "download";
-    link.click();
+    console.log(`Attempting to download file from: ${filePath}`);
+    fetch(filePath, { mode: "cors" })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Network error: ${response.statusText}`);
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = blobUrl;
+        const parts = filePath.split("/");
+        a.download = parts[parts.length - 1] || "download";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
   }
 
   isVideo(url: string): boolean {

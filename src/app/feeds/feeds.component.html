@@ -30,7 +30,7 @@
               <div *ngIf="feed.dropdownOpen"
                 class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10">
                 <nav class="flex flex-col">
-                  <a href="#" (click)="downloadFile(feed.content); toggleDropdown(feed)"
+                  <a href="#" (click)="downloadFile(feed.content); toggleDropdown(feed); $event.preventDefault()"
                     class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
                     <!-- Improved Bookmark Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -39,6 +39,7 @@
                     </svg>
                     <span>Download</span>
                   </a>
+
                   <a href="#" (click)="goToChatBox(feed); toggleDropdown(feed)"
                     class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
                     <!-- Improved Paper Plane Icon -->
