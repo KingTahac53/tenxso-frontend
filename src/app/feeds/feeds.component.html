@@ -39,8 +39,7 @@
                     </svg>
                     <span>Download</span>
                   </a>
-
-                  <a href="#" (click)="goToChatBox(feed); toggleDropdown(feed)"
+                  <a href="#" (click)="goToChatBox(feed); toggleDropdown(feed); $event.preventDefault()"
                     class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
                     <!-- Improved Paper Plane Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -51,7 +50,7 @@
                     <span>Message</span>
                   </a>
                   <hr class="border-gray-200 dark:border-gray-600">
-                  <a href="#" (click)="reportFeed(feed); toggleDropdown(feed)"
+                  <a href="#" (click)="reportFeed(feed); toggleDropdown(feed); $event.preventDefault()"
                     class="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-600/50">
                     <!-- Improved Flag Icon -->
                     <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6 text-red-500"
@@ -109,19 +108,26 @@
 
           <!-- Inline Comments Section -->
           <div *ngIf="feed.showComments" class="sm:p-4 p-2.5 border-t border-gray-100 dark:border-gray-700 space-y-3">
-            <!-- List comments -->
-            <div *ngFor="let comment of feed.comments" class="flex items-start gap-3">
-              <img [src]="comment.userProfileUrl || 'assets/images/default-avatar.jpg'" alt="Commenter"
-                class="w-6 h-6 rounded-full">
-              <div class="flex-1">
-                <a href="#" class="text-black dark:text-white font-medium text-sm">{{ comment.commentAuthorUsername
-                  }}</a>
-                <p class="mt-0.5 text-sm text-gray-700 dark:text-gray-300">{{ comment.commentContent }}</p>
-                <div class="text-xs text-gray-400">{{ comment.commentDateCreated }}</div>
+            <!-- List comments: Render only if comments exist -->
+            <ng-container *ngIf="feed.comments && feed.comments.length; else noComments">
+              <div *ngFor="let comment of feed.comments" class="flex items-start gap-3">
+                <img [src]="comment.userProfileUrl || 'assets/images/default-avatar.jpg'" alt="Commenter"
+                  class="w-6 h-6 rounded-full">
+                <div class="flex-1">
+                  <a href="#" class="text-black dark:text-white font-medium text-sm">
+                    {{ comment.commentAuthorUsername }}
+                  </a>
+                  <p class="mt-0.5 text-sm text-gray-900 dark:text-gray-100">{{ comment.commentContent }}</p>
+                  <div class="text-xs text-gray-400">{{ comment.commentDateCreated }}</div>
+                </div>
               </div>
-            </div>
+            </ng-container>
+            <ng-template #noComments>
+              <!-- If there are no comments, display nothing (or an optional message) -->
+              <!-- <p class="text-sm text-gray-700 dark:text-gray-100">No comments yet.</p> -->
+            </ng-template>
             <!-- Add Comment Input -->
-            <div class="sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 dark:border-gray-700 flex items-center gap-2">
+            <div class="sm:px-4 sm:py-3 p-2.5 flex items-center gap-2">
               <!-- Logged in user's profile pic from cookies -->
               <img [src]="profilePic || 'assets/images/default-avatar.jpg'" alt="Your Avatar"
                 class="w-6 h-6 rounded-full">
