@@ -118,7 +118,8 @@
                     {{ comment.commentAuthorUsername }}
                   </a>
                   <p class="mt-0.5 text-sm text-gray-900 dark:text-gray-100">{{ comment.commentContent }}</p>
-                  <div class="text-xs text-gray-400">{{ comment.commentDateCreated }}</div>
+                  <div class="text-xs text-gray-400">
+                    {{ comment.commentDateCreated | date:'medium' }} </div>
                 </div>
               </div>
             </ng-container>
