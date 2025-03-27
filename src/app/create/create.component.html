@@ -11,7 +11,7 @@
       <div class="text-center py-3 border-b dark:border-slate-700 relative">
         <h2 class="text-sm font-medium">Create Post</h2>
         <button type="button" class="absolute top-0 right-0 m-2.5" (click)="isModalOpen = false">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 86 86" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -32,13 +32,13 @@
         <div>
           <div class="w-full h-52 relative border rounded-lg overflow-hidden bg-repeat">
             <label for="createStatusUrl"
-              class="flex flex-col justify-center items-center absolute -translate-x-1/2 left-1/2 bottom-0 z-10 w-full pb-6 pt-10 cursor-pointer bg-gradient-to-t from-gray-700/60">
+              class="flex flex-col justify-center items-center w-full h-full absolute -translate-x-1/2 left-1/2 bottom-0 z-10 pb-6 pt-10 cursor-pointer bg-gradient-to-t from-gray-700/60">
               <input id="createStatusUrl" type="file" class="hidden" (change)="onFileSelected($event)"
-                accept="image/png, image/jpeg, image/jpg, image/gif, image/webp" />
-              <ion-icon name="image" class="text-3xl text-teal-600"></ion-icon>
-              <span class="text-white mt-2">Browse to Upload image</span>
+                accept="image/png, image/jpeg, image/jpg, image/gif, image/webp, video/mp4, video/ogg, video/webm" />
+              <ion-icon name="image" class="text-3xl text-teal-900"></ion-icon>
+              <span class="text-white mt-2">Upload image or video</span>
             </label>
-            <!-- Image Preview (if available) -->
+            <!-- Image/Video Preview (if available) -->
             <img *ngIf="imgPreview" [src]="imgPreview" alt="Uploaded Image"
               class="w-full h-full absolute object-cover" />
           </div>
