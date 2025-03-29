@@ -8,8 +8,19 @@
           <!-- Feed Header -->
           <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
             <!-- Use API profilePicUrl for feed authors -->
-            <img [src]="feed.profilePicUrl || 'assets/images/default-avatar.jpg'" alt="Profile Picture"
-              class="w-9 h-9 rounded-full">
+            <ng-container *ngIf="feed.title && !feed.imgError; else fallbackAvatar">
+              <img [src]="feed.title" alt="Profile Picture" class="w-9 h-9 rounded-full"
+                (error)="feed.imgError = true" />
+            </ng-container>
+            <ng-template #fallbackAvatar>
+              <div
+                class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-xl font-semibold text-gray-700">
+                {{ feed.authorUsername ? feed.authorUsername.charAt(0).toUpperCase() : '?' }}
+              </div>
+            </ng-template>
+
+
+
             <div class="flex-1">
               <h4 class="text-black dark:text-white">{{ feed.authorUsername }}</h4>
               <div class="text-xs text-gray-500 dark:text-gray-400">

@@ -301,14 +301,15 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   goToChatBox(feed: any): void {
     console.log(feed);
+    // Update: Use the 'title' field as the author's profile picture
     this.sharedService.setChatUserInfo(
       feed.authorId,
       feed.authorUsername,
-      feed.authorProfilePic || feed.content
+      feed.title
     );
     localStorage.setItem("userId", feed.authorId);
     localStorage.setItem("username", feed.authorUsername);
-    localStorage.setItem("profilePic", feed.authorProfilePic || feed.content);
+    localStorage.setItem("profilePic", feed.title);
     this.router.navigate(["/messages"]);
   }
 
