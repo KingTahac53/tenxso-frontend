@@ -85,6 +85,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
               feed.showComments = false;
               feed.newComment = "";
               feed.dropdownOpen = false; // Initialize dropdown toggle
+              // Using the new dateCreated field for post time.
+              // Comments will be loaded for each feed.
               this.feedService
                 .getPostComments(feed.postId)
                 .subscribe((comments: any) => {
@@ -201,6 +203,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   likePost(feed: any): void {
     if (!this.userId || !this.username) return;
+    // Toggle like based on the new likeFlag field
     if (feed.likeFlag == 0) {
       feed.likeFlag = 1;
       feed.likeCount = Number(feed.likeCount) + 1;
@@ -301,7 +304,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   goToChatBox(feed: any): void {
     console.log(feed);
-    // Update: Use the 'title' field as the author's profile picture
+    // Use the 'title' field as the author's profile picture per new API update
     this.sharedService.setChatUserInfo(
       feed.authorId,
       feed.authorUsername,
