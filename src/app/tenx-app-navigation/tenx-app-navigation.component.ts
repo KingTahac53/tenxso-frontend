@@ -14,11 +14,11 @@ declare const google: any;
   templateUrl: "./tenx-app-navigation.component.html",
 })
 export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
-  notificationCounter: number = 0;
-  generatedUserData: UserData = new UserData("", "", "");
+  // Update default instantiation with 6 parameters.
+  generatedUserData: UserData = new UserData("", "", "", "", "", "false");
   profileDropdownOpen: boolean = false;
   signedIn: boolean = false;
-  isVerified: boolean = false; // True if Google-verified
+  notificationCounter: number = 0;
 
   constructor(
     private userService: UserService,
@@ -31,18 +31,25 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     // Load user data from cookies
     const userId = this.getCookie("userId");
-    const username = this.getCookie("username");
+    const firstName = this.getCookie("firstName");
+    const lastName = this.getCookie("lastName");
     const profilePic = this.getCookie("profilePic");
     const googleVerified = this.getCookie("googleVerified");
-    if (userId && username && profilePic) {
-      this.generatedUserData = new UserData(userId, username, profilePic);
+
+    if (userId && firstName && lastName && profilePic) {
+      this.generatedUserData = new UserData(
+        userId,
+        "", // username may not be used since you now use firstName + " " + lastName
+        firstName,
+        lastName,
+        profilePic,
+        googleVerified || "false"
+      );
       this.signedIn = true;
-      this.isVerified = googleVerified === "true";
       this.getUser(userId, true);
     } else {
       this.generateAndStoreUser(true);
       this.signedIn = false;
-      this.isVerified = false;
     }
 
     // Subscribe to notification updates
@@ -52,45 +59,40 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Render the Google Sign-In button if user is unverified
-    if (!this.isVerified) {
+    // If not signed in, render the Google Sign-In button in the nav link container
+    if (!this.signedIn) {
       this.initializeGoogleSignIn();
     }
   }
 
-  // Trigger the custom Google sign-in when the button is clicked
-  // Trigger custom Google sign in
-  signInWithGoogleCustom(): void {
-    if (typeof google === "undefined") {
-      console.error("Google Identity Services script not loaded");
-      return;
-    }
-    // Ensure initialization (if not already initialized)
-    this.initializeGoogleSignIn();
-    // Trigger the Google One Tap prompt
-    google.accounts.id.prompt();
-  }
-
-  // Fetch user data from the server
+  // Fetch user data from server
   getUser(userId: any, storeCookies: boolean) {
     this.userService.getUser(userId).subscribe(
       (response: UserData) => {
-        if (response.userId === "") {
+        if (!response.userId) {
           this.generateAndStoreUser(true);
         } else {
           this.generatedUserData = response;
           if (storeCookies) {
             this.setCookie("userId", this.generatedUserData.userId, 365);
-            this.setCookie("username", this.generatedUserData.username, 365);
+            this.setCookie("firstName", this.generatedUserData.firstName, 365);
+            this.setCookie("lastName", this.generatedUserData.lastName, 365);
             this.setCookie(
               "profilePic",
               this.generatedUserData.profilePic,
               365
             );
+            this.setCookie(
+              "googleVerified",
+              this.generatedUserData.isVerified,
+              365
+            );
           }
           this.sharedService.setUserInfo(
             this.generatedUserData.userId,
-            this.generatedUserData.username,
+            this.generatedUserData.firstName +
+              " " +
+              this.generatedUserData.lastName,
             this.generatedUserData.profilePic
           );
         }
@@ -99,24 +101,26 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Generate a new user if none exists (default unverified)
+  // Generate a new user (default unverified)
   generateAndStoreUser(storeCookies: boolean) {
     this.userService.generateUserId().subscribe(
       (response: UserData) => {
         this.generatedUserData = response;
         if (storeCookies) {
           this.setCookie("userId", this.generatedUserData.userId, 365);
-          this.setCookie("username", this.generatedUserData.username, 365);
+          this.setCookie("firstName", this.generatedUserData.firstName, 365);
+          this.setCookie("lastName", this.generatedUserData.lastName, 365);
           this.setCookie("profilePic", this.generatedUserData.profilePic, 365);
           this.setCookie("googleVerified", "false", 365);
         }
         this.sharedService.setUserInfo(
           this.generatedUserData.userId,
-          this.generatedUserData.username,
+          this.generatedUserData.firstName +
+            " " +
+            this.generatedUserData.lastName,
           this.generatedUserData.profilePic
         );
         this.signedIn = true;
-        this.isVerified = false;
       },
       (error) => console.error("Error generating user data:", error)
     );
@@ -141,23 +145,12 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     document.cookie = name + "=; Max-Age=0; path=/;";
   }
 
-  // Toggle the profile dropdown
+  // Toggle profile dropdown
   toggleProfileDropdown(): void {
     this.profileDropdownOpen = !this.profileDropdownOpen;
-    // When opening and unverified, re-render the Google button
-    if (this.profileDropdownOpen && !this.isVerified) {
-      const btnContainer = document.getElementById("googleSignInDiv");
-      if (btnContainer && typeof google !== "undefined") {
-        btnContainer.innerHTML = "";
-        google.accounts.id.renderButton(btnContainer, {
-          theme: "outline",
-          size: "large",
-        });
-      }
-    }
   }
 
-  // Initialize Google Sign-In
+  // Initialize Google Sign-In (render the button in the navbar container with id "googleSignInNav")
   initializeGoogleSignIn(): void {
     if (typeof google === "undefined") {
       console.error("Google Identity Services script not loaded");
@@ -168,7 +161,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
       client_id: clientId,
       callback: this.handleCredentialResponse.bind(this),
     });
-    const btnContainer = document.getElementById("googleSignInDiv");
+    const btnContainer = document.getElementById("googleSignInNav");
     if (btnContainer) {
       btnContainer.innerHTML = "";
       google.accounts.id.renderButton(btnContainer, {
@@ -178,24 +171,28 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Handle the Google credential response
+  // Handle Google credential response
   handleCredentialResponse(response: any): void {
     console.log("Google JWT token:", response.credential);
     this.userService.verifyGoogleToken(response.credential).subscribe(
       (userData: UserData) => {
         this.ngZone.run(() => {
           this.sharedService.setCookie("userId", userData.userId, 365);
-          this.sharedService.setCookie("username", userData.username, 365);
+          this.sharedService.setCookie("firstName", userData.firstName, 365);
+          this.sharedService.setCookie("lastName", userData.lastName, 365);
           this.sharedService.setCookie("profilePic", userData.profilePic, 365);
-          this.sharedService.setCookie("googleVerified", "true", 365);
+          this.sharedService.setCookie(
+            "googleVerified",
+            userData.isVerified,
+            365
+          );
           this.sharedService.setUserInfo(
             userData.userId,
-            userData.username,
+            userData.firstName + " " + userData.lastName,
             userData.profilePic
           );
           this.generatedUserData = userData;
           this.signedIn = true;
-          this.isVerified = true;
           this.profileDropdownOpen = false;
         });
       },
@@ -203,24 +200,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Trigger the Google One Tap prompt
-  signInWithGoogle(): void {
+  // Trigger custom sign-in when the nav link is clicked
+  signInWithGoogleCustom(): void {
     if (typeof google !== "undefined") {
       google.accounts.id.prompt();
     }
   }
 
-  // For now, logout is commented out; you can uncomment if needed.
-  logout(): void {
-    console.log("Logging out...");
-    this.deleteCookie("userId");
-    this.deleteCookie("username");
-    this.deleteCookie("profilePic");
-    this.deleteCookie("googleVerified");
-    this.generatedUserData = new UserData("", "", "");
-    this.signedIn = false;
-    this.isVerified = false;
-    // Optionally navigate to login page:
-    // this.router.navigate(['/login']);
-  }
+  // Logout functionality (commented out for now)
+  // logout(): void { ... }
 }

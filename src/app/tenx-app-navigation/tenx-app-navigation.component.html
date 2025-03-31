@@ -35,7 +35,7 @@
         </a>
 
         <!-- Notifications -->
-        <!-- <a routerLink="/notifications" class="relative flex items-center p-2 hover:bg-gray-100 rounded">
+        <a routerLink="/notifications" class="relative flex items-center p-2 hover:bg-gray-100 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
             stroke="currentColor" class="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -48,7 +48,7 @@
           </svg>
           <span class="max-xl:hidden ml-4">Notifications</span>
           <div class="w-2 h-2 bg-red-600 rounded-full absolute left-7 top-2.5"></div>
-        </a> -->
+        </a>
 
         <!-- Create -->
         <a routerLink="/create" class="flex items-center p-2 hover:bg-gray-100 rounded">
@@ -62,15 +62,15 @@
         </a>
 
         <!-- About Us -->
-        <!-- <a routerLink="/about" class="flex items-center p-2 hover:bg-gray-100 rounded">
+        <a routerLink="/about" class="flex items-center p-2 hover:bg-gray-100 rounded">
           <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16" class="w-6 h-6">
             <path
               d="M8 16.016a7.5 7.5 0 0 0 1.962-14.74A1 1 0 0 0 9 0H7a1 1 0 0 0-.962 1.276A7.5 7.5 0 0 0 8 16.016zM14.5 8.516a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z" />
             <path d="m6.94 7.44 4.95-2.83-2.83 4.95-4.949 2.83 2.828-4.95z" />
           </svg>
           <span class="max-xl:hidden ml-4">About Us</span>
-        </a> -->
-
+        </a>
+        <!-- External Links -->
         <a href="https://github.com/ManishXS/BackEndSocial.git" target="_blank"
           class="flex items-center p-2 hover:bg-gray-100 rounded">
           <i class="fab fa-github text-xl mr-2"></i>
@@ -79,7 +79,14 @@
         <a href="https://www.linkedin.com/in/manish-pardeshi-069417133/" target="_blank"
           class="flex items-center p-2 hover:bg-gray-100 rounded">
           <i class="fab fa-linkedin text-xl mr-2"></i>
-          <span class="max-xl:hidden ml-4">My LinkedIn Profile</span>
+          <span class="max-xl:hidden ml-4">Follow on LinkedIn</span>
+        </a>
+
+        <!-- Sign In with Google NavLink -->
+        <a href="#" (click)="signInWithGoogleCustom(); $event.preventDefault()"
+          class="flex items-center p-2 hover:bg-gray-100 rounded">
+          <i class="fab fa-google text-xl mr-2"></i>
+          <span class="max-xl:hidden ml-4">Sign in with Google</span>
         </a>
       </nav>
 
@@ -88,7 +95,9 @@
         <button (click)="toggleProfileDropdown()" class="flex items-center gap-3 p-3 cursor-pointer focus:outline-none">
           <img [src]="generatedUserData?.profilePic || 'assets/images/default-avatar.jpg'" alt="Profile"
             class="rounded-full md:w-7 md:h-7 w-5 h-5 shrink-0" />
-          <span class="font-semibold text-sm text-gray-900 dark:text-gray-800 max-xl:block">My Profile</span>
+          <span class="font-semibold text-sm text-gray-900 dark:text-gray-800 max-xl:block">
+            {{ generatedUserData?.firstName }} {{ generatedUserData?.lastName }}
+          </span>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
             class="w-5 h-5 ml-auto transform transition-transform duration-200"
             [ngClass]="{'rotate-90': profileDropdownOpen}">
@@ -103,17 +112,17 @@
               class="w-8 h-8 rounded-full" alt="Profile" />
             <div class="ml-2">
               <div class="text-base font-semibold text-gray-900 dark:text-gray-800">
-                {{ generatedUserData?.username || 'Guest' }}
+                {{ generatedUserData?.firstName }} {{ generatedUserData?.lastName || 'Guest' }}
               </div>
               <div class="flex items-center text-gray-600 dark:text-gray-900">
-                {{ generatedUserData?.username ? '@' + generatedUserData.username : '' }}
-                <span *ngIf="!isVerified" class="ml-1 text-red-500" title="Unverified">
+                <!-- If needed, display the verified/unverified icon here -->
+                <span *ngIf="!generatedUserData.isVerified" class="ml-1 text-red-500" title="Unverified">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
                     <path
                       d="M8.257 3.099c.765-1.36 2.681-1.36 3.446 0l6.516 11.59c.75 1.335-.213 2.99-1.723 2.99H3.464c-1.51 0-2.473-1.655-1.723-2.99l6.516-11.59zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v3a1 1 0 01-1 1z" />
                   </svg>
                 </span>
-                <span *ngIf="isVerified" class="ml-1 text-green-500" title="Verified">
+                <span *ngIf="generatedUserData.isVerified" class="ml-1 text-green-500" title="Verified">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
                     <path fill-rule="evenodd"
                       d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
@@ -125,43 +134,24 @@
           </div>
           <hr class="opacity-60" />
           <ul class="text-sm font-semibold p-2">
-            <a routerLink="/login">
-              <li>
-                <!-- Always show custom Sign in with Google Button -->
-                <button (click)="signInWithGoogleCustom(); $event.preventDefault()"
-                  class="flex items-center gap-3 rounded-md p-2 ">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5">
-                    <path fill="#EA4335"
-                      d="M24 9.5c3.69 0 6.98 1.27 9.58 3.75l7.14-7.14C35.86 2.85 30.63 0 24 0 14.73 0 6.95 5.08 2.71 12.47l8.34 6.48C12.57 12.16 17.87 9.5 24 9.5z" />
-                    <path fill="#4285F4"
-                      d="M46.09 24.5c0-1.65-.15-3.23-.44-4.75H24v9.03h12.59c-.54 2.93-2.16 5.42-4.6 7.08v5.87h7.45c4.36-4.01 6.87-9.92 6.87-17.23z" />
-                    <path fill="#FBBC05"
-                      d="M10.05 28.16a13.63 13.63 0 010-8.32V13.97h-8.34a24.08 24.08 0 000 16.05l8.34-2.86z" />
-                    <path fill="#34A853"
-                      d="M24 48c6.63 0 12.22-2.18 16.29-5.91l-7.45-5.87c-2.07 1.39-4.72 2.21-8.84 2.21-6.13 0-11.33-4.14-13.19-9.69H2.71v6.07A24.08 24.08 0 0024 48z" />
-                    <path fill="none" d="M0 0h48v48H0z" />
-                  </svg>
-                  <span>Sign in with Google</span>
-                </button>
-              </li>
-            </a>
-
-            <!-- LoggedIn template is commented out for now -->
-            <!--
-            <ng-template #loggedIn>
-              <li>
-                <a href="#" (click)="logout(); toggleProfileDropdown(); $event.preventDefault()"
-                   class="flex items-center gap-3 rounded-md p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                       stroke="currentColor" class="w-6 h-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M16 17l5-5m0 0l-5-5m5 5H9m4 5v1a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2h4a2 2 0 012 2v1"/>
-                  </svg>
-                  <span>Log Out</span>
-                </a>
-              </li>
-            </ng-template>
-            -->
+            <!-- For now, we are only showing the sign in with Google option in the nav -->
+            <li>
+              <button (click)="signInWithGoogleCustom(); $event.preventDefault()"
+                class="flex items-center gap-3 rounded-md p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5">
+                  <path fill="#EA4335"
+                    d="M24 9.5c3.69 0 6.98 1.27 9.58 3.75l7.14-7.14C35.86 2.85 30.63 0 24 0 14.73 0 6.95 5.08 2.71 12.47l8.34 6.48C12.57 12.16 17.87 9.5 24 9.5z" />
+                  <path fill="#4285F4"
+                    d="M46.09 24.5c0-1.65-.15-3.23-.44-4.75H24v9.03h12.59c-.54 2.93-2.16 5.42-4.6 7.08v5.87h7.45c4.36-4.01 6.87-9.92 6.87-17.23z" />
+                  <path fill="#FBBC05"
+                    d="M10.05 28.16a13.63 13.63 0 010-8.32V13.97h-8.34a24.08 24.08 0 000 16.05l8.34-2.86z" />
+                  <path fill="#34A853"
+                    d="M24 48c6.63 0 12.22-2.18 16.29-5.91l-7.45-5.87c-2.07 1.39-4.72 2.21-8.84 2.21-6.13 0-11.33-4.14-13.19-9.69H2.71v6.07A24.08 24.08 0 0024 48z" />
+                  <path fill="none" d="M0 0h48v48H0z" />
+                </svg>
+                <span>Sign in with Google</span>
+              </button>
+            </li>
           </ul>
         </div>
       </div>
