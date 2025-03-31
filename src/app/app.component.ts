@@ -1,27 +1,39 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from './services/user.service';
-import { UserData } from './models/user-data.model';
-import { DeviceService } from './services/device.service';
+import { Component, OnInit } from "@angular/core";
+import { UserService } from "./services/user.service";
+import { UserData } from "./models/user-data.model";
+import { DeviceService } from "./services/device.service";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit {
-  generatedUserData: UserData = new UserData('', '', ''); // Initialize UserData object with profilePic
+  generatedUserData: UserData = new UserData("", "", "", "", "", "false"); // Initialize UserData object with profilePic
   isMobileView: boolean = false; // Flag to track if the view is mobile
 
-  constructor(private userService: UserService, private deviceService: DeviceService) { }
+  constructor(
+    private userService: UserService,
+    private deviceService: DeviceService
+  ) {}
 
   ngOnInit() {
-
-    const userId = this.getCookie('userId');
-    const username = this.getCookie('username');
-    const profilePic = this.getCookie('profilePic'); // Retrieve profile pic from cookies
+    const userId = this.getCookie("userId");
+    const username = this.getCookie("username");
+    const firstName = this.getCookie("firstName");
+    const lastName = this.getCookie("lastName");
+    const profilePic = this.getCookie("profilePic");
+    const googleVerified = this.getCookie("googleVerified");
 
     if (userId && username && profilePic) {
-      this.generatedUserData = new UserData(userId, username, profilePic);
+      this.generatedUserData = new UserData(
+        userId,
+        username,
+        firstName || "",
+        lastName || "",
+        profilePic,
+        googleVerified || "false"
+      );
     } else {
       this.generateAndStoreUser(true); // Generate new data if no cookies
     }
@@ -33,13 +45,13 @@ export class AppComponent implements OnInit {
       (response: UserData) => {
         this.generatedUserData = response;
         if (storeCookies) {
-          this.setCookie('userId', this.generatedUserData.userId, 365);
-          this.setCookie('username', this.generatedUserData.username, 365);
-          this.setCookie('profilePic', this.generatedUserData.profilePic, 365);
+          this.setCookie("userId", this.generatedUserData.userId, 365);
+          this.setCookie("username", this.generatedUserData.username, 365);
+          this.setCookie("profilePic", this.generatedUserData.profilePic, 365);
         }
       },
-      error => {
-        console.error('Error generating user ID:', error);
+      (error) => {
+        console.error("Error generating user ID:", error);
       }
     );
   }
@@ -53,7 +65,7 @@ export class AppComponent implements OnInit {
 
   getCookie(name: string): string | null {
     const nameEQ = `${name}=`;
-    const ca = document.cookie.split(';');
+    const ca = document.cookie.split(";");
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i].trim();
       if (c.indexOf(nameEQ) === 0) {

@@ -25,7 +25,7 @@ import { ChatComponent } from "./chat/chat.component";
 import { EditProfileComponent } from "./edit-profile/edit-profile.component";
 import { AboutComponent } from "./about/about.component";
 import { VideoDisplayComponent } from "./video-display/video-display.component";
-import { LoginComponent } from "./login/login.component";
+// import { LoginComponent } from "./login/login.component";
 import { CreateComponent } from "./create/create.component";
 import { NotificationsComponent } from "./notifications/notifications.component";
 import { ProfileComponent } from "./profile/profile.component";
@@ -48,7 +48,7 @@ import { VideoPlayerComponent } from "./video-player/video-player.component";
     EditProfileComponent,
     AboutComponent,
     VideoDisplayComponent,
-    LoginComponent,
+    // LoginComponent,
     CreateComponent,
     NotificationsComponent,
     ProfileComponent,
