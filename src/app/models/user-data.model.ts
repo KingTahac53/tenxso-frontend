@@ -16,9 +16,9 @@ export class UserData {
   ) {
     this.userId = userId;
     this.username = username;
-    this.profilePic = profilePic;
     this.firstName = firstName;
     this.lastName = lastName;
+    this.profilePic = profilePic;
     this.isVerified = isVerified;
   }
 }

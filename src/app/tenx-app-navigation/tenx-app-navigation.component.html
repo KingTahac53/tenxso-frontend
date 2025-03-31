@@ -70,6 +70,7 @@
           </svg>
           <span class="max-xl:hidden ml-4">About Us</span>
         </a>
+
         <!-- External Links -->
         <a href="https://github.com/ManishXS/BackEndSocial.git" target="_blank"
           class="flex items-center p-2 hover:bg-gray-100 rounded">
@@ -81,14 +82,11 @@
           <i class="fab fa-linkedin text-xl mr-2"></i>
           <span class="max-xl:hidden ml-4">Follow on LinkedIn</span>
         </a>
-
-        <!-- Sign In with Google NavLink -->
-        <a href="#" (click)="signInWithGoogleCustom(); $event.preventDefault()"
-          class="flex items-center p-2 hover:bg-gray-100 rounded">
-          <i class="fab fa-google text-xl mr-2"></i>
-          <span class="max-xl:hidden ml-4">Sign in with Google</span>
-        </a>
       </nav>
+
+      <!-- Google Sign-In Button in Navbar -->
+      <!-- This div should be visible in the navbar -->
+      <div id="googleSignInDiv" class="mt-2"></div>
 
       <!-- Profile Section -->
       <div class="relative">
@@ -96,7 +94,8 @@
           <img [src]="generatedUserData?.profilePic || 'assets/images/default-avatar.jpg'" alt="Profile"
             class="rounded-full md:w-7 md:h-7 w-5 h-5 shrink-0" />
           <span class="font-semibold text-sm text-gray-900 dark:text-gray-800 max-xl:block">
-            {{ generatedUserData?.firstName }} {{ generatedUserData?.lastName }}
+            <!-- {{ generatedUserData?.username }} -->
+            My Profile
           </span>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
             class="w-5 h-5 ml-auto transform transition-transform duration-200"
@@ -112,17 +111,18 @@
               class="w-8 h-8 rounded-full" alt="Profile" />
             <div class="ml-2">
               <div class="text-base font-semibold text-gray-900 dark:text-gray-800">
-                {{ generatedUserData?.firstName }} {{ generatedUserData?.lastName || 'Guest' }}
+                {{ (generatedUserData?.firstName && generatedUserData?.lastName) ? (generatedUserData.firstName + ' ' +
+                generatedUserData.lastName) : generatedUserData?.username }}
               </div>
               <div class="flex items-center text-gray-600 dark:text-gray-900">
-                <!-- If needed, display the verified/unverified icon here -->
-                <span *ngIf="!generatedUserData.isVerified" class="ml-1 text-red-500" title="Unverified">
+                {{ generatedUserData?.username }}
+                <span *ngIf="generatedUserData.isVerified !== 'true'" class="ml-1 text-red-500" title="Unverified">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
                     <path
                       d="M8.257 3.099c.765-1.36 2.681-1.36 3.446 0l6.516 11.59c.75 1.335-.213 2.99-1.723 2.99H3.464c-1.51 0-2.473-1.655-1.723-2.99l6.516-11.59zM11 13a1 1 0 10-2 0 1 1 0 002 0zm-1-2a1 1 0 01-1-1V7a1 1 0 112 0v3a1 1 0 01-1 1z" />
                   </svg>
                 </span>
-                <span *ngIf="generatedUserData.isVerified" class="ml-1 text-green-500" title="Verified">
+                <span *ngIf="generatedUserData.isVerified === 'true'" class="ml-1 text-green-500" title="Verified">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="w-4 h-4">
                     <path fill-rule="evenodd"
                       d="M16.707 5.293a1 1 0 00-1.414 0L8 12.586 4.707 9.293a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8a1 1 0 000-1.414z"
@@ -133,8 +133,7 @@
             </div>
           </div>
           <hr class="opacity-60" />
-          <ul class="text-sm font-semibold p-2">
-            <!-- For now, we are only showing the sign in with Google option in the nav -->
+          <!-- <ul class="text-sm font-semibold p-2">
             <li>
               <button (click)="signInWithGoogleCustom(); $event.preventDefault()"
                 class="flex items-center gap-3 rounded-md p-2 hover:bg-gray-200 dark:hover:bg-gray-700">
@@ -152,7 +151,7 @@
                 <span>Sign in with Google</span>
               </button>
             </li>
-          </ul>
+          </ul> -->
         </div>
       </div>
     </div>

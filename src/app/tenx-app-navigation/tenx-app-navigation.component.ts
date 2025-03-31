@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone, AfterViewInit } from "@angular/core";
+import { Component, OnInit, AfterViewInit, NgZone } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { SharedService } from "../services/shared.service";
 import { SignalRService } from "../services/signal-r.service";
@@ -37,9 +37,10 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     const googleVerified = this.getCookie("googleVerified");
 
     if (userId && firstName && lastName && profilePic) {
+      // Note: the username field is not used since we now use firstName + lastName
       this.generatedUserData = new UserData(
         userId,
-        "", // username may not be used since you now use firstName + " " + lastName
+        "",
         firstName,
         lastName,
         profilePic,
@@ -59,13 +60,11 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // If not signed in, render the Google Sign-In button in the nav link container
-    if (!this.signedIn) {
-      this.initializeGoogleSignIn();
-    }
+    // Use the original Google sign-in flow from login.component.html:
+    // Render the Google Sign-In button inside the div with id "googleSignInDiv" in the navbar.
+    this.initializeGoogleSignIn();
   }
 
-  // Fetch user data from server
   getUser(userId: any, storeCookies: boolean) {
     this.userService.getUser(userId).subscribe(
       (response: UserData) => {
@@ -101,7 +100,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Generate a new user (default unverified)
   generateAndStoreUser(storeCookies: boolean) {
     this.userService.generateUserId().subscribe(
       (response: UserData) => {
@@ -126,7 +124,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Cookie helpers
+  // Cookie helper methods
   setCookie(name: string, value: string, days: number) {
     const d = new Date();
     d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
@@ -145,12 +143,11 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     document.cookie = name + "=; Max-Age=0; path=/;";
   }
 
-  // Toggle profile dropdown
   toggleProfileDropdown(): void {
     this.profileDropdownOpen = !this.profileDropdownOpen;
   }
 
-  // Initialize Google Sign-In (render the button in the navbar container with id "googleSignInNav")
+  // Original Google Sign-In flow from login.component.html
   initializeGoogleSignIn(): void {
     if (typeof google === "undefined") {
       console.error("Google Identity Services script not loaded");
@@ -161,7 +158,8 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
       client_id: clientId,
       callback: this.handleCredentialResponse.bind(this),
     });
-    const btnContainer = document.getElementById("googleSignInNav");
+    // Render the button inside the div with id "googleSignInDiv"
+    const btnContainer = document.getElementById("googleSignInDiv");
     if (btnContainer) {
       btnContainer.innerHTML = "";
       google.accounts.id.renderButton(btnContainer, {
@@ -171,7 +169,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Handle Google credential response
   handleCredentialResponse(response: any): void {
     console.log("Google JWT token:", response.credential);
     this.userService.verifyGoogleToken(response.credential).subscribe(
@@ -196,17 +193,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           this.profileDropdownOpen = false;
         });
       },
-      (error: any) => console.error("Error verifying Google token:", error)
+      (error) => console.error("Error verifying Google token:", error)
     );
   }
-
-  // Trigger custom sign-in when the nav link is clicked
-  signInWithGoogleCustom(): void {
-    if (typeof google !== "undefined") {
-      google.accounts.id.prompt();
-    }
-  }
-
-  // Logout functionality (commented out for now)
-  // logout(): void { ... }
 }
