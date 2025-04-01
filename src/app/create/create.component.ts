@@ -10,7 +10,7 @@ import { Router } from "@angular/router";
   styleUrls: ["./create.component.css"],
 })
 export class CreateComponent implements OnInit {
-  // Set to true so the modal is shown when the component loads
+  // Show modal on component load
   isModalOpen: boolean = true;
 
   selectedFile: File | null = null;
@@ -19,6 +19,7 @@ export class CreateComponent implements OnInit {
   username: string | null = null;
   profilePic: string | null = null;
   caption: string = "";
+  // We use one preview property for both image and video
   imgPreview: any;
   isUploading: boolean = false;
   uploadSuccess: boolean = false;
@@ -92,9 +93,8 @@ export class CreateComponent implements OnInit {
 
     const reader = new FileReader();
     reader.onload = (e: any) => {
-      if (this.ALLOWED_IMAGE_TYPES.includes(this.selectedFile!.type)) {
-        this.imgPreview = e.target.result;
-      }
+      // For both images and videos, set the preview DataURL
+      this.imgPreview = e.target.result;
     };
     reader.readAsDataURL(this.selectedFile);
   }

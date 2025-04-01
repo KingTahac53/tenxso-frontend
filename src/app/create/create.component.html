@@ -20,7 +20,6 @@
 
       <!-- Modal Body -->
       <div class="space-y-5 mt-7">
-
         <!-- Caption Input -->
         <div>
           <label class="text-base">What do you have in mind?</label>
@@ -38,9 +37,14 @@
               <ion-icon name="image" class="text-3xl text-teal-900"></ion-icon>
               <span class="text-white mt-2">Upload image or video</span>
             </label>
-            <!-- Image/Video Preview (if available) -->
-            <img *ngIf="imgPreview" [src]="imgPreview" alt="Uploaded Image"
-              class="w-full h-full absolute object-cover" />
+            <!-- Media Preview -->
+            <ng-container *ngIf="selectedFile && selectedFile.type.startsWith('video/')">
+              <video [src]="imgPreview" controls class="w-full h-full object-cover"></video>
+            </ng-container>
+            <ng-container *ngIf="!selectedFile || (selectedFile && !selectedFile.type.startsWith('video/'))">
+              <img *ngIf="imgPreview" [src]="imgPreview" alt="Uploaded Image"
+                class="w-full h-full absolute object-cover" />
+            </ng-container>
           </div>
         </div>
 
@@ -60,7 +64,6 @@
         <div *ngIf="uploadSuccess" class="text-green-500 text-center">
           Feed uploaded successfully!
         </div>
-
       </div>
     </div>
   </div>
