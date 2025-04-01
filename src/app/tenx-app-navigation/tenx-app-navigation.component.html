@@ -111,8 +111,9 @@
               class="w-8 h-8 rounded-full" alt="Profile" />
             <div class="ml-2">
               <div class="text-base font-semibold text-gray-900 dark:text-gray-800">
-                {{ (generatedUserData?.firstName && generatedUserData?.lastName) ? (generatedUserData.firstName + ' ' +
-                generatedUserData.lastName) : generatedUserData?.username }}
+                {{ (generatedUserData?.firstName && generatedUserData?.lastName) ?
+                (generatedUserData.firstName + ' ' + generatedUserData.lastName) :
+                (generatedUserData?.username ? formatUsername(generatedUserData.username) : 'Guest') }}
               </div>
               <div class="flex items-center text-gray-600 dark:text-gray-900">
                 {{ generatedUserData?.username }}

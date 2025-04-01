@@ -65,6 +65,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.initializeGoogleSignIn();
   }
 
+  formatUsername(username: string): string {
+    return username
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
   getUser(userId: any, storeCookies: boolean) {
     this.userService.getUser(userId).subscribe(
       (response: UserData) => {
