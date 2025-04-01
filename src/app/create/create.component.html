@@ -32,7 +32,7 @@
               <input id="createStatusUrl" type="file" class="hidden" (change)="onFileSelected($event)"
                 accept="image/png, image/jpeg, image/jpg, image/gif, image/webp, video/mp4, video/ogg, video/webm" />
               <ion-icon name="image" class="text-3xl text-teal-900"></ion-icon>
-              <span class="text-white mt-2">Upload image or video</span>
+              <span class="text-white text-xl mt-32">Upload image or video</span>
             </label>
             <!-- Media Preview -->
             <ng-container *ngIf="selectedFile && selectedFile.type.startsWith('video/')">
