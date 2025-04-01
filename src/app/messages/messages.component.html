@@ -77,18 +77,17 @@
                 </div>
 
                 <!-- Chat Body -->
-                <div id="chatBody"
-                    class="w-full p-5 py-10 overflow-y-auto md:h-[calc(100vh-137px)] h-[calc(100vh-250px)] flex-1">
-                    <div class="text-sm font-medium space-y-6 w-full">
+                <div id="chatBody" class="flex-1 p-5 py-10 overflow-y-auto max-h-[calc(100vh-200px)]">
+                    <div class="text-sm font-medium space-y-6">
                         <ng-container *ngFor="let msg of receivedMessages">
                             <div [ngClass]="{
-                    'flex gap-3': msg.type === 'sender',
-                    'flex gap-2 flex-row-reverse items-end': msg.type === 'reply'
-                  }">
+              'flex gap-3': msg.type === 'sender',
+              'flex gap-2 flex-row-reverse items-end': msg.type === 'reply'
+            }">
                                 <div [ngClass]="{
-                      'px-4 py-2 rounded-[20px] max-w-sm bg-secondery': msg.type === 'sender',
-                      'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow': msg.type === 'reply'
-                    }">
+                'px-4 py-2 rounded-[20px] max-w-sm bg-secondery': msg.type === 'sender',
+                'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow': msg.type === 'reply'
+              }">
                                     {{ msg.message }}
                                 </div>
                                 <small>{{ msg.msgtime }}</small>
@@ -96,6 +95,7 @@
                         </ng-container>
                     </div>
                 </div>
+
 
                 <!-- Chat Footer -->
                 <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden border-t">
@@ -105,7 +105,7 @@
                                 class="w-full resize-none bg-secondery rounded-full px-4 py-2 focus:outline-none"
                                 [(ngModel)]="message" name="message"
                                 (keydown.enter)="sendMessage(); $event.preventDefault()">
-        </textarea>
+            </textarea>
                         </div>
                         <button type="submit"
                             class="flex items-center justify-center p-2 bg-blue-500 rounded-full hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
