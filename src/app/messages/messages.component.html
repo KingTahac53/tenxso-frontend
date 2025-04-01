@@ -102,22 +102,19 @@
                     <form class="flex items-center w-full" (ngSubmit)="sendMessage()">
                         <div class="relative flex-1">
                             <textarea placeholder="Write your message" rows="1"
-                                class="w-full resize-none bg-secondery rounded-full px-4 p-2" [(ngModel)]="message"
-                                name="message"></textarea>
+                                class="w-full resize-none bg-secondery rounded-full px-4 py-2 focus:outline-none"
+                                [(ngModel)]="message" name="message"
+                                (keydown.enter)="sendMessage(); $event.preventDefault()">
+        </textarea>
                         </div>
                         <button type="submit"
                             class="flex items-center justify-center p-2 bg-blue-500 rounded-full hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
                             [disabled]="!chat_with_userId">
-                            <!-- Inline SVG icon for send -->
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 512 512">
-                                <path
-                                    d="M476 3L12 218c-13 6-12 24 1 28l111 35 35 111c4 13 22 14 28 1L509 36c6-13-10-23-23-33zM99 248l213-126"
-                                    fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10"
-                                    stroke-width="32" />
-                            </svg>
+                            <i class="fa fa-paper-plane text-white text-2xl"></i>
                         </button>
                     </form>
                 </div>
+
             </div>
         </div>
     </div>
