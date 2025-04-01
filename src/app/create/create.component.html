@@ -1,7 +1,7 @@
 <!-- Modal Container -->
 <div *ngIf="isModalOpen" class="fixed inset-0 flex items-center justify-center z-50">
   <!-- Modal Backdrop -->
-  <div class="fixed inset-0 bg-black opacity-50" (click)="isModalOpen = false"></div>
+  <div class="fixed inset-0 bg-black opacity-50"></div>
 
   <!-- Modal Content Wrapper -->
   <div class="lg:p-20 relative">
@@ -10,11 +10,8 @@
       <!-- Modal Header -->
       <div class="text-center py-3 border-b dark:border-slate-700 relative">
         <h2 class="text-sm font-medium">Create Post</h2>
-        <button type="button" class="absolute top-0 right-0 m-2.5" (click)="isModalOpen = false">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 86 86" stroke-width="1.5"
-            stroke="currentColor" class="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+        <button type="button" class="absolute top-0 right-0" (click)="closeModal()">
+          <i class="fas fa-times text-4xl text-gray-600"></i>
         </button>
       </div>
 

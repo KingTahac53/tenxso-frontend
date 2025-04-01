@@ -115,6 +115,11 @@ export class CreateComponent implements OnInit {
     return null;
   }
 
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.router.navigate(["/feeds"]);
+  }
+
   uploadFile(): void {
     const userId = this.getCookie("userId");
     const username = this.getCookie("username");
