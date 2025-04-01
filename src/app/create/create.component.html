@@ -36,7 +36,7 @@
             </label>
             <!-- Media Preview -->
             <ng-container *ngIf="selectedFile && selectedFile.type.startsWith('video/')">
-              <video [src]="imgPreview" controls class="w-full h-full object-cover"></video>
+              <video [src]="imgPreview" class="w-full h-full object-cover"></video>
             </ng-container>
             <ng-container *ngIf="!selectedFile || (selectedFile && !selectedFile.type.startsWith('video/'))">
               <img *ngIf="imgPreview" [src]="imgPreview" alt="Uploaded Image"
