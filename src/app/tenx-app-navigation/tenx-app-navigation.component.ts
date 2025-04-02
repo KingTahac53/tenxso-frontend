@@ -28,7 +28,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    // Load user data from persistence (localStorage or cookies)
+    // Load persistence from localStorage (or cookies as fallback)
     const userId = localStorage.getItem("userId") || this.getCookie("userId");
     const firstName =
       localStorage.getItem("firstName") || this.getCookie("firstName");
@@ -39,34 +39,34 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     const isVerified =
       localStorage.getItem("isVerified") || this.getCookie("isVerified");
 
-    if (userId && firstName && lastName && profilePic) {
+    // Use userId and profilePic as the minimal requirement.
+    if (userId && profilePic) {
       this.generatedUserData = new UserData(
         userId,
-        "",
-        firstName,
-        lastName,
+        this.getCookie("username") || "",
+        firstName || "",
+        lastName || "",
         profilePic,
         isVerified || "false"
       );
       this.signedIn = true;
+      // Force a refresh from the backend to update profile picture and other info.
       this.getUser(userId, true);
     } else {
       this.generateAndStoreUser(true);
       this.signedIn = false;
     }
 
-    // Subscribe to notification updates
+    // Subscribe to notifications.
     this.signalRService.notificationCounter.subscribe((resp) => {
       this.notificationCounter += Number(resp);
     });
   }
 
   ngAfterViewInit(): void {
-    // Wait until the Google script is loaded before initializing the button
     this.waitForGoogleScriptAndInitialize();
   }
 
-  // Repeatedly check if google.accounts is available, then initialize.
   private waitForGoogleScriptAndInitialize() {
     if (
       typeof google !== "undefined" &&
@@ -79,7 +79,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Helper method to format a username (splitting underscores and capitalizing)
   formatUsername(username: string): string {
     return username
       .split("_")
@@ -93,12 +92,11 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
         if (!response.userId) {
           this.generateAndStoreUser(true);
         } else {
-          // Map backend keys: "firstname" and "lastname" → firstName, lastName.
           this.generatedUserData = new UserData(
             response.userId,
             response.username,
-            response.firstname,
-            response.lastname,
+            response.firstname || "",
+            response.lastname || "",
             response.profilePic,
             response.isVerified.toString()
           );
@@ -107,9 +105,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           }
           this.sharedService.setUserInfo(
             this.generatedUserData.userId,
-            this.generatedUserData.firstName +
-              " " +
-              this.generatedUserData.lastName,
+            this.generatedUserData.firstName && this.generatedUserData.lastName
+              ? this.generatedUserData.firstName +
+                  " " +
+                  this.generatedUserData.lastName
+              : this.generatedUserData.username
+              ? this.formatUsername(this.generatedUserData.username)
+              : "",
             this.generatedUserData.profilePic
           );
         }
@@ -121,12 +123,11 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   generateAndStoreUser(storePersistence: boolean) {
     this.userService.generateUserId().subscribe(
       (response: any) => {
-        // Assume the generated response has keys: userId, username, firstname, lastname, profilePic
         this.generatedUserData = new UserData(
           response.userId,
           response.username,
-          response.firstname,
-          response.lastname,
+          response.firstname || "",
+          response.lastname || "",
           response.profilePic,
           "false"
         );
@@ -135,9 +136,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
         }
         this.sharedService.setUserInfo(
           this.generatedUserData.userId,
-          this.generatedUserData.firstName +
-            " " +
-            this.generatedUserData.lastName,
+          this.generatedUserData.firstName && this.generatedUserData.lastName
+            ? this.generatedUserData.firstName +
+                " " +
+                this.generatedUserData.lastName
+            : this.generatedUserData.username
+            ? this.formatUsername(this.generatedUserData.username)
+            : "",
           this.generatedUserData.profilePic
         );
         this.signedIn = true;
@@ -146,15 +151,14 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Save user data in cookies and localStorage for persistence
   setPersistentData(userData: UserData): void {
-    // Cookies
+    // Store in both cookies and localStorage.
     this.setCookie("userId", userData.userId, 365);
     this.setCookie("firstName", userData.firstName, 365);
     this.setCookie("lastName", userData.lastName, 365);
     this.setCookie("profilePic", userData.profilePic, 365);
     this.setCookie("isVerified", userData.isVerified, 365);
-    // LocalStorage
+
     localStorage.setItem("userId", userData.userId);
     localStorage.setItem("firstName", userData.firstName);
     localStorage.setItem("lastName", userData.lastName);
@@ -162,7 +166,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     localStorage.setItem("isVerified", userData.isVerified);
   }
 
-  // Cookie helper methods
   setCookie(name: string, value: string, days: number) {
     const d = new Date();
     d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
@@ -185,7 +188,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.profileDropdownOpen = !this.profileDropdownOpen;
   }
 
-  // Initialize Google Sign-In by rendering the button in the div with id "googleSignInDiv"
   initializeGoogleSignIn(): void {
     if (typeof google === "undefined") {
       console.error("Google Identity Services script not loaded");
@@ -211,31 +213,35 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.userService.verifyGoogleToken(response.credential).subscribe(
       (userData: any) => {
         this.ngZone.run(() => {
-          // Map the backend keys and convert isVerified to string.
           const mappedUser = new UserData(
             userData.userId,
             userData.username,
-            userData.firstname,
-            userData.lastname,
+            userData.firstname || "",
+            userData.lastname || "",
             userData.profilePic,
             userData.isVerified.toString()
           );
           this.setPersistentData(mappedUser);
           this.sharedService.setUserInfo(
             mappedUser.userId,
-            mappedUser.firstName + " " + mappedUser.lastName,
+            mappedUser.firstName && mappedUser.lastName
+              ? mappedUser.firstName + " " + mappedUser.lastName
+              : mappedUser.username
+              ? this.formatUsername(mappedUser.username)
+              : "",
             mappedUser.profilePic
           );
           this.generatedUserData = mappedUser;
           this.signedIn = true;
           this.profileDropdownOpen = false;
+          // Immediately refresh the user data to get updated profilePic
+          this.getUser(mappedUser.userId, true);
         });
       },
       (error: any) => console.error("Error verifying Google token:", error)
     );
   }
 
-  // Trigger the Google sign-in prompt when needed
   signInWithGoogleCustom(): void {
     if (typeof google !== "undefined") {
       google.accounts.id.prompt();
