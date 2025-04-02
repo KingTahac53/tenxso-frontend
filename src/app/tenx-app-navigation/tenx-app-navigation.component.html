@@ -84,8 +84,8 @@
         </a>
       </nav>
 
-      <!-- Google Sign-In Button in Navbar (visible only if not signed in) -->
-      <div id="googleSignInDiv" class="mt-2" *ngIf="!signedIn"></div>
+      <!-- Google Sign-In Button in Navbar (visible if not signed in OR not verified) -->
+      <div id="googleSignInDiv" class="mt-2" *ngIf="!signedIn || generatedUserData.isVerified !== 'true'"></div>
 
       <!-- Profile Section -->
       <div class="relative">
@@ -145,7 +145,7 @@
                 </button>
               </li>
             </ng-container>
-            <!-- Uncomment below if you want to enable logout for signed in users -->
+            <!-- Uncomment the logout option if needed -->
             <!--
             <ng-template #loggedIn>
               <li>
