@@ -1,4 +1,10 @@
-import { Component, OnInit, AfterViewInit, NgZone } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  ChangeDetectorRef,
+  NgZone,
+} from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { SharedService } from "../services/shared.service";
 import { SignalRService } from "../services/signal-r.service";
@@ -24,40 +30,20 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     private dialog: MatDialog,
     private sharedService: SharedService,
     private signalRService: SignalRService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    // Load persistence from localStorage (or cookies as fallback)
+    // On app initialization, always force a refresh by calling getUser.
     const userId = localStorage.getItem("userId") || this.getCookie("userId");
-    const firstName =
-      localStorage.getItem("firstName") || this.getCookie("firstName");
-    const lastName =
-      localStorage.getItem("lastName") || this.getCookie("lastName");
-    const profilePic =
-      localStorage.getItem("profilePic") || this.getCookie("profilePic");
-    const isVerified =
-      localStorage.getItem("isVerified") || this.getCookie("isVerified");
-
-    // Use userId and profilePic as the minimal requirement.
-    if (userId && profilePic) {
-      this.generatedUserData = new UserData(
-        userId,
-        this.getCookie("username") || "",
-        firstName || "",
-        lastName || "",
-        profilePic,
-        isVerified || "false"
-      );
-      this.signedIn = true;
-      // Force a refresh from the backend to update profile picture and other info.
+    if (userId) {
       this.getUser(userId, true);
+      this.signedIn = true;
     } else {
       this.generateAndStoreUser(true);
       this.signedIn = false;
     }
-
-    // Subscribe to notifications.
     this.signalRService.notificationCounter.subscribe((resp) => {
       this.notificationCounter += Number(resp);
     });
@@ -114,6 +100,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
               : "",
             this.generatedUserData.profilePic
           );
+          this.cd.detectChanges();
         }
       },
       (error) => console.error("Error fetching user data:", error)
@@ -146,24 +133,27 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           this.generatedUserData.profilePic
         );
         this.signedIn = true;
+        this.cd.detectChanges();
       },
       (error) => console.error("Error generating user data:", error)
     );
   }
 
   setPersistentData(userData: UserData): void {
-    // Store in both cookies and localStorage.
+    // Store in cookies.
     this.setCookie("userId", userData.userId, 365);
     this.setCookie("firstName", userData.firstName, 365);
     this.setCookie("lastName", userData.lastName, 365);
     this.setCookie("profilePic", userData.profilePic, 365);
     this.setCookie("isVerified", userData.isVerified, 365);
-
+    this.setCookie("username", userData.username, 365);
+    // Store in localStorage.
     localStorage.setItem("userId", userData.userId);
     localStorage.setItem("firstName", userData.firstName);
     localStorage.setItem("lastName", userData.lastName);
     localStorage.setItem("profilePic", userData.profilePic);
     localStorage.setItem("isVerified", userData.isVerified);
+    localStorage.setItem("username", userData.username);
   }
 
   setCookie(name: string, value: string, days: number) {
@@ -171,6 +161,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     d.setTime(d.getTime() + days * 24 * 60 * 60 * 1000);
     document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
   }
+
   getCookie(name: string): string | null {
     const nameEQ = name + "=";
     const ca = document.cookie.split(";");
@@ -180,6 +171,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     }
     return null;
   }
+
   deleteCookie(name: string): void {
     document.cookie = name + "=; Max-Age=0; path=/;";
   }
@@ -197,6 +189,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     google.accounts.id.initialize({
       client_id: clientId,
       callback: this.handleCredentialResponse.bind(this),
+      auto_select: true,
     });
     const btnContainer = document.getElementById("googleSignInDiv");
     if (btnContainer) {
@@ -234,8 +227,9 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           this.generatedUserData = mappedUser;
           this.signedIn = true;
           this.profileDropdownOpen = false;
-          // Immediately refresh the user data to get updated profilePic
+          // Refresh immediately to get updated profile picture.
           this.getUser(mappedUser.userId, true);
+          this.cd.detectChanges();
         });
       },
       (error: any) => console.error("Error verifying Google token:", error)
