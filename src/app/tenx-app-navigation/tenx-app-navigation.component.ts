@@ -14,7 +14,6 @@ declare const google: any;
   templateUrl: "./tenx-app-navigation.component.html",
 })
 export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
-  // Instantiate with empty strings and "false" for isVerified
   generatedUserData: UserData = new UserData("", "", "", "", "", "false");
   profileDropdownOpen: boolean = false;
   signedIn: boolean = false;
@@ -29,15 +28,19 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    // Load user data from cookies
-    const userId = this.getCookie("userId");
-    const firstName = this.getCookie("firstName");
-    const lastName = this.getCookie("lastName");
-    const profilePic = this.getCookie("profilePic");
-    const googleVerified = this.getCookie("googleVerified");
+    // First check localStorage for persistence
+    const userId = localStorage.getItem("userId") || this.getCookie("userId");
+    const firstName =
+      localStorage.getItem("firstName") || this.getCookie("firstName");
+    const lastName =
+      localStorage.getItem("lastName") || this.getCookie("lastName");
+    const profilePic =
+      localStorage.getItem("profilePic") || this.getCookie("profilePic");
+    const googleVerified =
+      localStorage.getItem("googleVerified") ||
+      this.getCookie("googleVerified");
 
     if (userId && firstName && lastName && profilePic) {
-      // Username field is unused; full name is displayed
       this.generatedUserData = new UserData(
         userId,
         "",
@@ -60,13 +63,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Render the Google sign-in button if the user is not signed in
+    // Render Google Sign-In button if the user is not signed in
     if (!this.signedIn) {
       this.initializeGoogleSignIn();
     }
   }
 
-  // Helper method to format username if full name is not available.
+  // Helper method to format username by splitting underscores and capitalizing each word
   formatUsername(username: string): string {
     return username
       .split("_")
@@ -74,27 +77,15 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
       .join(" ");
   }
 
-  getUser(userId: any, storeCookies: boolean) {
+  getUser(userId: any, storePersistence: boolean) {
     this.userService.getUser(userId).subscribe(
       (response: UserData) => {
         if (!response.userId) {
           this.generateAndStoreUser(true);
         } else {
           this.generatedUserData = response;
-          if (storeCookies) {
-            this.setCookie("userId", this.generatedUserData.userId, 365);
-            this.setCookie("firstName", this.generatedUserData.firstName, 365);
-            this.setCookie("lastName", this.generatedUserData.lastName, 365);
-            this.setCookie(
-              "profilePic",
-              this.generatedUserData.profilePic,
-              365
-            );
-            this.setCookie(
-              "googleVerified",
-              this.generatedUserData.isVerified,
-              365
-            );
+          if (storePersistence) {
+            this.setPersistentData(this.generatedUserData);
           }
           this.sharedService.setUserInfo(
             this.generatedUserData.userId,
@@ -109,16 +100,16 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  generateAndStoreUser(storeCookies: boolean) {
+  generateAndStoreUser(storePersistence: boolean) {
     this.userService.generateUserId().subscribe(
       (response: UserData) => {
         this.generatedUserData = response;
-        if (storeCookies) {
-          this.setCookie("userId", this.generatedUserData.userId, 365);
-          this.setCookie("firstName", this.generatedUserData.firstName, 365);
-          this.setCookie("lastName", this.generatedUserData.lastName, 365);
-          this.setCookie("profilePic", this.generatedUserData.profilePic, 365);
-          this.setCookie("googleVerified", "false", 365);
+        if (storePersistence) {
+          // Default unverified user
+          this.setPersistentData({
+            ...this.generatedUserData,
+            isVerified: "false",
+          });
         }
         this.sharedService.setUserInfo(
           this.generatedUserData.userId,
@@ -131,6 +122,22 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
       },
       (error) => console.error("Error generating user data:", error)
     );
+  }
+
+  // Helper to set cookies and localStorage for persistence
+  setPersistentData(userData: UserData): void {
+    // Cookies
+    this.setCookie("userId", userData.userId, 365);
+    this.setCookie("firstName", userData.firstName, 365);
+    this.setCookie("lastName", userData.lastName, 365);
+    this.setCookie("profilePic", userData.profilePic, 365);
+    this.setCookie("googleVerified", userData.isVerified, 365);
+    // LocalStorage
+    localStorage.setItem("userId", userData.userId);
+    localStorage.setItem("firstName", userData.firstName);
+    localStorage.setItem("lastName", userData.lastName);
+    localStorage.setItem("profilePic", userData.profilePic);
+    localStorage.setItem("googleVerified", userData.isVerified);
   }
 
   // Cookie helper methods
@@ -156,7 +163,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.profileDropdownOpen = !this.profileDropdownOpen;
   }
 
-  // Initialize Google Sign-In: render button in div with id "googleSignInDiv"
+  // Initialize Google Sign-In: render button in the div with id "googleSignInDiv"
   initializeGoogleSignIn(): void {
     if (typeof google === "undefined") {
       console.error("Google Identity Services script not loaded");
@@ -182,15 +189,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.userService.verifyGoogleToken(response.credential).subscribe(
       (userData: UserData) => {
         this.ngZone.run(() => {
-          this.sharedService.setCookie("userId", userData.userId, 365);
-          this.sharedService.setCookie("firstName", userData.firstName, 365);
-          this.sharedService.setCookie("lastName", userData.lastName, 365);
-          this.sharedService.setCookie("profilePic", userData.profilePic, 365);
-          this.sharedService.setCookie(
-            "googleVerified",
-            userData.isVerified,
-            365
-          );
+          this.setPersistentData(userData);
           this.sharedService.setUserInfo(
             userData.userId,
             userData.firstName + " " + userData.lastName,
@@ -205,7 +204,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Trigger the sign-in prompt when needed
   signInWithGoogleCustom(): void {
     if (typeof google !== "undefined") {
       google.accounts.id.prompt();
