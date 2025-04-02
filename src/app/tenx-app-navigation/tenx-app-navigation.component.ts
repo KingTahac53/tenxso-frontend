@@ -14,7 +14,7 @@ declare const google: any;
   templateUrl: "./tenx-app-navigation.component.html",
 })
 export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
-  // Update default instantiation with 6 parameters.
+  // Instantiate with empty strings and "false" for isVerified
   generatedUserData: UserData = new UserData("", "", "", "", "", "false");
   profileDropdownOpen: boolean = false;
   signedIn: boolean = false;
@@ -37,7 +37,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     const googleVerified = this.getCookie("googleVerified");
 
     if (userId && firstName && lastName && profilePic) {
-      // Note: the username field is not used since we now use firstName + lastName
+      // Username field is unused; full name is displayed
       this.generatedUserData = new UserData(
         userId,
         "",
@@ -60,11 +60,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Use the original Google sign-in flow from login.component.html:
-    // Render the Google Sign-In button inside the div with id "googleSignInDiv" in the navbar.
-    this.initializeGoogleSignIn();
+    // Render the Google sign-in button if the user is not signed in
+    if (!this.signedIn) {
+      this.initializeGoogleSignIn();
+    }
   }
 
+  // Helper method to format username if full name is not available.
   formatUsername(username: string): string {
     return username
       .split("_")
@@ -154,7 +156,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.profileDropdownOpen = !this.profileDropdownOpen;
   }
 
-  // Original Google Sign-In flow from login.component.html
+  // Initialize Google Sign-In: render button in div with id "googleSignInDiv"
   initializeGoogleSignIn(): void {
     if (typeof google === "undefined") {
       console.error("Google Identity Services script not loaded");
@@ -165,7 +167,6 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
       client_id: clientId,
       callback: this.handleCredentialResponse.bind(this),
     });
-    // Render the button inside the div with id "googleSignInDiv"
     const btnContainer = document.getElementById("googleSignInDiv");
     if (btnContainer) {
       btnContainer.innerHTML = "";
@@ -200,7 +201,14 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           this.profileDropdownOpen = false;
         });
       },
-      (error) => console.error("Error verifying Google token:", error)
+      (error: any) => console.error("Error verifying Google token:", error)
     );
+  }
+
+  // Trigger the sign-in prompt when needed
+  signInWithGoogleCustom(): void {
+    if (typeof google !== "undefined") {
+      google.accounts.id.prompt();
+    }
   }
 }

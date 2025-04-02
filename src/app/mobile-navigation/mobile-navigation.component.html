@@ -1,47 +1,44 @@
-<nav class="fixed bottom-0 left-0 w-full bg-white dark:bg-dark2 shadow p-2 flex items-center justify-between">
-  <!-- Left Side: Navigation Links -->
+<!-- Mobile Header (Top Bar) -->
+<header class="fixed top-0 left-0 w-full bg-white dark:bg-dark2 shadow p-2 flex items-center justify-between z-50">
+  <a routerLink="/feeds" class="flex items-center">
+    <img src="assets/logo.png" alt="Logo" class="w-8 h-8" />
+  </a>
+  <!-- (Optionally, add a notifications icon here) -->
+  <div>
+    <!-- You can add a bell icon if needed -->
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+      class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+    </svg>
+  </div>
+</header>
+
+<!-- Mobile Footer (Navigation Bar) -->
+<footer class="fixed bottom-0 left-0 w-full bg-white dark:bg-dark2 shadow p-2 flex items-center justify-between">
+  <!-- Left Side: Navigation Links (Icons only) -->
   <div class="flex space-x-4">
-    <a routerLink="/feeds" [ngClass]="{'text-indigo-600': router.url === '/feeds'}" class="flex flex-col items-center">
-      <!-- Home Icon -->
+    <a routerLink="/feeds" class="flex flex-col items-center">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
         class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
       </svg>
     </a>
-
-    <a routerLink="/messages" [ngClass]="{'text-indigo-600': router.url === '/messages'}"
-      class="flex flex-col items-center">
-      <!-- Messages Icon -->
+    <a routerLink="/messages" class="flex flex-col items-center">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
         class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
       </svg>
     </a>
-
-    <a routerLink="/create" [ngClass]="{'text-indigo-600': router.url === '/create'}"
-      class="flex flex-col items-center">
-      <!-- Create Icon -->
+    <a routerLink="/create" class="flex flex-col items-center">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
         class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     </a>
-
-    <!-- <a routerLink="/notifications" [ngClass]="{'text-indigo-600': router.url === '/notifications'}" -->
-    <!-- class="flex flex-col items-center"> -->
-    <!-- Notifications Icon -->
-    <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="w-6 h-6">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-      </svg> -->
-    <!-- </a> -->
-
-    <a routerLink="/edit-profile" [ngClass]="{'text-indigo-600': router.url === '/edit-profile'}"
-      class="flex flex-col items-center">
-      <!-- Profile Icon (for editing) -->
+    <a routerLink="/edit-profile" class="flex flex-col items-center">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
         class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round"
@@ -50,46 +47,38 @@
     </a>
   </div>
 
-  <!-- Right Side: Profile Icon & Dropdown -->
-  <div class="relative">
+  <!-- Right Side: Profile Icon & Google Sign-In Icon (if not signed in) -->
+  <div class="flex items-center space-x-2">
     <button (click)="toggleProfileDropdown()" class="flex items-center justify-center focus:outline-none">
       <img [src]="generatedUserData?.profilePic || 'assets/images/default-avatar.jpg'" alt="Profile"
         class="w-8 h-8 rounded-full" />
     </button>
-    <div *ngIf="profileDropdownOpen"
-      class="absolute bottom-full mb-2 right-0 w-48 bg-white dark:bg-dark2 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50">
-      <nav class="flex flex-col">
-        <ng-container *ngIf="!signedIn; else loggedIn">
-          <a href="#" (click)="signInWithGoogle(); toggleProfileDropdown(); $event.preventDefault()"
-            class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <!-- Google Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-5 h-5">
-              <path fill="#EA4335"
-                d="M24 9.5c3.69 0 6.98 1.27 9.58 3.75l7.14-7.14C35.86 2.85 30.63 0 24 0 14.73 0 6.95 5.08 2.71 12.47l8.34 6.48C12.57 12.16 17.87 9.5 24 9.5z" />
-              <path fill="#4285F4"
-                d="M46.09 24.5c0-1.65-.15-3.23-.44-4.75H24v9.03h12.59c-.54 2.93-2.16 5.42-4.6 7.08v5.87h7.45c4.36-4.01 6.87-9.92 6.87-17.23z" />
-              <path fill="#FBBC05"
-                d="M10.05 28.16a13.63 13.63 0 010-8.32V13.97h-8.34a24.08 24.08 0 000 16.05l8.34-2.86z" />
-              <path fill="#34A853"
-                d="M24 48c6.63 0 12.22-2.18 16.29-5.91l-7.45-5.87c-2.07 1.39-4.72 2.21-8.84 2.21-6.13 0-11.33-4.14-13.19-9.69H2.71v6.07A24.08 24.08 0 0024 48z" />
-              <path fill="none" d="M0 0h48v48H0z" />
-            </svg>
-            <span>Sign in with Google</span>
-          </a>
-        </ng-container>
-        <ng-template #loggedIn>
-          <a href="#" (click)="logout(); toggleProfileDropdown(); $event.preventDefault()"
-            class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-            <!-- Logout Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor" class="w-6 h-6">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16 17l5-5m0 0l-5-5m5 5H9m4 5v1a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2h4a2 2 0 012 2v1" />
-            </svg>
-            <span>Log Out</span>
-          </a>
-        </ng-template>
-      </nav>
+    <!-- Show Google sign-in icon if not signed in -->
+    <div *ngIf="!signedIn">
+      <button (click)="signInWithGoogle()" class="focus:outline-none">
+        <i class="fab fa-google text-2xl"></i>
+      </button>
     </div>
   </div>
-</nav>
+
+  <!-- Mobile Profile Dropdown (opens above the footer) -->
+  <div *ngIf="profileDropdownOpen"
+    class="absolute bottom-full mb-2 w-48 bg-white dark:bg-dark2 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50">
+    <nav class="flex flex-col">
+      <ng-container *ngIf="!signedIn; else loggedIn">
+        <a href="#" (click)="signInWithGoogle(); toggleProfileDropdown(); $event.preventDefault()"
+          class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i class="fab fa-google text-xl mr-2"></i>
+          <span>Sign in with Google</span>
+        </a>
+      </ng-container>
+      <ng-template #loggedIn>
+        <a href="#" (click)="logout(); toggleProfileDropdown(); $event.preventDefault()"
+          class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i class="fa fa-sign-out-alt text-xl mr-2"></i>
+          <span>Log Out</span>
+        </a>
+      </ng-template>
+    </nav>
+  </div>
+  <!-- </nav> -->

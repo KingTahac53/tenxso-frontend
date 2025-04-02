@@ -12,8 +12,9 @@ declare const google: any;
   templateUrl: "./mobile-navigation.component.html",
 })
 export class MobileNavigationComponent implements OnInit {
+  // We'll keep only the basic data here; mobile view may show only profilePic and username.
   profileDropdownOpen = false;
-  signedIn = false; // Determines if the user is signed in via Google
+  signedIn = false;
   generatedUserData: { profilePic?: string; username?: string } | null = null;
 
   constructor(
@@ -24,14 +25,16 @@ export class MobileNavigationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Check sign-in status via cookies instead of localStorage.
+    // Check sign-in status via cookies
     const userId = this.getCookie("userId");
     this.signedIn = !!userId;
     const username = this.getCookie("username");
-    const profilePic = this.getCookie("profilePic")!;
+    const profilePic =
+      this.getCookie("profilePic") || "assets/images/default-profile.png";
     if (username) {
       this.generatedUserData = { username, profilePic };
     }
+    // Initialize Google Sign-In after a slight delay for mobile
     setTimeout(() => {
       this.initializeGoogleSignIn();
     }, 1000);
@@ -60,7 +63,7 @@ export class MobileNavigationComponent implements OnInit {
       console.error("Google Identity Services script not loaded");
       return;
     }
-    const clientId = environment.GOOGLE_CLIENT_ID; // Your Google Client ID
+    const clientId = environment.GOOGLE_CLIENT_ID;
     google.accounts.id.initialize({
       client_id: clientId,
       callback: this.handleCredentialResponse.bind(this),
