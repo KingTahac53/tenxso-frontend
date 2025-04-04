@@ -310,9 +310,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
       feed.authorUsername,
       feed.title
     );
-    localStorage.setItem("userId", feed.authorId);
-    localStorage.setItem("username", feed.authorUsername);
-    localStorage.setItem("profilePic", feed.title);
     this.router.navigate(["/messages"]);
   }
 
