@@ -7,35 +7,36 @@
                     class="top-0 left-0 max-md:fixed max-md:w-5/6 max-md:h-screen bg-white z-50 max-md:shadow max-md:-translate-x-full dark:bg-dark2">
                     <div class="p-4 border-b dark:border-slate-200">
                         <div class="flex mt-2 items-center justify-between">
-                            <h2 class="text-2xl font-bold text-black ml-1 dark:text-white">
-                                Chats
-                            </h2>
+                            <h2 class="text-2xl font-bold text-black ml-1 dark:text-white">Chats</h2>
                         </div>
                     </div>
                     <!-- Chat Users List -->
                     <div class="space-y-2 p-2 overflow-y-auto h-[calc(100vh-127px)]">
-                        <div *ngFor="let user of chatList" (click)="selectChatUser(user)"
-                            class="cursor-pointer relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery">
-                            <div class="relative w-14 h-14 shrink-0">
-                                <img [src]="user.profilePicUrl || 'assets/img/default-avatar.png'" alt="User"
-                                    class="object-cover w-full h-full rounded-full" />
-                                <!-- Show online indicator if available -->
-                                <!-- <div *ngIf="user.online"
-                                    class="w-4 h-4 absolute bottom-0 right-0 bg-green-500 rounded-full border border-white dark:border-slate-200">
-                                </div> -->
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-1.5">
-                                    <div class="mr-auto text-sm text-black dark:text-white font-medium">
-                                        {{ user.username }}
-                                    </div>
-                                    <div *ngIf="user.newMessage"
-                                        class="text-xs font-light text-gray-500 dark:text-white/70">
-                                        <b>New Message</b>
+                        <ng-container *ngIf="chatList && chatList.length > 0; else noChats">
+                            <div *ngFor="let user of chatList" (click)="selectChatUser(user)"
+                                class="cursor-pointer relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery">
+                                <div class="relative w-14 h-14 shrink-0">
+                                    <img [src]="user.profilePicUrl || 'assets/img/default-avatar.png'" alt="User"
+                                        class="object-cover w-full h-full rounded-full" />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 mb-1.5">
+                                        <div class="mr-auto text-sm text-black dark:text-white font-medium">
+                                            {{ user.username }}
+                                        </div>
+                                        <div *ngIf="user.newMessage"
+                                            class="text-xs font-light text-gray-500 dark:text-white/70">
+                                            <b>New Message</b>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </ng-container>
+                        <ng-template #noChats>
+                            <div class="text-center text-gray-600 dark:text-gray-300 mt-4">
+                                There are no chats currently.
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
                 <!-- Mobile backdrop to toggle sidebar -->
@@ -45,77 +46,85 @@
             </div>
 
             <!-- Message Center -->
-            <div class="flex-1 flex flex-col">
-                <!-- Chat Header -->
-                <div class="flex items-center justify-between gap-2 px-6 py-3.5 z-10 border-b dark:border-slate-200">
-                    <div class="flex items-center sm:gap-4 gap-2">
-                        <!-- Mobile toggle button -->
-                        <button type="button" class="md:hidden" (click)="toggleSidebar()">
-                            <ion-icon name="chevron-back-outline" class="text-2xl -ml-4"></ion-icon>
-                        </button>
-                        <div class="relative cursor-pointer hidden md:block">
-                            <img [src]="chat_with_profilepic || 'assets/img/default-avatar.png'" alt="User"
-                                class="w-8 h-8 rounded-full shadow" />
-                            <div class="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>
-                        </div>
-                        <div class="cursor-pointer">
-                            <div class="text-base font-bold">
-                                {{ chat_with_username || 'Select a User' }}
+            <ng-container *ngIf="chat_with_userId; else noChatSelected">
+                <div class="flex-1 flex flex-col">
+                    <!-- Chat Header -->
+                    <div
+                        class="flex items-center justify-between gap-2 px-6 py-3.5 z-10 border-b dark:border-slate-200">
+                        <div class="flex items-center sm:gap-4 gap-2">
+                            <!-- Mobile toggle button -->
+                            <button type="button" class="md:hidden" (click)="toggleSidebar()">
+                                <ion-icon name="chevron-back-outline" class="text-2xl -ml-4"></ion-icon>
+                            </button>
+                            <div class="relative cursor-pointer hidden md:block">
+                                <img [src]="chat_with_profilepic || 'assets/img/default-avatar.png'" alt="User"
+                                    class="w-8 h-8 rounded-full shadow" />
+                                <div class="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"></div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button type="button" class="button__ico" [disabled]="!chat_with_userId"
-                            (click)="startAudioCall()">
-                            <ion-icon name="call-outline" class="text-2xl"></ion-icon>
-                        </button>
-                        <button type="button" class="hover:bg-slate-100 p-1.5 rounded-full"
-                            [disabled]="!chat_with_userId" (click)="startVideoCall()">
-                            <ion-icon name="videocam-outline" class="text-2xl"></ion-icon>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Chat Body -->
-                <div id="chatBody" class="flex-1 p-5 py-10 overflow-y-auto max-h-[calc(100vh-200px)]">
-                    <div class="text-sm font-medium space-y-6">
-                        <ng-container *ngFor="let msg of receivedMessages">
-                            <div [ngClass]="{
-              'flex gap-3': msg.type === 'sender',
-              'flex gap-2 flex-row-reverse items-end': msg.type === 'reply'
-            }">
-                                <div [ngClass]="{
-                'px-4 py-2 rounded-[20px] max-w-sm bg-secondery': msg.type === 'sender',
-                'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow': msg.type === 'reply'
-              }">
-                                    {{ msg.message }}
+                            <div class="cursor-pointer">
+                                <div class="text-base font-bold">
+                                    {{ chat_with_username || 'Select a User' }}
                                 </div>
-                                <small>{{ msg.msgtime }}</small>
                             </div>
-                        </ng-container>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" class="button__ico" [disabled]="!chat_with_userId"
+                                (click)="startAudioCall()">
+                                <ion-icon name="call-outline" class="text-2xl"></ion-icon>
+                            </button>
+                            <button type="button" class="hover:bg-slate-100 p-1.5 rounded-full"
+                                [disabled]="!chat_with_userId" (click)="startVideoCall()">
+                                <ion-icon name="videocam-outline" class="text-2xl"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Body -->
+                    <div id="chatBody" class="flex-1 p-5 py-10 overflow-y-auto max-h-[calc(100vh-200px)]">
+                        <div class="text-sm font-medium space-y-6">
+                            <ng-container *ngFor="let msg of receivedMessages">
+                                <div [ngClass]="{
+                    'flex gap-3': msg.type === 'sender',
+                    'flex gap-2 flex-row-reverse items-end': msg.type === 'reply'
+                  }">
+                                    <div [ngClass]="{
+                      'px-4 py-2 rounded-[20px] max-w-sm bg-secondery': msg.type === 'sender',
+                      'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow': msg.type === 'reply'
+                    }">
+                                        {{ msg.message }}
+                                    </div>
+                                    <small>{{ msg.msgtime }}</small>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </div>
+
+                    <!-- Chat Footer -->
+                    <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden border-t">
+                        <form class="flex items-center w-full" (ngSubmit)="sendMessage()">
+                            <div class="relative flex-1">
+                                <textarea placeholder="Write your message" rows="1"
+                                    class="w-full resize-none bg-secondery rounded-full px-4 py-2 focus:outline-none"
+                                    [(ngModel)]="message" name="message"
+                                    (keydown.enter)="sendMessage(); $event.preventDefault()">
+                  </textarea>
+                            </div>
+                            <button type="submit"
+                                class="flex items-center justify-center p-2 bg-blue-500 rounded-full hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
+                                [disabled]="!chat_with_userId">
+                                <i class="fa fa-paper-plane text-white text-2xl"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
+            </ng-container>
 
-
-                <!-- Chat Footer -->
-                <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden border-t">
-                    <form class="flex items-center w-full" (ngSubmit)="sendMessage()">
-                        <div class="relative flex-1">
-                            <textarea placeholder="Write your message" rows="1"
-                                class="w-full resize-none bg-secondery rounded-full px-4 py-2 focus:outline-none"
-                                [(ngModel)]="message" name="message"
-                                (keydown.enter)="sendMessage(); $event.preventDefault()">
-            </textarea>
-                        </div>
-                        <button type="submit"
-                            class="flex items-center justify-center p-2 bg-blue-500 rounded-full hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
-                            [disabled]="!chat_with_userId">
-                            <i class="fa fa-paper-plane text-white text-2xl"></i>
-                        </button>
-                    </form>
+            <!-- Placeholder when no chat is selected -->
+            <ng-template #noChatSelected>
+                <div class="flex-1 flex items-center justify-center">
+                    <p class="text-xl text-gray-600 dark:text-gray-300">Select a chat to start messaging</p>
                 </div>
-
-            </div>
+            </ng-template>
         </div>
     </div>
 </main>
