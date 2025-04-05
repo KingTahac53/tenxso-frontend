@@ -4,7 +4,6 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
-  AfterViewChecked,
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
@@ -21,7 +20,7 @@ import { exhaustMap } from "rxjs/operators";
   templateUrl: "./messages.component.html",
   styleUrls: ["./messages.component.css"],
 })
-export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
+export class MessagesComponent implements OnInit, OnDestroy {
   feeds: Feed[] = [];
   pageNumber: number = 1;
   loading: boolean = false;
@@ -95,7 +94,8 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
                 }),
               };
               this.receivedMessages.push(obj);
-              this.scrollToBottom();
+              // Force scroll if the user is near the bottom.
+              this.scrollToBottom(true);
             } else {
               const index = this.chatList.findIndex((item) => {
                 return item.chatId && item.chatId.trim() === incomingChatId;
@@ -111,17 +111,20 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
       });
   }
 
-  ngAfterViewChecked(): void {
-    // Scroll to bottom after every view update.
-    this.scrollToBottom();
-  }
+  // Remove unconditional scrolling in lifecycle hooks to let user control scroll.
+  // Instead, call scrollToBottom(true) in specific cases (after message send, chat history load, etc.)
 
-  // Scroll the chat container to the bottom.
-  private scrollToBottom(): void {
+  private scrollToBottom(force: boolean = false): void {
     try {
       if (this.chatBody && this.chatBody.nativeElement) {
-        this.chatBody.nativeElement.scrollTop =
-          this.chatBody.nativeElement.scrollHeight;
+        const element = this.chatBody.nativeElement;
+        // Check if user is near the bottom (within 100px) or if forced.
+        if (
+          force ||
+          element.scrollHeight - element.scrollTop - element.clientHeight < 100
+        ) {
+          element.scrollTop = element.scrollHeight;
+        }
       }
     } catch (err) {
       console.error("Error scrolling chat to bottom:", err);
@@ -160,8 +163,8 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
           };
           this.receivedMessages.push(obj);
           this.message = "";
-          // Scroll after sending a message.
-          setTimeout(() => this.scrollToBottom(), 0);
+          // Force scroll after sending a message.
+          setTimeout(() => this.scrollToBottom(true), 0);
         },
         error: (error) => {
           console.error("Error sending message", error);
@@ -181,8 +184,8 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
           }),
         }));
         this.chatId = chatId;
-        // Scroll to bottom after loading history.
-        setTimeout(() => this.scrollToBottom(), 0);
+        // Force scroll after loading history.
+        setTimeout(() => this.scrollToBottom(true), 0);
       },
       (error) => {
         console.error("Error loading chat history:", error);
@@ -216,6 +219,7 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
       (response: any[]) => {
         this.chatList = response;
         this.loading = false;
+        // Auto-select the first chat if no recipient is already set.
         if (
           !this.chat_with_userId &&
           this.chatList &&

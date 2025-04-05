@@ -80,24 +80,27 @@
                     </div>
 
                     <!-- Chat Body -->
-                    <div id="chatBody" #chatBody class="flex-1 p-5 py-10 overflow-y-auto max-h-[calc(100vh-200px)]">
-                        <div class="text-sm font-medium space-y-6">
+                    <div id="chatBody" #chatBody class="flex-1 overflow-y-auto"
+                        style="max-height: calc(100vh - 200px);">
+                        <div class="space-y-4 p-4">
                             <ng-container *ngFor="let msg of receivedMessages">
-                                <div [ngClass]="{
-            'flex gap-3': msg.type === 'sender',
-            'flex gap-2 flex-row-reverse items-end': msg.type === 'reply'
-          }">
-                                    <div [ngClass]="{
-              'px-4 py-2 rounded-[20px] max-w-sm bg-secondery': msg.type === 'sender',
-              'px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow': msg.type === 'reply'
-            }">
+                                <div [ngClass]="msg.type === 'reply' ? 'flex justify-end' : 'flex justify-start'">
+                                    <div [ngClass]="msg.type === 'reply' 
+              ? 'px-4 py-2 rounded-full max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow' 
+              : 'px-4 py-2 rounded-full max-w-sm bg-gray-200 text-gray-800 shadow'">
                                         {{ msg.message }}
                                     </div>
-                                    <small>{{ msg.msgtime }}</small>
+                                </div>
+                                <div [ngClass]="msg.type === 'reply' ? 'text-right' : 'text-left'"
+                                    class="text-xs text-gray-500">
+                                    {{ msg.msgtime }}
                                 </div>
                             </ng-container>
                         </div>
                     </div>
+
+
+
 
                     <!-- Chat Footer -->
                     <div class="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden border-t">
