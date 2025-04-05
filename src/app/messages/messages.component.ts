@@ -4,6 +4,7 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  AfterViewChecked,
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
@@ -20,7 +21,7 @@ import { exhaustMap } from "rxjs/operators";
   templateUrl: "./messages.component.html",
   styleUrls: ["./messages.component.css"],
 })
-export class MessagesComponent implements OnInit, OnDestroy {
+export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   feeds: Feed[] = [];
   pageNumber: number = 1;
   loading: boolean = false;
@@ -77,7 +78,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
 
     // Poll the new messages endpoint every 10 seconds.
-    this.newMessagesSub = interval(10000)
+    this.newMessagesSub = interval(2500)
       .pipe(exhaustMap(() => this.chatService.getNewMessages()))
       .subscribe((messages: any[]) => {
         if (messages && messages.length > 0) {
@@ -109,16 +110,25 @@ export class MessagesComponent implements OnInit, OnDestroy {
           });
         }
       });
+
+    // Poll the chat users API every 5 seconds to update the chat list order.
+    this.chatUsersSub = interval(5000)
+      .pipe(exhaustMap(() => this.chatService.getChatUsers(this.userId)))
+      .subscribe((response: any[]) => {
+        this.chatList = response;
+      });
   }
 
-  // Remove unconditional scrolling in lifecycle hooks to let user control scroll.
-  // Instead, call scrollToBottom(true) in specific cases (after message send, chat history load, etc.)
+  ngAfterViewChecked(): void {
+    // Scroll to bottom only if the user is near the bottom.
+    this.scrollToBottom();
+  }
 
+  // Auto-scroll only if the user is near the bottom (within 100px) or if forced.
   private scrollToBottom(force: boolean = false): void {
     try {
       if (this.chatBody && this.chatBody.nativeElement) {
         const element = this.chatBody.nativeElement;
-        // Check if user is near the bottom (within 100px) or if forced.
         if (
           force ||
           element.scrollHeight - element.scrollTop - element.clientHeight < 100
