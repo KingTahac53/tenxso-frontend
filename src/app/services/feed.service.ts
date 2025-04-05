@@ -1,10 +1,5 @@
 import { Injectable } from "@angular/core";
-import {
-  HttpClient,
-  HttpParams,
-  HttpRequest,
-  HttpHeaders,
-} from "@angular/common/http";
+import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Feed } from "../models/feed.model";
 import { environment } from "../environment"; // Ensure the path is correct
@@ -60,15 +55,23 @@ export class FeedService {
     return this.http.post(`${this.apiUrl}/UserPost/create-post-comment`, data);
   }
 
-  // New: Update a comment by commentId
-  updatePostComment(commentId: string, data: any): Observable<any> {
+  // Updated: Now sends the updated comment as a plain text payload.
+  // In feed.service.ts
+  updatePostComment(
+    commentId: string,
+    updatedComment: string
+  ): Observable<any> {
+    const headers = new HttpHeaders({
+      "Content-Type": "text/plain",
+    });
     return this.http.put(
       `${this.apiUrl}/UserPost/edit-post-comment/${commentId}`,
-      data
+      updatedComment,
+      { headers }
     );
   }
 
-  // New: Delete a comment by commentId
+  // New: Delete comment API (unchanged, uses commentId in URL)
   deletePostComment(commentId: string): Observable<any> {
     return this.http.delete(
       `${this.apiUrl}/UserPost/delete-post-comment/${commentId}`

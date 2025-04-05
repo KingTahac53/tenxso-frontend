@@ -35,13 +35,15 @@ export class FeedsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Load user data from shared service and cookies.
-    this.sharedService
-      .getUserId()
-      .subscribe((userId) => (this.userId = userId || undefined));
-    this.sharedService
-      .getUsername()
-      .subscribe((username) => (this.username = username || undefined));
+    console.log("Initializing FeedsComponent...");
+    this.sharedService.getUserId().subscribe((userId) => {
+      this.userId = userId || undefined;
+      console.log("User ID:", this.userId);
+    });
+    this.sharedService.getUsername().subscribe((username) => {
+      this.username = username || undefined;
+      console.log("Username:", this.username);
+    });
     this.profilePic =
       this.getCookie("profilePic") || "assets/images/default-avatar.jpg";
     this.scrollListener = this.onScroll.bind(this);
@@ -64,6 +66,9 @@ export class FeedsComponent implements OnInit, OnDestroy {
   loadFeeds(): void {
     if (this.loading || this.allFeedsLoaded) return;
     this.loading = true;
+    console.log(
+      `Loading feeds - Page: ${this.pageNumber}, Size: ${this.pageSize}`
+    );
     this.feedService
       .getFeeds(this.pageNumber, this.pageSize, this.userId)
       .subscribe(
@@ -73,8 +78,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
             newFeeds.forEach((feed: any) => {
               feed.showComments = false;
               feed.newComment = "";
-              feed.dropdownOpen = false; // For feed actions dropdown
-              // Load comments for each feed.
+              feed.dropdownOpen = false;
               this.feedService
                 .getPostComments(feed.postId)
                 .subscribe((comments: any) => {
@@ -98,7 +102,32 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   refreshFeeds(): void {
-    // Similar implementation for refreshing feeds...
+    const pageSize = this.feeds.length;
+    const pageNumber = 1;
+    this.loading = true;
+    this.feedService.getFeeds(pageNumber, pageSize, this.userId).subscribe(
+      (response: any) => {
+        const newFeeds = response.blogPostsMostRecent || [];
+        this.feeds = newFeeds;
+        newFeeds.forEach((feed: any) => {
+          feed.showComments = false;
+          feed.newComment = "";
+          feed.dropdownOpen = false;
+          this.feedService
+            .getPostComments(feed.postId)
+            .subscribe((comments: any) => {
+              feed.comments = comments;
+              feed.commentCount = comments.length;
+            });
+        });
+        setTimeout(() => this.initializeVideoPlayers(), 0);
+        this.loading = false;
+      },
+      (error) => {
+        console.error("Error loading feeds:", error);
+        this.loading = false;
+      }
+    );
   }
 
   initializeVideoPlayers(): void {
@@ -231,25 +260,21 @@ export class FeedsComponent implements OnInit, OnDestroy {
     );
   }
 
-  // New method: Edit comment
+  // Updated editComment method: now sends the updated comment as a plain text string.
   editComment(feed: any, comment: any, newContent: string): void {
     if (!newContent.trim()) return;
-    this.feedService
-      .updatePostComment(comment.commentId, { commentContent: newContent })
-      .subscribe(
-        () => {
-          // Update the comment content in UI.
-          comment.commentContent = newContent;
-        },
-        (error) => console.error("Error updating comment:", error)
-      );
+    this.feedService.updatePostComment(comment.commentId, newContent).subscribe(
+      () => {
+        comment.commentContent = newContent;
+      },
+      (error) => console.error("Error updating comment:", error)
+    );
   }
 
-  // New method: Delete comment
+  // Delete comment method remains similar, using commentId.
   deleteComment(feed: any, comment: any): void {
     this.feedService.deletePostComment(comment.commentId).subscribe(
       () => {
-        // Remove the deleted comment from the UI.
         feed.comments = feed.comments.filter(
           (c: any) => c.commentId !== comment.commentId
         );
@@ -264,7 +289,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   goToChatBox(feed: any): void {
-    // Use shared service to pass the recipient’s details without overriding logged‑in user data.
     this.sharedService.setChatUserInfo(
       feed.authorId,
       feed.authorUsername,
@@ -275,18 +299,5 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   reportFeed(feed: any): void {
     console.log("Reporting feed:", feed.postId);
-    // Implement further report logic as needed.
   }
-
-  // getCookie(name: string): string | null {
-  //   const nameEQ = `${name}=`;
-  //   const ca = document.cookie.split(";");
-  //   for (let i = 0; i < ca.length; i++) {
-  //     let c = ca[i].trim();
-  //     if (c.indexOf(nameEQ) === 0) {
-  //       return c.substring(nameEQ.length);
-  //     }
-  //   }
-  //   return null;
-  // }
 }

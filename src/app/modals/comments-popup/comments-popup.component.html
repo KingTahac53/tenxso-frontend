@@ -14,12 +14,41 @@
     <h6 class="text-lg font-medium mb-2 text-gray-800 dark:text-white">Comments On Post</h6>
     <div *ngFor="let comment of commentData" class="flex items-start gap-3 mb-3">
       <div class="w-10 h-10 rounded-full overflow-hidden">
-        <img [src]="comment.userProfileUrl" alt="User Profile" class="w-full h-full object-cover">
+        <img [src]="comment.userProfileUrl || 'assets/img/default-avatar.png'" alt="User Profile"
+          class="w-full h-full object-cover">
       </div>
-      <div>
-        <div class="text-sm font-medium text-black dark:text-white">{{ comment.commentAuthorUsername }}</div>
-        <div class="text-sm text-gray-600 dark:text-gray-300">{{ comment.commentContent }}</div>
-        <div class="text-xs text-gray-400">{{ comment.commentDateCreated }}</div>
+      <div class="flex-1">
+        <div class="flex justify-between items-center">
+          <span class="font-medium text-sm text-black dark:text-white">{{ comment.commentAuthorUsername }}</span>
+          <!-- Only show edit/delete if current user is the author -->
+          <div *ngIf="comment.commentAuthorId === getCookie('userId')">
+            <!-- Show Edit button if not in edit mode -->
+            <button *ngIf="editingCommentId !== comment.commentId" (click)="startEditing(comment)"
+              class="text-blue-500 text-xs mr-2">
+              Edit
+            </button>
+            <!-- Show Delete button -->
+            <button (click)="deleteComment(comment.commentId)" class="text-red-500 text-xs mr-2">
+              Delete
+            </button>
+          </div>
+        </div>
+        <!-- If this comment is being edited, show an input field -->
+        <div *ngIf="editingCommentId === comment.commentId; else showComment">
+          <input type="text" [(ngModel)]="editingCommentContent" class="w-full border border-gray-300 rounded p-1" />
+          <div class="mt-1 flex gap-2">
+            <button (click)="saveEditing(comment.commentId)" class="text-green-500 text-xs">
+              Save
+            </button>
+            <button (click)="cancelEditing()" class="text-gray-500 text-xs">
+              Cancel
+            </button>
+          </div>
+        </div>
+        <ng-template #showComment>
+          <p class="text-sm text-gray-900 dark:text-gray-800">{{ comment.commentContent }}</p>
+        </ng-template>
+        <div class="text-xs text-gray-400">{{ comment.commentDateCreated | date:'MMM d, y, h:mm a' }}</div>
       </div>
     </div>
   </div>
@@ -37,11 +66,7 @@
       class="flex-1 p-2 border rounded-lg focus:outline-none">
     <button (click)="commentPost()" class="ml-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
       <!-- Paper Plane Icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9l5 3-5 3v-6z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z" />
-      </svg>
+      <i class="fa fa-paper-plane"></i>
     </button>
   </div>
 </div>

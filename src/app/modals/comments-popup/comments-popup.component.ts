@@ -23,6 +23,10 @@ export class CommentsPopupComponent implements OnInit {
   profilePic: string | null;
   isLiked: boolean = false;
 
+  // Variables for inline editing
+  editingCommentId: string | null = null;
+  editingCommentContent: string = "";
+
   constructor(
     private sharedService: SharedService,
     private feedService: FeedService,
@@ -62,6 +66,7 @@ export class CommentsPopupComponent implements OnInit {
     );
   }
 
+  // Post a new comment.
   commentPost(): void {
     if (!this.comment.trim()) return;
     const commentData = {
@@ -81,14 +86,33 @@ export class CommentsPopupComponent implements OnInit {
     );
   }
 
-  updateComment(commentId: string, newContent: string): void {
-    const updateData = { commentContent: newContent };
-    this.feedService.updatePostComment(commentId, updateData).subscribe(
-      () => this.getPostComments(this.feed.postId),
-      (error) => console.error("Error updating comment:", error)
-    );
+  // Called when the user clicks "Edit" on a comment.
+  startEditing(comment: any): void {
+    this.editingCommentId = comment.commentId;
+    this.editingCommentContent = comment.commentContent;
   }
 
+  // Cancel inline editing.
+  cancelEditing(): void {
+    this.editingCommentId = null;
+    this.editingCommentContent = "";
+  }
+
+  // Save the edited comment.
+  saveEditing(commentId: string): void {
+    if (!this.editingCommentContent.trim()) return;
+    this.feedService
+      .updatePostComment(commentId, this.editingCommentContent)
+      .subscribe(
+        () => {
+          this.getPostComments(this.feed.postId);
+          this.cancelEditing();
+        },
+        (error) => console.error("Error updating comment:", error)
+      );
+  }
+
+  // Delete a comment.
   deleteComment(commentId: string): void {
     this.feedService.deletePostComment(commentId).subscribe(
       () => this.getPostComments(this.feed.postId),

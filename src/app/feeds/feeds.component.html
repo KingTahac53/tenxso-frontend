@@ -131,11 +131,11 @@
                       </button>
                       <div *ngIf="comment.dropdownOpen"
                         class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded shadow-lg z-10">
-                        <button
+                        <!-- <button
                           (click)="editComment(feed, comment, prompt('Edit your comment:', comment.commentContent) || comment.commentContent); comment.dropdownOpen = false"
                           class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm">
                           Edit
-                        </button>
+                        </button> -->
                         <button (click)="deleteComment(feed, comment); comment.dropdownOpen = false"
                           class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-red-500">
                           Delete
@@ -151,7 +151,7 @@
               </div>
             </ng-container>
             <ng-template #noComments>
-              <!-- Optional message when no comments exist -->
+              <!-- Optionally show a message if no comments exist -->
             </ng-template>
             <!-- Add Comment Input -->
             <div class="sm:px-4 sm:py-3 p-2.5 flex items-center gap-2">
