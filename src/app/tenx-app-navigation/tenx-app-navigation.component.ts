@@ -35,14 +35,13 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    // On app initialization, always force a refresh by calling getUser.
     const userId = localStorage.getItem("userId") || this.getCookie("userId");
     if (userId) {
       this.getUser(userId, true);
       this.signedIn = true;
     } else {
       this.generateAndStoreUser(true);
-      this.signedIn = false;
+      this.signedIn = true;
     }
     this.signalRService.notificationCounter.subscribe((resp) => {
       this.notificationCounter += Number(resp);
@@ -66,6 +65,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   }
 
   formatUsername(username: string): string {
+    if (!username) return "User";
     return username
       .split("_")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -76,7 +76,8 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     this.userService.getUser(userId).subscribe(
       (response: any) => {
         if (!response.userId) {
-          this.generateAndStoreUser(true);
+          // If getUser returns no data, assume current generated data is valid.
+          return;
         } else {
           this.generatedUserData = new UserData(
             response.userId,
@@ -89,15 +90,19 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           if (storePersistence) {
             this.setPersistentData(this.generatedUserData);
           }
-          this.sharedService.setUserInfo(
-            this.generatedUserData.userId,
-            this.generatedUserData.firstName && this.generatedUserData.lastName
-              ? this.generatedUserData.firstName +
+          const displayName =
+            this.generatedUserData.firstName || this.generatedUserData.lastName
+              ? (
+                  this.generatedUserData.firstName +
                   " " +
                   this.generatedUserData.lastName
+                ).trim()
               : this.generatedUserData.username
               ? this.formatUsername(this.generatedUserData.username)
-              : "",
+              : "User";
+          this.sharedService.setUserInfo(
+            this.generatedUserData.userId,
+            displayName,
             this.generatedUserData.profilePic
           );
           this.cd.detectChanges();
@@ -110,44 +115,62 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
   generateAndStoreUser(storePersistence: boolean) {
     this.userService.generateUserId().subscribe(
       (response: any) => {
+        const fName =
+          response.firstname && response.firstname.trim() !== ""
+            ? response.firstname
+            : this.formatUsername(response.username);
+        const lName =
+          response.lastname && response.lastname.trim() !== ""
+            ? response.lastname
+            : "";
         this.generatedUserData = new UserData(
           response.userId,
           response.username,
-          response.firstname || "",
-          response.lastname || "",
+          fName,
+          lName,
           response.profilePic,
           "false"
         );
         if (storePersistence) {
           this.setPersistentData(this.generatedUserData);
         }
-        this.sharedService.setUserInfo(
-          this.generatedUserData.userId,
-          this.generatedUserData.firstName && this.generatedUserData.lastName
-            ? this.generatedUserData.firstName +
+        const displayName =
+          this.generatedUserData.firstName || this.generatedUserData.lastName
+            ? (
+                this.generatedUserData.firstName +
                 " " +
                 this.generatedUserData.lastName
+              ).trim()
             : this.generatedUserData.username
             ? this.formatUsername(this.generatedUserData.username)
-            : "",
+            : "User";
+        this.sharedService.setUserInfo(
+          this.generatedUserData.userId,
+          displayName,
           this.generatedUserData.profilePic
         );
         this.signedIn = true;
         this.cd.detectChanges();
+
+        // Force a one-time full reload after a short delay (2 seconds) to load the profile correctly.
+        setTimeout(() => {
+          if (!localStorage.getItem("hasReloaded")) {
+            localStorage.setItem("hasReloaded", "true");
+            window.location.reload();
+          }
+        }, 2000);
       },
       (error) => console.error("Error generating user data:", error)
     );
   }
 
   setPersistentData(userData: UserData): void {
-    // Store in cookies.
     this.setCookie("userId", userData.userId, 365);
     this.setCookie("firstName", userData.firstName, 365);
     this.setCookie("lastName", userData.lastName, 365);
     this.setCookie("profilePic", userData.profilePic, 365);
     this.setCookie("isVerified", userData.isVerified, 365);
     this.setCookie("username", userData.username, 365);
-    // Store in localStorage.
     localStorage.setItem("userId", userData.userId);
     localStorage.setItem("firstName", userData.firstName);
     localStorage.setItem("lastName", userData.lastName);
@@ -209,26 +232,26 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           const mappedUser = new UserData(
             userData.userId,
             userData.username,
-            userData.firstname || "",
+            userData.firstname || this.formatUsername(userData.username),
             userData.lastname || "",
             userData.profilePic,
             userData.isVerified.toString()
           );
           this.setPersistentData(mappedUser);
-          this.sharedService.setUserInfo(
-            mappedUser.userId,
-            mappedUser.firstName && mappedUser.lastName
-              ? mappedUser.firstName + " " + mappedUser.lastName
+          const displayName =
+            mappedUser.firstName || mappedUser.lastName
+              ? (mappedUser.firstName + " " + mappedUser.lastName).trim()
               : mappedUser.username
               ? this.formatUsername(mappedUser.username)
-              : "",
+              : "User";
+          this.sharedService.setUserInfo(
+            mappedUser.userId,
+            displayName,
             mappedUser.profilePic
           );
           this.generatedUserData = mappedUser;
           this.signedIn = true;
           this.profileDropdownOpen = false;
-          // Refresh immediately to get updated profile picture.
-          this.getUser(mappedUser.userId, true);
           this.cd.detectChanges();
         });
       },
