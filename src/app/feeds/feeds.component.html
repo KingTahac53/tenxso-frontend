@@ -3,65 +3,127 @@
     <div class="flex max-lg:flex-col xl:gap-10 md:gap-3" id="js-oversized">
       <div class="md:max-w-[510px] mx-auto flex-1 space-y-6">
         <!-- Loop through each feed -->
-        <div *ngFor="let feed of feeds"
-          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div
+          *ngFor="let feed of feeds"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
+        >
           <!-- Feed Header -->
           <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
             <!-- Profile Picture with fallback to initial avatar -->
-            <ng-container *ngIf="feed.title && !feed.imgError; else fallbackAvatar">
-              <img [src]="feed.title" alt="Profile Picture" class="w-9 h-9 rounded-full"
-                (error)="feed.imgError = true" />
+            <ng-container
+              *ngIf="feed.title && !feed.imgError; else fallbackAvatar"
+            >
+              <img
+                [src]="feed.title"
+                alt="Profile Picture"
+                class="w-9 h-9 rounded-full"
+                (error)="feed.imgError = true"
+              />
             </ng-container>
             <ng-template #fallbackAvatar>
               <div
-                class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-xl font-semibold text-gray-700">
-                {{ feed.authorUsername ? feed.authorUsername.charAt(0).toUpperCase() : '?' }}
+                class="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-xl font-semibold text-gray-700"
+              >
+                {{
+                  feed.authorUsername
+                    ? feed.authorUsername.charAt(0).toUpperCase()
+                    : "?"
+                }}
               </div>
             </ng-template>
 
             <div class="flex-1">
-              <h4 class="text-black dark:text-white">{{ feed.authorUsername }}</h4>
+              <h4 class="text-black dark:text-white">
+                {{ feed.authorUsername }}
+              </h4>
               <div class="text-xs text-gray-500 dark:text-gray-400">
-                {{ feed.dateCreated | date:'MMM d, y, h:mm a' }}
+                {{ feed.dateCreated | date : "MMM d, y, h:mm a" }}
               </div>
             </div>
             <!-- Dropdown Trigger & Menu -->
             <div class="relative">
-              <button type="button" (click)="toggleDropdown(feed)"
-                class="w-8 h-8 flex items-center justify-center focus:outline-none">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                  class="w-6 h-6 text-gray-600 dark:text-gray-300" viewBox="0 0 20 20">
+              <button
+                type="button"
+                (click)="toggleDropdown(feed)"
+                class="w-8 h-8 flex items-center justify-center focus:outline-none"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  class="w-6 h-6 text-gray-600 dark:text-gray-300"
+                  viewBox="0 0 20 20"
+                >
                   <path
-                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
                 </svg>
               </button>
-              <div *ngIf="feed.dropdownOpen"
-                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10">
+              <div
+                *ngIf="feed.dropdownOpen"
+                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10"
+              >
                 <nav class="flex flex-col">
-                  <a href="#" (click)="downloadFile(feed.content); toggleDropdown(feed); $event.preventDefault()"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                      class="w-6 h-6 text-gray-600 dark:text-gray-300" viewBox="0 0 20 20">
-                      <path d="M5 4a2 2 0 00-2 2v12l7-5 7 5V6a2 2 0 00-2-2H5z" />
+                  <a
+                    href="#"
+                    (click)="
+                      downloadFile(feed.content);
+                      toggleDropdown(feed);
+                      $event.preventDefault()
+                    "
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      class="w-6 h-6 text-gray-600 dark:text-gray-300"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M5 4a2 2 0 00-2 2v12l7-5 7 5V6a2 2 0 00-2-2H5z"
+                      />
                     </svg>
                     <span>Download</span>
                   </a>
-                  <a href="#" (click)="goToChatBox(feed); toggleDropdown(feed); $event.preventDefault()"
-                    class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                      class="w-6 h-6 text-gray-600 dark:text-gray-300" viewBox="0 0 20 20">
+                  <a
+                    href="#"
+                    (click)="
+                      goToChatBox(feed);
+                      toggleDropdown(feed);
+                      $event.preventDefault()
+                    "
+                    class="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      class="w-6 h-6 text-gray-600 dark:text-gray-300"
+                      viewBox="0 0 20 20"
+                    >
                       <path
-                        d="M2.94 10.94a1.5 1.5 0 010-2.88L15.5 2.07a1 1 0 011.29.54l.72 1.73a1 1 0 01-.23 1.03L11 14l-2.73 2.73a1 1 0 01-1.45 0l-1.73-1.73a1 1 0 01-.23-1.03l7.11-8.37L2.94 10.94z" />
+                        d="M2.94 10.94a1.5 1.5 0 010-2.88L15.5 2.07a1 1 0 011.29.54l.72 1.73a1 1 0 01-.23 1.03L11 14l-2.73 2.73a1 1 0 01-1.45 0l-1.73-1.73a1 1 0 01-.23-1.03l7.11-8.37L2.94 10.94z"
+                      />
                     </svg>
                     <span>Message</span>
                   </a>
-                  <hr class="border-gray-200 dark:border-gray-600">
-                  <a href="#" (click)="reportFeed(feed); toggleDropdown(feed); $event.preventDefault()"
-                    class="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-600/50">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="w-6 h-6 text-red-500"
-                      viewBox="0 0 20 20">
+                  <hr class="border-gray-200 dark:border-gray-600" />
+                  <a
+                    href="#"
+                    (click)="
+                      reportFeed(feed);
+                      toggleDropdown(feed);
+                      $event.preventDefault()
+                    "
+                    class="flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-600/50"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      class="w-6 h-6 text-red-500"
+                      viewBox="0 0 20 20"
+                    >
                       <path
-                        d="M5 3a1 1 0 00-1 1v12a1 1 0 001 1h1.586a1 1 0 00.707-.293l5.414-5.414a1 1 0 00.293-.707V4a1 1 0 00-1-1H5z" />
+                        d="M5 3a1 1 0 00-1 1v12a1 1 0 001 1h1.586a1 1 0 00.707-.293l5.414-5.414a1 1 0 00.293-.707V4a1 1 0 00-1-1H5z"
+                      />
                     </svg>
                     <span>Report</span>
                   </a>
@@ -73,11 +135,20 @@
           <!-- Media Container -->
           <div class="w-full rounded-xl overflow-hidden sm:px-4">
             <ng-container *ngIf="isVideo(feed.content); else notVideo">
-              <app-video-player [src]="feed.content" [poster]="feed.thumbnail || '/assets/default-video-poster.jpg'"
-                [muted]="true" [loop]="true" class="w-full h-full object-cover"></app-video-player>
+              <app-video-player
+                [src]="feed.content"
+                [poster]="feed.thumbnail || '/assets/default-video-poster.jpg'"
+                [muted]="true"
+                [loop]="true"
+                class="w-full h-full object-cover"
+              ></app-video-player>
             </ng-container>
             <ng-template #notVideo>
-              <img [src]="feed.content" alt="Feed Content" class="w-full h-full rounded-xl object-cover">
+              <img
+                [src]="feed.content"
+                alt="Feed Content"
+                class="w-full h-full rounded-xl object-cover"
+              />
             </ng-template>
           </div>
 
@@ -87,26 +158,56 @@
           </div>
 
           <!-- Feed Actions -->
-          <div class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
+          <div
+            class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold"
+          >
             <div class="flex items-center gap-2">
-              <button type="button" (click)="likePost(feed)"
+              <button
+                type="button"
+                (click)="likePost(feed)"
                 class="flex items-center justify-center w-8 h-8 rounded-full"
-                [ngClass]="feed.likeFlag == 0 ? 'text-gray-500 bg-gray-100 dark:bg-gray-600' : 'text-red-500 bg-red-200 dark:bg-gray-500'">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                  [attr.fill]="feed.likeFlag == 1 ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                [ngClass]="
+                  feed.likeFlag == 0
+                    ? 'text-gray-500 bg-gray-100 dark:bg-gray-600'
+                    : 'text-red-500 bg-red-200 dark:bg-gray-500'
+                "
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  [attr.fill]="feed.likeFlag == 1 ? 'currentColor' : 'none'"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                  />
                 </svg>
               </button>
               <span>{{ feed.likeCount || 0 }}</span>
             </div>
             <div class="flex items-center gap-2">
-              <button type="button" (click)="toggleComments(feed)"
-                class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700 dark:text-gray-300" fill="none"
-                  viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M7 8h10M7 12h4m1 8l-6-6H3a2 2 0 01-2-2V5a2 2 0 012-2h18a2 2 0 012 2v7a2 2 0 01-2 2h-4l-6 6z" />
+              <button
+                type="button"
+                (click)="toggleComments(feed)"
+                class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-gray-700 dark:text-gray-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M7 8h10M7 12h4m1 8l-6-6H3a2 2 0 01-2-2V5a2 2 0 012-2h18a2 2 0 012 2v7a2 2 0 01-2 2h-4l-6 6z"
+                  />
                 </svg>
               </button>
               <span>{{ feed.commentCount || 0 }}</span>
@@ -114,38 +215,69 @@
           </div>
 
           <!-- Inline Comments Section -->
-          <div *ngIf="feed.showComments" class="sm:p-4 p-2.5 border-t border-gray-100 dark:border-gray-700 space-y-3">
-            <ng-container *ngIf="feed.comments && feed.comments.length; else noComments">
-              <div *ngFor="let comment of feed.comments" class="flex items-start gap-3 relative">
-                <img [src]="comment.userProfileUrl || 'assets/images/default-avatar.jpg'" alt="Commenter"
-                  class="w-6 h-6 rounded-full">
+          <div
+            *ngIf="feed.showComments"
+            class="sm:p-4 p-2.5 border-t border-gray-100 dark:border-gray-700 space-y-3"
+          >
+            <ng-container
+              *ngIf="feed.comments && feed.comments.length; else noComments"
+            >
+              <div
+                *ngFor="let comment of feed.comments"
+                class="flex items-start gap-3 relative"
+              >
+                <img
+                  [src]="
+                    comment.userProfileUrl || 'assets/images/default-avatar.jpg'
+                  "
+                  alt="Commenter"
+                  class="w-6 h-6 rounded-full"
+                />
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
-                    <a href="#" class="text-black dark:text-white font-medium text-sm">
+                    <a
+                      href="#"
+                      class="text-black dark:text-white font-medium text-sm"
+                    >
                       {{ comment.commentAuthorUsername }}
                     </a>
                     <!-- Show options only if the logged-in user is the comment author -->
-                    <div *ngIf="comment.commentAuthorId === userId" class="relative">
-                      <button (click)="comment.dropdownOpen = !comment.dropdownOpen" class="focus:outline-none">
+                    <div
+                      *ngIf="comment.commentAuthorId === userId"
+                      class="relative"
+                    >
+                      <button
+                        (click)="comment.dropdownOpen = !comment.dropdownOpen"
+                        class="focus:outline-none"
+                      >
                         <i class="fa fa-ellipsis-v text-gray-600"></i>
                       </button>
-                      <div *ngIf="comment.dropdownOpen"
-                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded shadow-lg z-10">
+                      <div
+                        *ngIf="comment.dropdownOpen"
+                        class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded shadow-lg z-10"
+                      >
                         <!-- <button
                           (click)="editComment(feed, comment, prompt('Edit your comment:', comment.commentContent) || comment.commentContent); comment.dropdownOpen = false"
                           class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm">
                           Edit
                         </button> -->
-                        <button (click)="deleteComment(feed, comment); comment.dropdownOpen = false"
-                          class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-red-500">
+                        <button
+                          (click)="
+                            deleteComment(feed, comment);
+                            comment.dropdownOpen = false
+                          "
+                          class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-red-500"
+                        >
                           Delete
                         </button>
                       </div>
                     </div>
                   </div>
-                  <p class="mt-0.5 text-sm text-gray-900 dark:text-gray-800">{{ comment.commentContent }}</p>
+                  <p class="mt-0.5 text-sm text-gray-900 dark:text-gray-800">
+                    {{ comment.commentContent }}
+                  </p>
                   <div class="text-xs text-gray-400">
-                    {{ comment.commentDateCreated | date:'MMM d, y, h:mm a' }}
+                    {{ comment.commentDateCreated | date : "MMM d, y, h:mm a" }}
                   </div>
                 </div>
               </div>
@@ -155,23 +287,34 @@
             </ng-template>
             <!-- Add Comment Input -->
             <div class="sm:px-4 sm:py-3 p-2.5 flex items-center gap-2">
-              <img [src]="profilePic || 'assets/images/default-avatar.jpg'" alt="Your Avatar"
-                class="w-6 h-6 rounded-full">
+              <img
+                [src]="profilePic || 'assets/images/default-avatar.jpg'"
+                alt="Your Avatar"
+                class="w-6 h-6 rounded-full"
+              />
               <div class="flex-1">
-                <textarea placeholder="Add a comment...." rows="1"
+                <textarea
+                  placeholder="Add a comment...."
+                  rows="1"
                   class="w-full resize-none bg-transparent px-4 py-2 focus:outline-none"
-                  [(ngModel)]="feed.newComment"></textarea>
+                  [(ngModel)]="feed.newComment"
+                ></textarea>
               </div>
-              <button type="button" (click)="postComment(feed)"
-                class="text-sm rounded-full py-1.5 px-3.5 bg-blue-500 text-white hover:bg-blue-600">
+              <button
+                type="button"
+                (click)="postComment(feed)"
+                class="text-sm rounded-full py-1.5 px-3.5 bg-blue-500 text-white hover:bg-blue-600"
+              >
                 Save
               </button>
             </div>
           </div>
 
-
           <!-- Loader -->
-          <div *ngIf="loading" class="rounded-xl shadow-sm p-4 space-y-4 bg-gray-200/40 dark:bg-gray-800 animate-pulse">
+          <div
+            *ngIf="loading"
+            class="rounded-xl shadow-sm p-4 space-y-4 bg-gray-200/40 dark:bg-gray-800 animate-pulse"
+          >
             <div class="flex gap-3">
               <div class="w-9 h-9 rounded-full bg-gray-300/20"></div>
               <div class="flex-1 space-y-3">
@@ -191,3 +334,8 @@
           <div *ngIf="allFeedsLoaded" class="text-center py-4 text-gray-500">
             All Feeds Loaded
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
