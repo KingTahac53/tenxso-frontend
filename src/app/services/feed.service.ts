@@ -61,13 +61,19 @@ export class FeedService {
     commentId: string,
     updatedComment: string
   ): Observable<any> {
-    const headers = new HttpHeaders({
-      "Content-Type": "text/plain",
-    });
+    // Trim the input
+    const trimmed = updatedComment.trim();
+    // Check if the string is already wrapped in double quotes.
+    const body =
+      trimmed.startsWith('"') && trimmed.endsWith('"')
+        ? trimmed
+        : JSON.stringify(trimmed);
+
+    const headers = new HttpHeaders({ "Content-Type": "text/plain" });
     return this.http.put(
-      `${this.apiUrl}/UserPost/edit-post-comment/${commentId}`,
-      updatedComment,
-      { headers }
+      `${this.apiUrl}/UserPost/update-post-comment/${commentId}`,
+      body,
+      { headers, responseType: "text" } // adjust responseType if needed
     );
   }
 

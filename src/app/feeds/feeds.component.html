@@ -31,7 +31,6 @@
                 }}
               </div>
             </ng-template>
-
             <div class="flex-1">
               <h4 class="text-black dark:text-white">
                 {{ feed.authorUsername }}
@@ -152,8 +151,8 @@
             </ng-template>
           </div>
 
-          <!-- Caption Container -->
-          <div class="px-4 py-2">
+          <!-- Caption Container with additional vertical padding -->
+          <div class="px-4 py-4">
             <span class="text-sm font-medium">{{ feed.caption }}</span>
           </div>
 
@@ -224,7 +223,7 @@
             >
               <div
                 *ngFor="let comment of feed.comments"
-                class="flex items-start gap-3 relative"
+                class="flex items-start gap-3 mb-3 relative"
               >
                 <img
                   [src]="
@@ -241,9 +240,9 @@
                     >
                       {{ comment.commentAuthorUsername }}
                     </a>
-                    <!-- Show options only if the logged-in user is the comment author -->
+                    <!-- Options for comment author only -->
                     <div
-                      *ngIf="comment.commentAuthorId === userId"
+                      *ngIf="comment.commentAuthorId === getCookie('userId')"
                       class="relative"
                     >
                       <button
@@ -256,16 +255,14 @@
                         *ngIf="comment.dropdownOpen"
                         class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded shadow-lg z-10"
                       >
-                        <!-- <button
-                          (click)="editComment(feed, comment, prompt('Edit your comment:', comment.commentContent) || comment.commentContent); comment.dropdownOpen = false"
-                          class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm">
-                          Edit
-                        </button> -->
                         <button
-                          (click)="
-                            deleteComment(feed, comment);
-                            comment.dropdownOpen = false
-                          "
+                          (click)="startEditingComment(comment)"
+                          class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          (click)="deleteComment(comment.commentId, feed)"
                           class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-red-500"
                         >
                           Delete
@@ -273,9 +270,33 @@
                       </div>
                     </div>
                   </div>
-                  <p class="mt-0.5 text-sm text-gray-900 dark:text-gray-800">
-                    {{ comment.commentContent }}
-                  </p>
+                  <!-- Comment content display / edit -->
+                  <div *ngIf="!comment.editing; else editMode">
+                    <p class="text-sm text-gray-900 dark:text-gray-800">
+                      {{ comment.commentContent }}
+                    </p>
+                  </div>
+                  <ng-template #editMode>
+                    <input
+                      type="text"
+                      [(ngModel)]="comment.editingContent"
+                      class="w-full border border-gray-300 rounded p-1"
+                    />
+                    <div class="mt-1 flex gap-2">
+                      <button
+                        (click)="saveEditedComment(comment, feed)"
+                        class="text-green-500 text-xs"
+                      >
+                        Save
+                      </button>
+                      <button
+                        (click)="cancelEditingComment(comment)"
+                        class="text-gray-500 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </ng-template>
                   <div class="text-xs text-gray-400">
                     {{ comment.commentDateCreated | date : "MMM d, y, h:mm a" }}
                   </div>
@@ -283,7 +304,7 @@
               </div>
             </ng-container>
             <ng-template #noComments>
-              <!-- Optionally show a message if no comments exist -->
+              <!-- Optionally display a message for no comments -->
             </ng-template>
             <!-- Add Comment Input -->
             <div class="sm:px-4 sm:py-3 p-2.5 flex items-center gap-2">

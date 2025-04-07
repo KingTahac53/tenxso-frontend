@@ -197,6 +197,43 @@ export class FeedsComponent implements OnInit, OnDestroy {
     );
   }
 
+  startEditingComment(comment: any): void {
+    comment.editing = true;
+    comment.dropdownOpen = false;
+    comment.editingContent = comment.commentContent;
+  }
+
+  cancelEditingComment(comment: any): void {
+    comment.editing = false;
+    comment.editingContent = "";
+  }
+
+  saveEditedComment(comment: any, feed: any): void {
+    if (!comment.editingContent.trim()) return;
+    // Wrap the updated comment in double quotes.
+    const updatedText = '"' + comment.editingContent.trim() + '"';
+    this.feedService
+      .updatePostComment(comment.commentId, updatedText)
+      .subscribe(
+        () => {
+          // Close the dropdown and exit edit mode.
+          comment.dropdownOpen = false;
+          comment.editing = false;
+          comment.editingContent = "";
+          // Refresh comments for the current feed.
+          this.feedService
+            .getPostComments(feed.postId)
+            .subscribe((comments: any[]) => {
+              feed.comments = comments;
+              feed.commentCount = comments.length;
+            });
+        },
+        (error) => {
+          console.error("Error updating comment:", error);
+        }
+      );
+  }
+
   downloadFile(filePath: string): void {
     fetch(filePath, { mode: "cors" })
       .then((response) => {
@@ -261,14 +298,24 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   // Updated editComment method: now sends the updated comment as a plain text string.
-  editComment(feed: any, comment: any, newContent: string): void {
-    if (!newContent.trim()) return;
-    this.feedService.updatePostComment(comment.commentId, newContent).subscribe(
-      () => {
-        comment.commentContent = newContent;
-      },
-      (error) => console.error("Error updating comment:", error)
-    );
+  editComment(feed: any, comment: any): void {
+    // For instance, use a prompt to get the new comment text.
+    const newContent = prompt("Edit your comment:", comment.commentContent);
+    if (newContent !== null && newContent.trim().length > 0) {
+      this.feedService
+        .updatePostComment(comment.commentId, newContent)
+        .subscribe(
+          () => {
+            // Optionally, refresh comments for this feed.
+            this.feedService
+              .getPostComments(feed.postId)
+              .subscribe((comments: any[]) => {
+                feed.comments = comments;
+              });
+          },
+          (error) => console.error("Error updating comment:", error)
+        );
+    }
   }
 
   // Delete comment method remains similar, using commentId.
