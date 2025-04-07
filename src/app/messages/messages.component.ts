@@ -4,6 +4,7 @@ import {
   OnDestroy,
   ViewChild,
   ElementRef,
+  AfterViewChecked,
 } from "@angular/core";
 import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
@@ -20,27 +21,28 @@ import { exhaustMap } from "rxjs/operators";
   templateUrl: "./messages.component.html",
   styleUrls: ["./messages.component.css"],
 })
-export class MessagesComponent implements OnInit, OnDestroy {
+export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   feeds: Feed[] = [];
   pageNumber: number = 1;
   loading: boolean = false;
   userId: any;
   username: any;
+  chatData: any[] = [];
   public receivedMessages: any[] = [];
   public chatList: any[] = [];
   message: string = "";
+  isSendingMessage: boolean = false;
+  // Chat recipient info
   chat_with_userId: any;
   chat_with_username: any;
   chat_with_profilepic: any;
   chatId: string | null = null;
-  isSendingMessage: boolean = false;
   callState: "idle" | "calling" | "inCall" = "idle";
   sidebarVisible: boolean = true;
 
   private newMessagesSub!: Subscription;
   private chatUsersSub!: Subscription;
 
-  // Reference to the chat body container.
   @ViewChild("chatBody") chatBody!: ElementRef;
 
   constructor(
@@ -53,23 +55,23 @@ export class MessagesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    // Get userId and username from shared service (or cookie)
+    // Subscribe for userId and username from shared service (or cookies)
     this.sharedService.getUserId().subscribe((userId) => {
       this.userId = userId;
     });
-    this.sharedService.getUsername().subscribe((username) => {
+    this.sharedService.getUserId().subscribe((username) => {
       this.username = username;
     });
 
-    let uId = this.sharedService.getCookie("userId");
+    const uId = this.sharedService.getCookie("userId");
     if (uId) {
       this.userId = uId;
       this.checkNewChat();
       this.getChats(uId);
     }
 
-    // Poll the new messages endpoint every 2.5 seconds.
-    this.newMessagesSub = interval(2500)
+    // Poll new messages every 2.5 seconds.
+    this.newMessagesSub = interval(7500)
       .pipe(exhaustMap(() => this.chatService.getNewMessages()))
       .subscribe((messages: any[]) => {
         if (messages && messages.length > 0) {
@@ -77,7 +79,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
             const incomingChatId = msg.chatId ? msg.chatId.trim() : "";
             const currentChatId = this.chatId ? this.chatId.trim() : "";
             if (currentChatId && incomingChatId === currentChatId) {
-              const obj = {
+              const newMsg = {
                 message: msg.content,
                 type: msg.senderId === this.userId ? "reply" : "sender",
                 msgtime: new Date(msg.timestamp).toLocaleTimeString([], {
@@ -85,9 +87,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
                   minute: "2-digit",
                 }),
               };
-              this.receivedMessages.push(obj);
-              // Scroll to bottom with a 100ms delay.
-              setTimeout(() => this.scrollToBottom(true), 100);
+              // Check for duplicate message before adding.
+              if (!this.messageExists(newMsg)) {
+                this.receivedMessages.push(newMsg);
+                this.scrollToBottom(true);
+              }
             } else {
               const index = this.chatList.findIndex((item) => {
                 return item.chatId && item.chatId.trim() === incomingChatId;
@@ -102,7 +106,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Poll the chat users API every 5 seconds to update the chat list order.
+    // Poll chat users every 5 seconds to update order based on latest activity.
     this.chatUsersSub = interval(5000)
       .pipe(exhaustMap(() => this.chatService.getChatUsers(this.userId)))
       .subscribe((response: any[]) => {
@@ -110,7 +114,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Scroll the chat container to the bottom only if the user is near the bottom or if forced.
+  ngAfterViewChecked(): void {
+    // Only auto-scroll if user is near the bottom.
+    this.scrollToBottom();
+  }
+
   private scrollToBottom(force: boolean = false): void {
     try {
       if (this.chatBody && this.chatBody.nativeElement) {
@@ -127,9 +135,25 @@ export class MessagesComponent implements OnInit, OnDestroy {
     }
   }
 
+  private messageExists(newMessage: any): boolean {
+    // Check if a message with the same content, type and time already exists.
+    return this.receivedMessages.some(
+      (msg) =>
+        msg.message === newMessage.message &&
+        msg.type === newMessage.type &&
+        msg.msgtime === newMessage.msgtime
+    );
+  }
+
   ngOnDestroy(): void {
     if (this.newMessagesSub) this.newMessagesSub.unsubscribe();
     if (this.chatUsersSub) this.chatUsersSub.unsubscribe();
+  }
+
+  onEnter(event: KeyboardEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.sendMessage();
   }
 
   sendMessage(): void {
@@ -139,8 +163,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     if (!this.userId || !this.chat_with_userId || !this.message.trim()) {
       return;
     }
-
-    this.isSendingMessage = true; // Disable further sends until complete
+    this.isSendingMessage = true;
     this.chatService
       .sendMessage(
         this.chatId,
@@ -150,12 +173,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (response: any) => {
-          // If chatId was not set before, update it.
           if (!this.chatId && response.chatId) {
             this.chatId = response.chatId;
             this.getChats(this.userId);
           }
-          const obj = {
+          const newMsg = {
             message: this.message,
             type: "reply",
             msgtime: new Date().toLocaleTimeString([], {
@@ -163,9 +185,11 @@ export class MessagesComponent implements OnInit, OnDestroy {
               minute: "2-digit",
             }),
           };
-          this.receivedMessages.push(obj);
+          // To avoid duplicates, check if the message exists already.
+          if (!this.messageExists(newMsg)) {
+            this.receivedMessages.push(newMsg);
+          }
           this.message = "";
-          // Force scroll to bottom with a 100ms delay, then re-enable sending.
           setTimeout(() => {
             this.scrollToBottom(true);
             this.isSendingMessage = false;
@@ -178,10 +202,9 @@ export class MessagesComponent implements OnInit, OnDestroy {
       });
   }
 
-  loadChatHistory(chatId: string): void {
+  loadChatHistory(chatId: string) {
     this.chatService.getChatHistory(chatId).subscribe(
       (history: any[]) => {
-        // Assume API returns messages in chronological order (oldest first)
         this.receivedMessages = history.map((msg) => ({
           message: msg.content,
           type: msg.senderId === this.userId ? "reply" : "sender",
@@ -191,8 +214,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
           }),
         }));
         this.chatId = chatId;
-        // Force scroll to bottom with a 100ms delay.
-        setTimeout(() => this.scrollToBottom(true), 100);
+        setTimeout(() => this.scrollToBottom(true), 0);
       },
       (error) => {
         console.error("Error loading chat history:", error);
@@ -200,7 +222,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     );
   }
 
-  checkNewChat(): void {
+  checkNewChat() {
     this.sharedService
       .getchat_UserId()
       .subscribe(
@@ -219,14 +241,13 @@ export class MessagesComponent implements OnInit, OnDestroy {
       );
   }
 
-  getChats(uid: any): void {
+  getChats(uid: any) {
     if (this.loading) return;
     this.loading = true;
     this.chatService.getChatUsers(uid).subscribe(
       (response: any[]) => {
         this.chatList = response;
         this.loading = false;
-        // Auto-select the first chat if no recipient is already set.
         if (
           !this.chat_with_userId &&
           this.chatList &&
@@ -255,7 +276,7 @@ export class MessagesComponent implements OnInit, OnDestroy {
     this.chat_with_username = user.username;
     this.chat_with_profilepic = user.profilePicUrl;
     if (user.chatId) {
-      user.newMessage = false; // Clear new message flag.
+      user.newMessage = false;
       this.chatId = user.chatId;
       this.loadChatHistory(this.chatId!);
     } else {
