@@ -44,8 +44,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
       this.username = username || undefined;
       console.log("Username:", this.username);
     });
+    // Retrieve the logged in user's profile pic from cookies
     this.profilePic =
       this.getCookie("profilePic") || "assets/images/default-avatar.jpg";
+
     this.scrollListener = this.onScroll.bind(this);
     window.addEventListener("scroll", this.scrollListener);
     this.loadFeeds();
@@ -64,7 +66,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
   }
 
   loadFeeds(): void {
-    if (this.loading || this.allFeedsLoaded) return;
+    if (this.loading || this.allFeedsLoaded) {
+      console.log("Already loading or all feeds loaded.");
+      return;
+    }
     this.loading = true;
     console.log(
       `Loading feeds - Page: ${this.pageNumber}, Size: ${this.pageSize}`
@@ -78,12 +83,27 @@ export class FeedsComponent implements OnInit, OnDestroy {
             newFeeds.forEach((feed: any) => {
               feed.showComments = false;
               feed.newComment = "";
-              feed.dropdownOpen = false;
+              feed.dropdownOpen = false; // For post-level dropdown
+              // For each comment, add properties for inline editing:
+              if (feed.comments && feed.comments.length > 0) {
+                feed.comments.forEach((comment: any) => {
+                  comment.editing = false;
+                  comment.editingContent = "";
+                  comment.dropdownOpen = false; // For comment dropdown
+                });
+              }
+              // Load comments for each feed.
               this.feedService
                 .getPostComments(feed.postId)
                 .subscribe((comments: any) => {
                   feed.comments = comments;
                   feed.commentCount = comments.length;
+                  // Initialize inline editing properties for each comment.
+                  feed.comments.forEach((comment: any) => {
+                    comment.editing = false;
+                    comment.editingContent = "";
+                    comment.dropdownOpen = false;
+                  });
                 });
             });
             this.feeds = [...this.feeds, ...newFeeds];
@@ -118,6 +138,11 @@ export class FeedsComponent implements OnInit, OnDestroy {
             .subscribe((comments: any) => {
               feed.comments = comments;
               feed.commentCount = comments.length;
+              feed.comments.forEach((comment: any) => {
+                comment.editing = false;
+                comment.editingContent = "";
+                comment.dropdownOpen = false;
+              });
             });
         });
         setTimeout(() => this.initializeVideoPlayers(), 0);
@@ -197,30 +222,32 @@ export class FeedsComponent implements OnInit, OnDestroy {
     );
   }
 
+  // --- Inline Comment Editing Functions ---
+
   startEditingComment(comment: any): void {
+    // Enable editing mode for the comment.
     comment.editing = true;
-    comment.dropdownOpen = false;
+    comment.dropdownOpen = false; // Close the dropdown
     comment.editingContent = comment.commentContent;
   }
 
   cancelEditingComment(comment: any): void {
+    // Exit editing mode and reset editing content.
     comment.editing = false;
     comment.editingContent = "";
   }
 
   saveEditedComment(comment: any, feed: any): void {
     if (!comment.editingContent.trim()) return;
-    // Wrap the updated comment in double quotes.
-    const updatedText = '"' + comment.editingContent.trim() + '"';
+    // Directly send the updated comment text as JSON.
     this.feedService
-      .updatePostComment(comment.commentId, updatedText)
+      .updatePostComment(comment.commentId, comment.editingContent)
       .subscribe(
         () => {
-          // Close the dropdown and exit edit mode.
-          comment.dropdownOpen = false;
+          // After successful update, exit editing mode and refresh the comments.
           comment.editing = false;
           comment.editingContent = "";
-          // Refresh comments for the current feed.
+          comment.dropdownOpen = false;
           this.feedService
             .getPostComments(feed.postId)
             .subscribe((comments: any[]) => {
@@ -228,9 +255,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
               feed.commentCount = comments.length;
             });
         },
-        (error) => {
-          console.error("Error updating comment:", error);
-        }
+        (error) => console.error("Error updating comment:", error)
       );
   }
 

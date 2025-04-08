@@ -55,29 +55,21 @@ export class FeedService {
     return this.http.post(`${this.apiUrl}/UserPost/create-post-comment`, data);
   }
 
-  // Updated: Now sends the updated comment as a plain text payload.
-  // In feed.service.ts
+  // Updated edit comment API: sends the updated comment as a JSON payload.
   updatePostComment(
     commentId: string,
     updatedComment: string
   ): Observable<any> {
-    // Trim the input
-    const trimmed = updatedComment.trim();
-    // Check if the string is already wrapped in double quotes.
-    const body =
-      trimmed.startsWith('"') && trimmed.endsWith('"')
-        ? trimmed
-        : JSON.stringify(trimmed);
-
-    const headers = new HttpHeaders({ "Content-Type": "text/plain" });
+    const payload = { commentContent: updatedComment.trim() };
+    const headers = new HttpHeaders({ "Content-Type": "application/json" });
     return this.http.put(
       `${this.apiUrl}/UserPost/update-post-comment/${commentId}`,
-      body,
-      { headers, responseType: "text" } // adjust responseType if needed
+      payload,
+      { headers, responseType: "text" }
     );
   }
 
-  // New: Delete comment API (unchanged, uses commentId in URL)
+  // Delete comment API using commentId.
   deletePostComment(commentId: string): Observable<any> {
     return this.http.delete(
       `${this.apiUrl}/UserPost/delete-post-comment/${commentId}`
