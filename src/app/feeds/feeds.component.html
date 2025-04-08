@@ -31,9 +31,15 @@
                 }}
               </div>
             </ng-template>
+
             <div class="flex-1">
               <h4 class="text-black dark:text-white">
                 {{ feed.authorUsername }}
+                <ng-container
+                  *ngIf="feed.isVerified === true || feed.isVerified === 'true'"
+                >
+                  <i class="fa fa-check-circle text-blue-600"></i>
+                </ng-container>
               </h4>
               <div class="text-xs text-gray-500 dark:text-gray-400">
                 {{ feed.dateCreated | date : "MMM d, y, h:mm a" }}
