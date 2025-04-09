@@ -111,10 +111,11 @@
                     <span>Message</span>
                   </a>
                   <hr class="border-gray-200 dark:border-gray-600" />
+                  <!-- Updated Report link to open the report popup -->
                   <a
                     href="#"
                     (click)="
-                      reportFeed(feed);
+                      openReportPopup(feed);
                       toggleDropdown(feed);
                       $event.preventDefault()
                     "
@@ -157,7 +158,7 @@
             </ng-template>
           </div>
 
-          <!-- Caption Container with additional vertical padding -->
+          <!-- Caption Container -->
           <div class="px-4 py-2">
             <span class="text-sm font-medium">{{ feed.caption }}</span>
           </div>
@@ -229,7 +230,7 @@
             >
               <div
                 *ngFor="let comment of feed.comments"
-                class="flex items-start gap-3 mb-3 relative"
+                class="flex items-start gap-3 relative"
               >
                 <img
                   [src]="
@@ -246,9 +247,9 @@
                     >
                       {{ comment.commentAuthorUsername }}
                     </a>
-                    <!-- Options for comment author only -->
+                    <!-- Edit/Delete options shown only if the logged-in user is the author -->
                     <div
-                      *ngIf="comment.commentAuthorId === getCookie('userId')"
+                      *ngIf="comment.commentAuthorId === userId"
                       class="relative"
                     >
                       <button
@@ -268,7 +269,10 @@
                           Edit
                         </button>
                         <button
-                          (click)="deleteComment(comment.commentId, feed)"
+                          (click)="
+                            deleteComment(feed, comment);
+                            comment.dropdownOpen = false
+                          "
                           class="w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 text-sm text-red-500"
                         >
                           Delete
@@ -276,32 +280,30 @@
                       </div>
                     </div>
                   </div>
-                  <!-- Comment content display / edit -->
-                  <div *ngIf="!comment.editing; else editMode">
-                    <p class="text-sm text-gray-900 dark:text-gray-800">
-                      {{ comment.commentContent }}
-                    </p>
-                  </div>
-                  <ng-template #editMode>
+                  <!-- If the comment is in editing mode, show an input box and a save button -->
+                  <div *ngIf="comment.editing; else displayComment">
                     <input
                       type="text"
                       [(ngModel)]="comment.editingContent"
-                      class="w-full border border-gray-300 rounded p-1"
+                      class="w-full p-2 border rounded focus:outline-none"
                     />
-                    <div class="mt-1 flex gap-2">
-                      <button
-                        (click)="saveEditedComment(comment, feed)"
-                        class="text-green-500 text-xs"
-                      >
-                        Save
-                      </button>
-                      <button
-                        (click)="cancelEditingComment(comment)"
-                        class="text-gray-500 text-xs"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                    <button
+                      (click)="saveEditedComment(comment, feed)"
+                      class="mt-1 bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600"
+                    >
+                      Save
+                    </button>
+                    <button
+                      (click)="cancelEditingComment(comment)"
+                      class="mt-1 bg-gray-300 text-black px-3 py-1 rounded text-sm hover:bg-gray-400 ml-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <ng-template #displayComment>
+                    <p class="mt-0.5 text-sm text-gray-900 dark:text-gray-800">
+                      {{ comment.commentContent }}
+                    </p>
                   </ng-template>
                   <div class="text-xs text-gray-400">
                     {{ comment.commentDateCreated | date : "MMM d, y, h:mm a" }}
@@ -310,7 +312,7 @@
               </div>
             </ng-container>
             <ng-template #noComments>
-              <!-- Optionally display a message for no comments -->
+              <!-- Optionally show a message if no comments exist -->
             </ng-template>
             <!-- Add Comment Input -->
             <div class="sm:px-4 sm:py-3 p-2.5 flex items-center gap-2">
@@ -366,3 +368,52 @@
     </div>
   </div>
 </main>
+
+<!-- Report Popup -->
+<div
+  *ngIf="reportPopupOpen"
+  class="fixed inset-0 flex items-center justify-center z-50"
+>
+  <!-- Modal Backdrop -->
+  <div
+    class="fixed inset-0 bg-black opacity-50"
+    (click)="closeReportPopup()"
+  ></div>
+  <!-- Modal Content -->
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg z-50 w-80">
+    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-black">
+      Report Post
+    </h2>
+    <p class="mb-4 text-gray-600 dark:text-gray-600">
+      Please select a reason for reporting this post:
+    </p>
+    <div class="space-y-2 mb-4">
+      <div *ngFor="let reason of reportReasons">
+        <label class="flex items-center cursor-pointer">
+          <input
+            type="radio"
+            name="reportReason"
+            [value]="reason"
+            [(ngModel)]="selectedReportReason"
+            class="mr-2"
+          />
+          <span class="text-gray-700 dark:text-gray-800">{{ reason }}</span>
+        </label>
+      </div>
+    </div>
+    <div class="flex justify-between">
+      <button
+        (click)="closeReportPopup()"
+        class="px-4 py-2 mr-2 rounded border text-gray-700 dark:text-gray-800"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="submitReport()"
+        class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+      >
+        Report Post
+      </button>
+    </div>
+  </div>
+</div>

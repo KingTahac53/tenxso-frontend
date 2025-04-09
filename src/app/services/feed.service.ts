@@ -2,13 +2,13 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpParams, HttpHeaders } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Feed } from "../models/feed.model";
-import { environment } from "../environment"; // Ensure the path is correct
+import { environment } from "../environment";
 
 @Injectable({
   providedIn: "root",
 })
 export class FeedService {
-  private apiUrl = environment.apiUrl; // Backend API base URL
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -55,21 +55,20 @@ export class FeedService {
     return this.http.post(`${this.apiUrl}/UserPost/create-post-comment`, data);
   }
 
-  // Updated edit comment API: sends the updated comment as a JSON payload.
   updatePostComment(
     commentId: string,
     updatedComment: string
   ): Observable<any> {
-    const payload = { commentContent: updatedComment.trim() };
+    // Send the updated comment as JSON with key "commentContent"
+    const body = { commentContent: updatedComment.trim() };
     const headers = new HttpHeaders({ "Content-Type": "application/json" });
     return this.http.put(
       `${this.apiUrl}/UserPost/update-post-comment/${commentId}`,
-      payload,
+      body,
       { headers, responseType: "text" }
     );
   }
 
-  // Delete comment API using commentId.
   deletePostComment(commentId: string): Observable<any> {
     return this.http.delete(
       `${this.apiUrl}/UserPost/delete-post-comment/${commentId}`
@@ -79,5 +78,13 @@ export class FeedService {
   getChats(userId: string): Observable<Feed[]> {
     let params = new HttpParams().set("userId", userId.toString());
     return this.http.get<any[]>(`${this.apiUrl}/Feeds/getChats`, { params });
+  }
+
+  reportPost(reportData: {
+    postId: string;
+    reportedUserId: string;
+    reason: string;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/UserPost/report-post`, reportData);
   }
 }

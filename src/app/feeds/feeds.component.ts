@@ -24,6 +24,18 @@ export class FeedsComponent implements OnInit, OnDestroy {
   username: string | undefined;
   profilePic: string | undefined;
 
+  // Report popup variables
+  reportPopupOpen: boolean = false;
+  selectedFeedForReport: any = null;
+  selectedReportReason: string = "";
+  reportReasons: string[] = [
+    "Spam",
+    "Inappropriate Content",
+    "Harassment",
+    "False Information",
+    "Other",
+  ];
+
   private scrollListener!: () => void;
 
   constructor(
@@ -107,10 +119,12 @@ export class FeedsComponent implements OnInit, OnDestroy {
                 });
             });
             this.feeds = [...this.feeds, ...newFeeds];
+            console.log("New feeds added:", newFeeds);
             this.pageNumber++;
             setTimeout(() => this.initializeVideoPlayers(), 0);
           } else {
             this.allFeedsLoaded = true;
+            console.log("No more feeds to load.");
           }
           this.loading = false;
         },
@@ -125,6 +139,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const pageSize = this.feeds.length;
     const pageNumber = 1;
     this.loading = true;
+    console.log(`Loading feeds - Page: ${pageNumber}, Size: ${pageSize}`);
     this.feedService.getFeeds(pageNumber, pageSize, this.userId).subscribe(
       (response: any) => {
         const newFeeds = response.blogPostsMostRecent || [];
@@ -175,6 +190,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
               error
             );
           }
+        } else {
+          console.warn(`Player element not found for feed: ${feed.postId}`);
         }
       }
     });
@@ -222,32 +239,29 @@ export class FeedsComponent implements OnInit, OnDestroy {
     );
   }
 
-  // --- Inline Comment Editing Functions ---
-
+  // --- Comment Editing Functions ---
   startEditingComment(comment: any): void {
-    // Enable editing mode for the comment.
     comment.editing = true;
-    comment.dropdownOpen = false; // Close the dropdown
+    comment.dropdownOpen = false;
     comment.editingContent = comment.commentContent;
   }
 
   cancelEditingComment(comment: any): void {
-    // Exit editing mode and reset editing content.
     comment.editing = false;
     comment.editingContent = "";
   }
 
   saveEditedComment(comment: any, feed: any): void {
     if (!comment.editingContent.trim()) return;
-    // Directly send the updated comment text as JSON.
+    // Send the updated comment as plain text in a JSON object.
     this.feedService
       .updatePostComment(comment.commentId, comment.editingContent)
       .subscribe(
         () => {
-          // After successful update, exit editing mode and refresh the comments.
           comment.editing = false;
           comment.editingContent = "";
           comment.dropdownOpen = false;
+          // Refresh comments for the feed.
           this.feedService
             .getPostComments(feed.postId)
             .subscribe((comments: any[]) => {
@@ -371,5 +385,41 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   reportFeed(feed: any): void {
     console.log("Reporting feed:", feed.postId);
+  }
+
+  // --- Report Popup Functions ---
+  openReportPopup(feed: any): void {
+    this.selectedFeedForReport = feed;
+    this.selectedReportReason = "";
+    this.reportPopupOpen = true;
+  }
+
+  closeReportPopup(): void {
+    this.reportPopupOpen = false;
+    this.selectedFeedForReport = null;
+  }
+
+  submitReport(): void {
+    if (!this.selectedFeedForReport || !this.selectedReportReason.trim()) {
+      return;
+    }
+    if (!this.userId) {
+      console.error("User ID is undefined. Cannot report post.");
+      return;
+    }
+    const reportData = {
+      postId: this.selectedFeedForReport.postId,
+      reportedUserId: this.userId,
+      reason: this.selectedReportReason.trim(),
+    };
+    this.feedService.reportPost(reportData).subscribe(
+      () => {
+        this.closeReportPopup();
+        this.refreshFeeds();
+      },
+      (error) => {
+        console.error("Error reporting post", error);
+      }
+    );
   }
 }
