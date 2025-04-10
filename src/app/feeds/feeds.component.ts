@@ -24,7 +24,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   username: string | undefined;
   profilePic: string | undefined;
 
-  // Report popup variables
+  // --- Report Popup Properties ---
   reportPopupOpen: boolean = false;
   selectedFeedForReport: any = null;
   selectedReportReason: string = "";
@@ -32,9 +32,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
     "Spam",
     "Inappropriate Content",
     "Harassment",
-    "False Information",
-    "Other",
+    "Hate Speech",
   ];
+  reportSubmitted: boolean = false;
+  reportedFeed: any = null;
 
   private scrollListener!: () => void;
 
@@ -96,7 +97,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
               feed.showComments = false;
               feed.newComment = "";
               feed.dropdownOpen = false; // For post-level dropdown
-              // For each comment, add properties for inline editing:
+              // For each comment, add inline editing properties:
               if (feed.comments && feed.comments.length > 0) {
                 feed.comments.forEach((comment: any) => {
                   comment.editing = false;
@@ -110,7 +111,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
                 .subscribe((comments: any) => {
                   feed.comments = comments;
                   feed.commentCount = comments.length;
-                  // Initialize inline editing properties for each comment.
                   feed.comments.forEach((comment: any) => {
                     comment.editing = false;
                     comment.editingContent = "";
@@ -119,12 +119,10 @@ export class FeedsComponent implements OnInit, OnDestroy {
                 });
             });
             this.feeds = [...this.feeds, ...newFeeds];
-            console.log("New feeds added:", newFeeds);
             this.pageNumber++;
             setTimeout(() => this.initializeVideoPlayers(), 0);
           } else {
             this.allFeedsLoaded = true;
-            console.log("No more feeds to load.");
           }
           this.loading = false;
         },
@@ -139,7 +137,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
     const pageSize = this.feeds.length;
     const pageNumber = 1;
     this.loading = true;
-    console.log(`Loading feeds - Page: ${pageNumber}, Size: ${pageSize}`);
     this.feedService.getFeeds(pageNumber, pageSize, this.userId).subscribe(
       (response: any) => {
         const newFeeds = response.blogPostsMostRecent || [];
@@ -239,7 +236,8 @@ export class FeedsComponent implements OnInit, OnDestroy {
     );
   }
 
-  // --- Comment Editing Functions ---
+  // --- Inline Comment Editing Functions ---
+
   startEditingComment(comment: any): void {
     comment.editing = true;
     comment.dropdownOpen = false;
@@ -253,7 +251,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   saveEditedComment(comment: any, feed: any): void {
     if (!comment.editingContent.trim()) return;
-    // Send the updated comment as plain text in a JSON object.
+    // Directly send the updated comment text as plain text (wrapped in a JSON object)
     this.feedService
       .updatePostComment(comment.commentId, comment.editingContent)
       .subscribe(
@@ -261,7 +259,6 @@ export class FeedsComponent implements OnInit, OnDestroy {
           comment.editing = false;
           comment.editingContent = "";
           comment.dropdownOpen = false;
-          // Refresh comments for the feed.
           this.feedService
             .getPostComments(feed.postId)
             .subscribe((comments: any[]) => {
@@ -385,18 +382,25 @@ export class FeedsComponent implements OnInit, OnDestroy {
 
   reportFeed(feed: any): void {
     console.log("Reporting feed:", feed.postId);
+    // (Reporting logic will be implemented in the Report Popup.)
   }
 
   // --- Report Popup Functions ---
+
   openReportPopup(feed: any): void {
     this.selectedFeedForReport = feed;
     this.selectedReportReason = "";
     this.reportPopupOpen = true;
+    this.reportSubmitted = false;
+    this.reportedFeed = feed;
   }
 
   closeReportPopup(): void {
     this.reportPopupOpen = false;
     this.selectedFeedForReport = null;
+    this.reportSubmitted = false;
+    this.selectedReportReason = "";
+    this.reportedFeed = null;
   }
 
   submitReport(): void {
@@ -414,11 +418,15 @@ export class FeedsComponent implements OnInit, OnDestroy {
     };
     this.feedService.reportPost(reportData).subscribe(
       () => {
-        this.closeReportPopup();
+        this.reportSubmitted = true;
+        // Optionally refresh feeds
         this.refreshFeeds();
+        setTimeout(() => {
+          this.closeReportPopup();
+        }, 3000);
       },
       (error) => {
-        console.error("Error reporting post", error);
+        console.error("Error reporting post:", error);
       }
     );
   }

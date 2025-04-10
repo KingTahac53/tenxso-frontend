@@ -380,40 +380,51 @@
     (click)="closeReportPopup()"
   ></div>
   <!-- Modal Content -->
-  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg z-50 w-80">
-    <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-black">
-      Report Post
-    </h2>
-    <p class="mb-4 text-gray-600 dark:text-gray-600">
-      Please select a reason for reporting this post:
-    </p>
-    <div class="space-y-2 mb-4">
-      <div *ngFor="let reason of reportReasons">
-        <label class="flex items-center cursor-pointer">
-          <input
-            type="radio"
-            name="reportReason"
-            [value]="reason"
-            [(ngModel)]="selectedReportReason"
-            class="mr-2"
-          />
-          <span class="text-gray-700 dark:text-gray-800">{{ reason }}</span>
-        </label>
-      </div>
-    </div>
-    <div class="flex justify-between">
-      <button
-        (click)="closeReportPopup()"
-        class="px-4 py-2 mr-2 rounded border text-gray-700 dark:text-gray-800"
-      >
-        Cancel
-      </button>
-      <button
-        (click)="submitReport()"
-        class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
-      >
+  <div
+    class="bg-white dark:bg-gray-800 p-6 rounded-lg text-center shadow-lg z-50 w-80"
+  >
+    <ng-container *ngIf="!reportSubmitted; else thankYouTemplate">
+      <h2 class="text-lg font-semibold mb-4 text-gray-800 dark:text-black">
         Report Post
-      </button>
-    </div>
+      </h2>
+      <p class="mb-4 text-gray-600 dark:text-gray-600">
+        Please select a reason for reporting this post:
+      </p>
+      <div class="space-y-2 mb-4">
+        <div *ngFor="let reason of reportReasons">
+          <label class="flex items-center cursor-pointer">
+            <input
+              type="radio"
+              name="reportReason"
+              [value]="reason"
+              [(ngModel)]="selectedReportReason"
+              class="mr-2"
+            />
+            <span class="text-gray-700 dark:text-gray-800">{{ reason }}</span>
+          </label>
+        </div>
+      </div>
+      <div class="flex justify-between">
+        <button
+          (click)="closeReportPopup()"
+          class="px-4 py-2 mr-2 rounded border text-gray-700 dark:text-gray-800"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="submitReport()"
+          class="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600"
+        >
+          Report Post
+        </button>
+      </div>
+    </ng-container>
+    <ng-template #thankYouTemplate>
+      <h2
+        class="text-lg font-semibold text-center mb-4 text-gray-800 dark:text-black"
+      >
+        Thank you for reporting.
+      </h2>
+    </ng-template>
   </div>
 </div>
