@@ -1,9 +1,11 @@
 <div class="edit-profile-container">
   <!-- Profile Section -->
-  <div class="profile-info">
+  <div class="profile-info mt-10">
     <h2 class="profile-header">Your Profile</h2>
     <img
-      src="{{ generatedUserData.profilePic }}"
+      [src]="
+        generatedUserData?.profilePic || 'assets/images/default-avatar.jpg'
+      "
       alt="Profile Picture"
       class="profile-pic"
     />
@@ -12,7 +14,7 @@
   </div>
   <div
     id="googleSignInDiv"
-    class="mt-2 border-0"
+    class="mt-2 w-full border-0"
     *ngIf="!signedIn || generatedUserData.isVerified !== 'true'"
   ></div>
   <!-- Development Message -->
