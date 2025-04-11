@@ -283,6 +283,8 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.chatId = null;
       this.receivedMessages = [];
     }
+    // Hide the sidebar on mobile view once a user is selected.
+    this.sidebarVisible = false;
   }
 
   toggleSidebar(): void {

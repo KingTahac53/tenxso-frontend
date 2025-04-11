@@ -7,7 +7,11 @@
       <div class="md:w-[360px] relative border-r dark:border-slate-200">
         <div
           id="side-chat"
-          class="top-0 left-0 max-md:fixed max-md:w-5/6 max-md:h-screen bg-white z-50 max-md:shadow max-md:-translate-x-full dark:bg-dark2"
+          class="fixed inset-y-0 left-0 w-5/6 max-w-[360px] bg-white z-50 shadow dark:bg-dark2 transition-transform duration-300 md:relative md:translate-x-0"
+          [ngClass]="{
+            '-translate-x-full': !sidebarVisible,
+            'translate-x-0': sidebarVisible
+          }"
         >
           <div class="p-4 border-b dark:border-slate-200">
             <div class="flex mt-2 items-center justify-between">
@@ -57,11 +61,14 @@
             </ng-template>
           </div>
         </div>
-        <!-- Mobile backdrop to toggle sidebar -->
+        <!-- Mobile Backdrop to toggle sidebar -->
         <div
-          id="side-chat"
-          class="bg-slate-100/40 backdrop-blur w-full h-full dark:bg-slate-800/40 z-40 fixed inset-0 max-md:-translate-x-full md:hidden"
-          uk-toggle="target: #side-chat ; cls: max-md:-translate-x-full"
+          class="fixed inset-0 bg-slate-800/40 backdrop-blur transition-opacity duration-300 md:hidden"
+          [ngClass]="{
+            'opacity-100': sidebarVisible,
+            'opacity-0 pointer-events-none': !sidebarVisible
+          }"
+          (click)="toggleSidebar()"
         ></div>
       </div>
 
@@ -73,13 +80,11 @@
             class="flex items-center justify-between gap-2 px-6 py-3.5 z-10 border-b dark:border-slate-200"
           >
             <div class="flex items-center sm:gap-4 gap-2">
-              <!-- Mobile toggle button -->
+              <!-- Mobile Back Button: visible only on mobile view -->
               <button type="button" class="md:hidden" (click)="toggleSidebar()">
-                <ion-icon
-                  name="chevron-back-outline"
-                  class="text-2xl -ml-4"
-                ></ion-icon>
+                <i class="fa fa-arrow-left text-2xl mr-2"></i>
               </button>
+              <!-- User Avatar: visible in desktop view -->
               <div class="relative cursor-pointer hidden md:block">
                 <img
                   [src]="
@@ -92,6 +97,7 @@
                   class="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"
                 ></div>
               </div>
+              <!-- Username -->
               <div class="cursor-pointer">
                 <div class="text-base font-bold">
                   {{ chat_with_username || "Select a User" }}
