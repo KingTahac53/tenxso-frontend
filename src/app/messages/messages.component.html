@@ -1,6 +1,6 @@
 <main class="2xl:ml-[--w-side] xl:ml-[--w-side-md] md:ml-[--w-side-small]">
   <div
-    class="2xl:max-w-6xl mx-auto h-screen relative shadow-lg overflow-hidden border1 max-md:pt-14"
+    class="2xl:max-w-6xl mx-auto h-full relative shadow-lg overflow-hidden border1 max-md:pt-14"
   >
     <div class="flex bg-white dark:bg-dark2">
       <!-- Chat Sidebar -->
@@ -170,7 +170,7 @@
                 <textarea
                   placeholder="Write your message"
                   rows="1"
-                  class="w-full resize-none bg-secondery rounded-full px-4 py-2 focus:outline-none"
+                  class="w-full resize-none bg-secondery border-2 rounded-full px-4 py-2 focus:outline-none"
                   [(ngModel)]="message"
                   name="message"
                   (keydown.enter)="onEnter($event)"
@@ -179,11 +179,10 @@
               </div>
               <button
                 type="button"
-                class="flex items-center justify-center p-2 bg-blue-500 rounded-full hover:bg-blue-600 transition-colors dark:bg-blue-700 dark:hover:bg-blue-800"
-                [disabled]="!chat_with_userId || isSendingMessage"
+                class="flex items-center justify-center p-2 rounded-full hover:bg-gray-300 transition-colors"
                 (click)="sendMessage()"
               >
-                <i class="fa fa-paper-plane text-white text-2xl"></i>
+                <i class="fa fa-paper-plane text-2xl"></i>
               </button>
             </div>
           </div>
