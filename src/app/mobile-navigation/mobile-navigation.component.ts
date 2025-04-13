@@ -57,6 +57,7 @@ export class MobileNavigationComponent implements OnInit {
         this.getDisplayName(this.generatedUserData),
         this.generatedUserData.profilePic
       );
+      this.getUser(userId, true);
       this.signedIn = true;
     } else {
       // If no persistent data exists, call generateAndStoreUser to create a new user.
@@ -121,6 +122,36 @@ export class MobileNavigationComponent implements OnInit {
     return user.username ? this.formatUsername(user.username) : "";
   }
 
+  getUser(userId: any, storePersistence: boolean) {
+    this.userService.getUser(userId).subscribe(
+      (response: any) => {
+        if (!response.userId) {
+          // If getUser returns no data, do nothing.
+          return;
+        } else {
+          this.generatedUserData = new UserData(
+            response.userId,
+            response.username,
+            response.firstname || "",
+            response.lastname || "",
+            response.profilePic,
+            response.isVerified.toString()
+          );
+          if (storePersistence) {
+            this.setPersistentData(this.generatedUserData);
+          }
+          const displayName = this.getDisplayName(this.generatedUserData);
+          this.sharedService.setUserInfo(
+            this.generatedUserData.userId,
+            displayName,
+            this.generatedUserData.profilePic
+          );
+          this.cd.detectChanges();
+        }
+      },
+      (error) => console.error("Error fetching user data:", error)
+    );
+  }
   generateAndStoreUser(storePersistence: boolean) {
     this.userService.generateUserId().subscribe(
       (response: any) => {
@@ -215,6 +246,7 @@ export class MobileNavigationComponent implements OnInit {
           this.generatedUserData = mappedUser;
           this.signedIn = true;
           this.profileDropdownOpen = false;
+          this.getUser(mappedUser.userId, true);
           this.cd.detectChanges();
         });
       },
