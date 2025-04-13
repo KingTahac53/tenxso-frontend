@@ -58,7 +58,8 @@ export class CreateComponent implements OnInit {
   ngOnInit(): void {
     this.userId = this.getCookie("userId");
     this.username = this.getCookie("username");
-    this.profilePic = this.getCookie("profilePic");
+    this.profilePic =
+      localStorage.getItem("profilePic") || this.getCookie("profilePic");
   }
 
   onFileSelected(event: any): void {
@@ -132,7 +133,12 @@ export class CreateComponent implements OnInit {
       formData.append("userId", userId);
       formData.append("userName", username);
       formData.append("fileName", this.selectedFile.name);
-      formData.append("caption", this.caption.length > 0 ? this.caption : "");
+
+      // Only append caption if it's not empty
+      if (this.caption && this.caption.length > 0) {
+        formData.append("caption", this.caption);
+      }
+
       if (this.profilePic) {
         formData.append("profilePic", this.profilePic);
       }
