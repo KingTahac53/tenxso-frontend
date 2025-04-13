@@ -64,6 +64,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
         this.generatedUserData.profilePic
       );
       this.signedIn = true;
+      this.getUser(userId, true);
     } else {
       // If no persistent data exists, call generateAndStoreUser to create a new user.
       this.generateAndStoreUser(true);
@@ -250,6 +251,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           this.generatedUserData = mappedUser;
           this.signedIn = true;
           this.profileDropdownOpen = false;
+          this.getUser(mappedUser.userId, true);
           this.cd.detectChanges();
         });
       },
