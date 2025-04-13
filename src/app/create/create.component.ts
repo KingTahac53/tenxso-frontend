@@ -132,10 +132,7 @@ export class CreateComponent implements OnInit {
       formData.append("userId", userId);
       formData.append("userName", username);
       formData.append("fileName", this.selectedFile.name);
-      formData.append(
-        "caption",
-        this.caption.length > 0 ? this.caption : "no caption"
-      );
+      formData.append("caption", this.caption.length > 0 ? this.caption : "");
       if (this.profilePic) {
         formData.append("profilePic", this.profilePic);
       }
