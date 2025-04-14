@@ -3,6 +3,7 @@ import { SharedService } from "../services/shared.service";
 import { UserData } from "../models/user-data.model";
 import { UserService } from "../services/user.service";
 import { environment } from "../environment";
+import { Router } from "@angular/router";
 
 declare const google: any;
 @Component({
@@ -11,6 +12,7 @@ declare const google: any;
   styleUrls: ["./edit-profile.component.css"],
 })
 export class EditProfileComponent implements OnInit {
+  profileImgError: boolean = false;
   generatedUserData: UserData = new UserData("", "", "", "", "", "false");
   profileDropdownOpen: boolean = false;
   signedIn: boolean = false;
@@ -21,7 +23,8 @@ export class EditProfileComponent implements OnInit {
     private sharedService: SharedService,
     // private signalRService: SignalRService,
     private ngZone: NgZone,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private router: Router
   ) {}
   ngOnInit(): void {
     // First, try to retrieve user data from persistent storage.
@@ -47,6 +50,7 @@ export class EditProfileComponent implements OnInit {
         profilePic,
         isVerified || "false"
       );
+      this.getUser(userId, true);
       this.sharedService.setUserInfo(
         this.generatedUserData.userId,
         this.getDisplayName(this.generatedUserData),
@@ -228,8 +232,11 @@ export class EditProfileComponent implements OnInit {
           );
           this.generatedUserData = mappedUser;
           this.signedIn = true;
+          this.getUser(mappedUser.userId, true);
           this.profileDropdownOpen = false;
           this.cd.detectChanges();
+          // Immediately redirect to the /feeds page after successful sign-in.
+          this.router.navigate(["/feeds"]);
         });
       },
       (error: any) => console.error("Error verifying Google token:", error)

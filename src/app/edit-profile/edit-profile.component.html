@@ -1,29 +1,51 @@
-<div class="edit-profile-container">
+<div
+  class="font-sans mx-auto my-5 max-w-[800px] bg-[#f9f9f9] rounded-[10px] shadow-[0px_4px_10px_rgba(0,0,0,0.1)] p-5 text-center"
+>
   <!-- Profile Section -->
-  <div class="profile-info mt-10">
-    <h2 class="profile-header">Your Profile</h2>
-    <img
-      [src]="
-        generatedUserData?.profilePic || 'assets/images/default-avatar.jpg'
+  <div class="mb-5 flex flex-col items-center">
+    <h2 class="text-[22px] font-bold text-[#333] mb-[15px]">Your Profile</h2>
+    <ng-container
+      *ngIf="
+        generatedUserData?.profilePic && !profileImgError;
+        else fallbackAvatar
       "
-      alt="Profile Picture"
-      class="profile-pic"
-    />
-    <!-- <p class="user-id">User ID: {{ userId }}</p> -->
-    <p class="username">Username: {{ generatedUserData.username }}</p>
+    >
+      <img
+        [src]="generatedUserData?.profilePic"
+        alt="Profile Picture"
+        class="h-[150px] w-[150px] rounded-full border-2 border-[#ddd] mb-[15px] mx-auto"
+        (error)="profileImgError = true"
+      />
+    </ng-container>
+    <ng-template #fallbackAvatar>
+      <div
+        class="h-[150px] w-[150px] rounded-full bg-gray-300 flex items-center justify-center text-5xl font-medium text-gray-700"
+      >
+        {{
+          generatedUserData?.username
+            ? generatedUserData.username.charAt(0).toUpperCase()
+            : "?"
+        }}
+      </div>
+    </ng-template>
+    <!-- <p>User ID: {{ userId }}</p> -->
+    <p class="text-[16px] text-[#555] my-[5px]">
+      Username: {{ generatedUserData.username }}
+    </p>
   </div>
   <div
     id="googleSignInDiv"
     class="mt-2 w-full border-0"
     *ngIf="!signedIn || generatedUserData.isVerified !== 'true'"
   ></div>
-  <!-- Development Message -->
-  <!-- <div class="development-message">
+  <!-- Development Message (currently commented out) -->
+  <!--
+  <div class="mt-5 text-[16px] text-[#777] italic bg-[#fff3cd] border border-[#ffeeba] p-2.5 rounded-[8px]">
     <p>
-      The Edit Profile functionality is under development and will be
-      available soon! Stay tuned.
-      Or Just add the code. Source Code in About Section.
+      The Edit Profile functionality is under development and will be available soon! Stay tuned.
+      Or just add the code. Source Code in About Section.
       Coding is easy and you are smart !!!
     </p>
-  </div> -->
+  </div>
+  -->
 </div>
