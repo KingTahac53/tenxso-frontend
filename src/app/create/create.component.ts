@@ -151,8 +151,8 @@ export class CreateComponent implements OnInit {
             );
           } else if (event.type === HttpEventType.Response) {
             this.uploadSuccess = true;
-            this.isUploading = false;
             setTimeout(() => {
+              this.isUploading = false;
               this.router.navigate(["/feeds"]);
             }, 3000);
           }
