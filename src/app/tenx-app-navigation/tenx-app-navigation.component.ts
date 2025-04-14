@@ -20,6 +20,7 @@ declare const google: any;
   templateUrl: "./tenx-app-navigation.component.html",
 })
 export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
+  profileImgError: boolean = false;
   generatedUserData: UserData = new UserData("", "", "", "", "", "false");
   profileDropdownOpen: boolean = false;
   signedIn: boolean = false;
