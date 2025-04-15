@@ -234,10 +234,11 @@
               >
                 <img
                   [src]="
-                    comment.userProfileUrl || 'assets/images/default-avatar.jpg'
+                    comment.userProfileUrl || './assets/default_profile.png'
                   "
                   alt="Commenter"
                   class="w-6 h-6 rounded-full"
+                  (error)="$event.target.src = './assets/default_profile.png'"
                 />
                 <div class="flex-1">
                   <div class="flex items-center justify-between">
