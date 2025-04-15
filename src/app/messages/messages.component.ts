@@ -24,6 +24,7 @@ import { exhaustMap } from "rxjs/operators";
 export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   feeds: Feed[] = [];
   pageNumber: number = 1;
+  profileImgError: boolean = false;
   loading: boolean = false;
   userId: any;
   username: any;

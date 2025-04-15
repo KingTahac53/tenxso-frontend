@@ -30,11 +30,10 @@
               >
                 <div class="relative w-14 h-14 shrink-0">
                   <img
-                    [src]="
-                      user.profilePicUrl || 'assets/img/default-avatar.png'
-                    "
+                    [src]="user.profilePicUrl || './assets/default_profile.png'"
                     alt="User"
                     class="object-cover w-full h-full rounded-full"
+                    (error)="$event.target.src = './assets/default_profile.png'"
                   />
                 </div>
                 <div class="flex-1 min-w-0">
@@ -87,15 +86,38 @@
               <!-- User Avatar: visible in desktop view -->
               <div class="relative cursor-pointer hidden md:block">
                 <img
-                  [src]="
-                    chat_with_profilepic || 'assets/img/default-avatar.png'
-                  "
+                  [src]="chat_with_profilepic || './assets/default_profile.png'"
                   alt="User"
-                  class="w-8 h-8 rounded-full shadow"
+                  class="w-10 h-10 rounded-full shadow"
+                  (error)="$event.target.src = './assets/default_profile.png'"
                 />
-                <div
+                <!-- <ng-container
+                  *ngIf="
+                    chat_with_profilepic && !profileImgError;
+                    else fallbackAvatar
+                  "
+                >
+                  <img
+                    [src]="chat_with_profilepic"
+                    alt="Profile Picture"
+                    class="w-8 h-8 rounded-full"
+                    (error)="profileImgError = true"
+                  />
+                </ng-container>
+                <ng-template #fallbackAvatar>
+                  <div
+                    class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-xs font-medium text-gray-700"
+                  >
+                    {{
+                      chat_with_username
+                        ? chat_with_username.charAt(0).toUpperCase()
+                        : ""
+                    }}
+                  </div>
+                </ng-template> -->
+                <!-- <div
                   class="w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px"
-                ></div>
+                ></div> -->
               </div>
               <!-- Username -->
               <div class="cursor-pointer">
