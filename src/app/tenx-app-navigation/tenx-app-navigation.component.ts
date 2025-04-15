@@ -229,6 +229,33 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     }
   }
 
+  pollForProfilePic(url: string, retryDelay: number = 2000): void {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
+      // Image loaded successfully, update the component state.
+      console.log("Profile image loaded successfully.");
+      this.profileImgError = false;
+      this.generatedUserData.profilePic = url;
+      this.sharedService.setUserInfo(
+        this.generatedUserData.userId,
+        this.getDisplayName(this.generatedUserData),
+        url
+      );
+      this.cd.detectChanges();
+    };
+    img.onerror = () => {
+      // Image didn't load, try again after a delay with a new cache-busting timestamp.
+      console.log("Profile image failed to load, retrying...");
+      setTimeout(() => {
+        const newUrl = url.split("?")[0] + "?t=" + new Date().getTime();
+        this.generatedUserData.profilePic = newUrl;
+        this.cd.detectChanges();
+        this.pollForProfilePic(newUrl, retryDelay);
+      }, retryDelay);
+    };
+  }
+
   handleCredentialResponse(response: any): void {
     console.log("Google JWT token:", response.credential);
     this.userService.verifyGoogleToken(response.credential).subscribe(
@@ -263,6 +290,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
           this.profileDropdownOpen = false;
           this.getUser(mappedUser.userId, true);
           this.cd.detectChanges();
+          this.pollForProfilePic(this.generatedUserData.profilePic);
         });
       },
       (error: any) => console.error("Error verifying Google token:", error)
