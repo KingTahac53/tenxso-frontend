@@ -318,9 +318,10 @@
             <!-- Add Comment Input -->
             <div class="sm:px-4 sm:py-3 p-2.5 flex items-center gap-2">
               <img
-                [src]="profilePic || 'assets/images/default-avatar.jpg'"
+                [src]="profilePic || './assets/default_profile.png'"
                 alt="Your Avatar"
                 class="w-6 h-6 rounded-full"
+                (error)="$event.target.src = './assets/default_profile.png'"
               />
               <div class="flex-1">
                 <textarea
