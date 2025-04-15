@@ -10,7 +10,7 @@ import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { FeedService } from "../services/feed.service";
 import { SharedService } from "../services/shared.service";
-import { SignalRService } from "../services/signal-r.service";
+// import { SignalRService } from "../services/signal-r.service";
 import { ChatService } from "../services/chat.service";
 import { Feed } from "../models/feed.model";
 import { interval, Subscription } from "rxjs";
@@ -49,7 +49,7 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   constructor(
     private feedService: FeedService,
     private sharedService: SharedService,
-    private signalRService: SignalRService,
+    // private signalRService: SignalRService,
     private chatService: ChatService,
     private router: Router,
     private dialog: MatDialog

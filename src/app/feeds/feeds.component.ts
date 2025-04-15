@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import { MatDialog } from "@angular/material/dialog";
 import { FeedService } from "../services/feed.service";
 import { SharedService } from "../services/shared.service";
-import { SignalRService } from "../services/signal-r.service";
+// import { SignalRService } from "../services/signal-r.service";
 import videojs from "video.js";
 
 type VideoJsPlayer = ReturnType<typeof videojs>;
@@ -42,7 +42,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
   constructor(
     private feedService: FeedService,
     private sharedService: SharedService,
-    private signalRService: SignalRService,
+    // private signalRService: SignalRService,
     private dialog: MatDialog,
     private router: Router
   ) {}
@@ -229,7 +229,7 @@ export class FeedsComponent implements OnInit, OnDestroy {
     this.sharedService.getProfilePic().subscribe((pic) => {
       formData.append("UserProfileUrl", pic as string);
     });
-    this.signalRService.sendBellCount(feed.authorId, "1");
+    // this.signalRService.sendBellCount(feed.authorId, "1");
     this.feedService.likeUnlikePost(formData).subscribe(
       () => {},
       (error) => console.error("Error liking/unliking post:", error)

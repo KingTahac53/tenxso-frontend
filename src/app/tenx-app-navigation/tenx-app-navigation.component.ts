@@ -7,7 +7,7 @@ import {
 } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { SharedService } from "../services/shared.service";
-import { SignalRService } from "../services/signal-r.service";
+// import { SignalRService } from "../services/signal-r.service";
 import { UserService } from "../services/user.service";
 import { UserData } from "../models/user-data.model";
 import { environment } from "../environment";
@@ -30,7 +30,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
     private userService: UserService,
     private dialog: MatDialog,
     private sharedService: SharedService,
-    private signalRService: SignalRService,
+    // private signalRService: SignalRService,
     private ngZone: NgZone,
     private cd: ChangeDetectorRef
   ) {}
@@ -70,9 +70,9 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
       // If no persistent data exists, call generateAndStoreUser to create a new user.
       this.generateAndStoreUser(true);
     }
-    this.signalRService.notificationCounter.subscribe((resp) => {
-      this.notificationCounter += Number(resp);
-    });
+    // this.signalRService.notificationCounter.subscribe((resp) => {
+    //   this.notificationCounter += Number(resp);
+    // });
   }
 
   ngAfterViewInit(): void {
@@ -242,7 +242,16 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
             userData.profilePic,
             userData.isVerified.toString()
           );
+          // Append a timestamp to bust browser cache
+          const timestamp = new Date().getTime();
+          mappedUser.profilePic = mappedUser.profilePic + "?t=" + timestamp;
+
+          // Save the updated user data in persistent storage
           this.setPersistentData(mappedUser);
+
+          // Reset the error flag so the image can be loaded afresh
+          this.profileImgError = false;
+
           const displayName = this.getDisplayName(mappedUser);
           this.sharedService.setUserInfo(
             mappedUser.userId,
