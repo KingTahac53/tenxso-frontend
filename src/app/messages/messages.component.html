@@ -13,7 +13,7 @@
             'translate-x-0': sidebarVisible
           }"
         >
-          <div class="mt-10 sm:mt-0 px-4 py-3.5 border-b dark:border-slate-200">
+          <div class="mt-10 sm:mt-0 px-4 py-4 border-b dark:border-slate-200">
             <div class="flex items-center justify-between">
               <h2 class="text-2xl font-bold text-black ml-1 dark:text-white">
                 Chats
@@ -88,7 +88,7 @@
                 <img
                   [src]="chat_with_profilepic || './assets/default_profile.png'"
                   alt="User"
-                  class="w-10 h-10 rounded-full shadow"
+                  class="w-11 h-11 rounded-full shadow"
                   (error)="$event.target.src = './assets/default_profile.png'"
                 />
                 <!-- <ng-container
