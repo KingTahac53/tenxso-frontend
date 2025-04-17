@@ -32,6 +32,44 @@
     <p class="text-[16px] text-[#555] my-[5px]">
       Username: {{ generatedUserData.username }}
     </p>
+    <div class="flex flex-col items-start justify-center">
+      <!-- About Us -->
+      <a
+        routerLink="/about"
+        class="flex items-center p-2 hover:bg-gray-100 rounded"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+          class="w-6 h-6"
+        >
+          <path
+            d="M8 16.016a7.5 7.5 0 0 0 1.962-14.74A1 1 0 0 0 9 0H7a1 1 0 0 0-.962 1.276A7.5 7.5 0 0 0 8 16.016zM14.5 8.516a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"
+          />
+          <path d="m6.94 7.44 4.95-2.83-2.83 4.95-4.949 2.83 2.828-4.95z" />
+        </svg>
+        <span class="max-sm:hidden ml-4">About Us</span>
+      </a>
+
+      <!-- External Links -->
+      <a
+        href="https://github.com/socialnotebooks"
+        target="_blank"
+        class="flex items-center p-2 hover:bg-gray-100 rounded"
+      >
+        <i class="fab fa-github text-xl mr-2"></i>
+        <span class="max-sm:hidden ml-4">Source Code</span>
+      </a>
+      <a
+        href="https://www.linkedin.com/in/manish-pardeshi-069417133/"
+        target="_blank"
+        class="flex items-center p-2 hover:bg-gray-100 rounded"
+      >
+        <i class="fab fa-linkedin text-xl mr-2"></i>
+        <span class="max-sm:hidden ml-4">Follow on LinkedIn</span>
+      </a>
+    </div>
   </div>
   <div
     id="googleSignInDiv"
