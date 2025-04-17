@@ -7,7 +7,7 @@
       <div class="md:w-[360px] relative border-r dark:border-slate-200">
         <div
           id="side-chat"
-          class="fixed inset-y-0 left-0 w-full max-w-[360px] bg-white z-50 shadow dark:bg-dark2 transition-transform duration-300 md:relative md:translate-x-0"
+          class="fixed inset-y-0 left-0 w-full max-w-[80%] sm:max-w-[360px] bg-white z-50 shadow dark:bg-dark2 transition-transform duration-300 md:relative md:translate-x-0"
           [ngClass]="{
             '-translate-x-full': !sidebarVisible,
             'translate-x-0': sidebarVisible
@@ -21,7 +21,7 @@
             </div>
           </div>
           <!-- Chat Users List -->
-          <div class="space-y-2 p-2 overflow-y-auto h-[calc(100vh-127px)]">
+          <div class="space-y-2 p-2 overflow-y-auto h-[calc(100vh-120px)]">
             <ng-container *ngIf="chatList && chatList.length > 0; else noChats">
               <div
                 *ngFor="let user of chatList"
