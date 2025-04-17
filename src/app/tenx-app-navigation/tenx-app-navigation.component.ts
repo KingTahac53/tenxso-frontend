@@ -266,7 +266,7 @@ export class TenxAppNavigationComponent implements OnInit, AfterViewInit {
             userData.username,
             userData.firstname || "",
             userData.lastname || "",
-            userData.profilePic,
+            userData.profilePicUrl,
             userData.isVerified.toString()
           );
           // Append a timestamp to bust browser cache
