@@ -27,15 +27,17 @@ jobs:
 
       - name: Mirror from source to target (ignore vanished files)
         run: |
-          set -o pipefail
-          # rsync will return code 24 if files vanished mid‑transfer, which we treat as a non‑fatal warning
-          rsync -av --delete ./ ./frontend/ 2>&1 | grep -v "vanished"
-          code=$?
-          if [ $code -eq 24 ]; then
-            echo "Notice: rsync exit code 24 (vanished files), continuing"
-            exit 0
-          fi
-          exit $code
+          # Fail on any non‑zero except 24
+          rsync -av --delete ./ ./frontend/ || {
+            code=$?
+            if [ $code -eq 24 ]; then
+              echo "Notice: rsync exit code 24 (vanished files)—continuing"
+              exit 0
+            else
+              echo "rsync failed with exit code $code"
+              exit $code
+            fi
+          }
 
       - name: Configure Git
         working-directory: frontend
