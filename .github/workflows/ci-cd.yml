@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: write # allow repo write via GITHUB_TOKEN
+  contents: write # allow same‐repo operations with GITHUB_TOKEN
 
 jobs:
   replicate:
@@ -15,7 +15,7 @@ jobs:
       - name: Checkout Source Repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # fetch full history if needed
+          fetch-depth: 0
 
       - name: Checkout Target Repository
         uses: actions/checkout@v3
@@ -25,9 +25,16 @@ jobs:
           path: frontend
           fetch-depth: 0
 
-      - name: Mirror from source to target
+      - name: Mirror from source to target (ignore vanished)
         run: |
-          rsync -av --delete ./ ./frontend/
+          set -o pipefail
+          rsync -av --delete ./ ./frontend/ 2>&1 | grep -v "vanished"
+          code=$?
+          if [ $code -eq 24 ]; then
+            echo "Notice: rsync exit code 24 (vanished), continuing"
+            exit 0
+          fi
+          exit $code
 
       - name: Configure Git
         working-directory: frontend
@@ -39,6 +46,5 @@ jobs:
         working-directory: frontend
         run: |
           git add .
-          # Only commit & push if there are changes
           git diff --quiet && git diff --staged --quiet || \
             (git commit -m "chore: sync from source repo" && git push origin main --force)
