@@ -5,26 +5,40 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write # allow repo write via GITHUB_TOKEN
+
 jobs:
   replicate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # fetch full history if needed
 
-      - name: Set up Git Config
-        run: |
-          git config --global user.name "${{ secrets.GIT_USER_NAME }}"
-          git config --global user.email "${{ secrets.GIT_USER_EMAIL }}"
+      - name: Checkout Target Repository
+        uses: actions/checkout@v3
+        with:
+          repository: socialnotebooks/socialnotebooks-frontend
+          token: ${{ secrets.SOCIALNOTEBOOKS_TOKEN }}
+          path: frontend
+          fetch-depth: 0
 
-      - name: Add Target Repository Remote
-        env:
-          TOKEN: ${{ secrets.SOCIALNOTEBOOKS_TOKEN }}
+      - name: Mirror from source to target
         run: |
-          # Add the target repository as a new remote named "target"
-          git remote add target https://$TOKEN@github.com/socialnotebooks/socialnotebooks-frontend.git
+          rsync -av --delete ./ ./frontend/
 
-      - name: Push to Target Repository
+      - name: Configure Git
+        working-directory: frontend
         run: |
-          # Push the code to the main branch of the target repository
-          git push target main --force
+          git config user.name  "${{ secrets.GIT_USER_NAME }}"
+          git config user.email "${{ secrets.GIT_USER_EMAIL }}"
+
+      - name: Commit & Push to Target
+        working-directory: frontend
+        run: |
+          git add .
+          # Only commit & push if there are changes
+          git diff --quiet && git diff --staged --quiet || \
+            (git commit -m "chore: sync from source repo" && git push origin main --force)
