@@ -157,15 +157,16 @@
                       : 'flex justify-start'
                   "
                 >
-                  <div
+                  <pre
                     [ngClass]="
                       msg.type === 'reply'
-                        ? 'px-4 py-2 rounded-xl max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow'
-                        : 'px-4 py-2 rounded-xl max-w-sm bg-gray-200 text-gray-800 shadow'
+                        ? 'px-4 py-2 rounded-xl max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow whitespace-pre-wrap break-words'
+                        : 'px-4 py-2 rounded-xl max-w-sm bg-gray-200 text-gray-800 shadow whitespace-pre-wrap break-words'
                     "
                   >
-                    {{ msg.message }}
-                  </div>
+                {{ msg.message }}
+              </pre
+                  >
                 </div>
                 <div
                   [ngClass]="msg.type === 'reply' ? 'text-right' : 'text-left'"
